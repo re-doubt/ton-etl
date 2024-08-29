@@ -1,0 +1,3 @@
+[submodule "ton-indexer"]
+	path = ton-indexer
+	url = https://github.com/re-doubt/ton-indexer.git
