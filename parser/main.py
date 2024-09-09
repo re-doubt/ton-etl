@@ -30,6 +30,10 @@ if __name__ == "__main__":
     successful = 0
     PARSERS = generate_parsers(None)
     for msg in consumer:
+        __op = msg.get('__op', None)
+        if __op == 'd': # ignore deletes
+            continue
+
         total += 1
         handled = 0
         for parser in PARSERS.get(msg.topic, []):
