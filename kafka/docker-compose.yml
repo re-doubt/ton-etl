@@ -1,34 +1,69 @@
+version: '3.9'
+
 services:
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    depends_on:
-      - zookeeper
+  postgres:
+    image: debezium/postgres:16-alpine
     ports:
-      - "9092:9092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      CLUSTER_ID: dMBsElNTT3S8SZF_EsSxfQ
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      - 5432:5432
     volumes:
-      - ./kafka:/var/lib/kafka/data
+      - ./postgresdb:/var/lib/postgresql/data
+    command: postgres -c max_connections=1024 -c shared_buffers=32GB -c work_mem=8GB -c max_wal_size=16GB -c tcp_keepalives_idle=60 -c tcp_keepalives_interval=60 -c tcp_keepalives_count=60 -c shared_preload_libraries=decoderbufs -c wal_level=logical -c max_wal_senders=1 -c max_replication_slots=1 -c max_connections=2048
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    shm_size: 16G
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=postgres
+    logging:
+      driver: local
+      options:
+        max-size: 1G
+  cdc-using-debezium-kafka:
+    image: bitnami/kafka:3.4
+    container_name: cdc-using-debezium-kafka
+    volumes:
+      - ./kafka:/bitnami/kafka
+    hostname: cdc-using-debezium-kafka
+    restart: always
+    ports:
+      - '9092:9092'
+    environment:
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_KRAFT_CLUSTER_ID: ${KAFKA_UUID} # base64 UUID
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      KAFKA_CFG_LISTENERS: INTERNAL://cdc-using-debezium-kafka:29092,CONTROLLER://cdc-using-debezium-kafka:29093,EXTERNAL://0.0.0.0:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: INTERNAL://cdc-using-debezium-kafka:29092,EXTERNAL://localhost:9092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@cdc-using-debezium-kafka:29093
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  cdc-using-debezium-connect:
+    image: debezium/connect:2.3
+    container_name: cdc-using-debezium-connect
+    hostname: cdc-using-debezium-connect
+    restart: always
+    ports:
+      - '8083:8083'
+    environment:
+      BOOTSTRAP_SERVERS: cdc-using-debezium-kafka:29092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      STATUS_STORAGE_TOPIC: my_connect_statuses
+      ENABLE_DEBEZIUM_SCRIPTING: 'true'
+      CONNECT_CONNECTOR_CLIENT_CONFIG_OVERRIDE_POLICY: 'true'
+    links:
+      - cdc-using-debezium-kafka
+      - postgres
   kafdrop:
     image: obsidiandynamics/kafdrop:latest
     ports:
       - 9000:9000
     depends_on:
-      - kafka
+      - cdc-using-debezium-kafka
     environment:
-      KAFKA_BROKERCONNECT: kafka:9092
-networks:
-  default:
-    name: ton-indexer_default
-    external: true
+      KAFKA_BROKERCONNECT: cdc-using-debezium-kafka:29092
