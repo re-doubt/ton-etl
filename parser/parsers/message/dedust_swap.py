@@ -61,6 +61,3 @@ class DedustSwap(Parser):
             referral_address=referral_addr
         )
         db.serialize(swap)
-
-        # logger.info(f"Lalal: {cell}")
-        # raise
