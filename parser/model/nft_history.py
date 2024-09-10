@@ -1,5 +1,23 @@
 from dataclasses import dataclass
 
+"""
+CREATE TABLE parsed.nft_history (
+	tx_hash bpchar(44) not NULL,
+    utime int8 NULL,
+    tx_lt int8 NULL,
+    event_type nft_history_event not NULL,
+	nft_item_address varchar NULL,
+	collection_address varchar NULL,
+	sale_address varchar NULL,
+	code_hash varchar NULL,
+	marketplace varchar NULL,
+	current_owner varchar NULL,
+	new_owner varchar NULL,
+	price numeric NULL,
+    is_auction bool NULL,
+	CONSTRAINT nft_history_tx_hash_key PRIMARY KEY (tx_hash)
+);
+"""
 
 @dataclass
 class NftHistory:

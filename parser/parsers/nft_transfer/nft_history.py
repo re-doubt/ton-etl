@@ -74,9 +74,9 @@ class NftHistoryParser(Parser):
             event_type = NftHistory.EVENT_TYPE_TRANSFER
 
         nft_history = NftHistory(
-            tx_hash=obj.get("tx_hash"),
-            utime=obj.get("tx_now"),
-            tx_lt=obj.get("tx_lt"),
+            tx_hash=Parser.require(obj.get('tx_hash', None)),
+            utime=Parser.require(obj.get("tx_now")),
+            tx_lt=Parser.require(obj.get("tx_lt")),
             event_type=event_type,
             nft_item_address=obj.get("nft_item_address"),
             collection_address=obj.get("nft_collection_address"),
