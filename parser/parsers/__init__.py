@@ -1,9 +1,11 @@
 from typing import Dict, List, Set
 from parsers.message.dedust_swap import DedustSwap
+from parsers.nft_transfer.nft_history import NftHistoryParser
 from model.parser import Parser
 
 _parsers = [
-    DedustSwap()
+    DedustSwap(),
+    NftHistoryParser(),
 ]
 
 """

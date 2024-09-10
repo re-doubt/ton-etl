@@ -11,7 +11,7 @@ from parsers import generate_parsers
 
 if __name__ == "__main__":
     group_id = os.environ.get("KAFKA_GROUP_ID")
-    topics = os.environ.get("KAFKA_TOPICS", "ton.public.latest_account_states,ton.public.messages")
+    topics = os.environ.get("KAFKA_TOPICS", "ton.public.latest_account_states,ton.public.messages,ton.public.nft_transfers")
     log_interval = int(os.environ.get("LOG_INTERVAL", '10'))
     db = DB()
 

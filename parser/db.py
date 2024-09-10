@@ -26,6 +26,43 @@ class DB():
         finally:
             self.pool.putconn(conn)
 
+    def get_account_code_hash(self, address: str) -> str:
+        conn = self.pool.getconn()
+        try:
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute("select code_hash from latest_account_states where address = %s", (address,))
+                res = cursor.fetchone()
+                if not res:
+                    return None
+                return res['code_hash']
+
+        finally:
+            self.pool.putconn(conn)
+
+    def get_nft_sale(self, address: str) -> dict:
+        conn = self.pool.getconn()
+        try:
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(
+                    """
+                    select address, marketplace_address as marketplace, nft_owner_address as owner, 
+                    full_price as price, false as is_auction
+                    from getgems_nft_sales where address = %s
+                    union
+                    select address, mp_addr as marketplace, nft_owner as owner, 
+                    last_bid as price, true as is_auction
+                    from getgems_nft_auctions where address = %s
+                    """, 
+                    (address, address),
+                )
+                res = cursor.fetchone()
+                if not res:
+                    return None
+                return res
+
+        finally:
+            self.pool.putconn(conn)
+
     def serialize(self, obj):
         table = obj.__tablename__
         conn = self.pool.getconn()

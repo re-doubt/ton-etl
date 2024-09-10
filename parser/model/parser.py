@@ -6,6 +6,7 @@ from db import DB
 
 
 TOPIC_MESSAGES = "ton.public.messages"
+TOPIC_NFT_TRANSFERS = "ton.public.nft_transfers"
 
 """
 Base class for parser
