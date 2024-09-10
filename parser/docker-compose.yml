@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  parser:
+    build: ./
+    restart: always
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+networks:
+  default:
+    name: data_default
+    external: true
