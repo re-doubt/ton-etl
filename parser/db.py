@@ -26,19 +26,6 @@ class DB():
         finally:
             self.pool.putconn(conn)
 
-    def get_account_code_hash(self, address: str) -> str:
-        conn = self.pool.getconn()
-        try:
-            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-                cursor.execute("select code_hash from latest_account_states where address = %s", (address,))
-                res = cursor.fetchone()
-                if not res:
-                    return None
-                return res['code_hash']
-
-        finally:
-            self.pool.putconn(conn)
-
     def get_nft_sale(self, address: str) -> dict:
         conn = self.pool.getconn()
         try:
