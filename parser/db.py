@@ -46,18 +46,16 @@ class DB():
                 cursor.execute(
                     """
                     select address, marketplace_address as marketplace, nft_owner_address as owner, 
-                    full_price as price, false as is_auction
+                    full_price as price, false as is_auction, code_hash
                     from getgems_nft_sales where address = %s
                     union
                     select address, mp_addr as marketplace, nft_owner as owner, 
-                    last_bid as price, true as is_auction
+                    last_bid as price, true as is_auction, code_hash
                     from getgems_nft_auctions where address = %s
                     """, 
                     (address, address),
                 )
                 res = cursor.fetchone()
-                if not res:
-                    return None
                 return res
 
         finally:
