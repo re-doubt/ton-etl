@@ -45,6 +45,8 @@ class DedustSwap(Parser):
         payload = cell.load_ref().begin_parse()
         sender_addr = payload.load_address()
         referral_addr = payload.load_address()
+        reserve0 = payload.load_coins()
+        reserve1 = payload.load_coins()
 
         swap = DexSwapParsed(
             tx_hash=Parser.require(obj.get('tx_hash', None)),
@@ -58,6 +60,8 @@ class DedustSwap(Parser):
             swap_dst_token=asset_out,
             swap_src_amount=amount_in,
             swap_dst_amount=amount_out,
-            referral_address=referral_addr
+            referral_address=referral_addr,
+            reserve0=reserve0,
+            reserve1=reserve1
         )
         db.serialize(swap)

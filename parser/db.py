@@ -38,6 +38,37 @@ class DB():
             if not res:
                 return None
             return res['body']
+    
+    """
+    Returns jetton master
+    """
+    def get_wallet_master(self, jetton_wallet: Address) -> str:
+        assert self.conn is not None
+        assert type(jetton_wallet) == Address
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("select jetton from jetton_wallets jw where address = %s",
+                           (jetton_wallet.to_str(is_user_friendly=False).upper(), ))
+            res = cursor.fetchone()
+            if not res:
+                return None
+            return res['jetton']
+        
+    """
+    Returns message body for the parent message
+    """
+    def get_parent_message_body(self, msg_hash) -> str:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("""
+                           select mc.body from trace_edges te
+                            join messages m on m.tx_hash = te.left_tx and m.direction ='in'
+                            join message_contents mc on mc.hash = m.body_hash 
+                            where te.msg_hash = %s
+                           """, (msg_hash, ))
+            res = cursor.fetchone()
+            if not res:
+                return None
+            return res['body']
 
     def get_nft_sale(self, address: str) -> dict:
         assert self.conn is not None
@@ -56,6 +87,20 @@ class DB():
             )
             res = cursor.fetchone()
             return res
+        
+    def is_tx_successful(self, tx_hash: str) -> dict:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                select compute_exit_code, action_result_code from transactions where hash = %s
+                """, 
+                (tx_hash,),
+            )
+            res = cursor.fetchone()
+            if not res:
+                return None
+            return res['compute_exit_code'] == 0 and res['action_result_code'] == 0
 
     def serialize(self, obj):
         table = obj.__tablename__
@@ -73,6 +118,10 @@ class DB():
                 values.append(v)
                 placeholders.append('%s')
             # TODO add support for upsert
+            names.append('created')
+            names.append('updated')
+            placeholders.append('now()')
+            placeholders.append('now()')
             cursor.execute(f"""
                 insert into parsed.{table}({",".join(names)}) values ({",".join(placeholders)})
                 on conflict do nothing
