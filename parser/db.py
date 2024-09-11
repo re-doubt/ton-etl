@@ -127,3 +127,35 @@ class DB():
                 on conflict do nothing
                             """, tuple(values))
             self.updated += 1
+
+    def insert_core_price(self, asset, price, obj):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(f"""
+                insert into prices.core(tx_hash, lt, asset, price, price_ts, created, updated)
+                           values(%s, %s, %s, %s, %s, now(), now())
+                on conflict (tx_hash) do update 
+                           set tx_hash = EXCLUDED.tx_hash,
+                           lt = EXCLUDED.lt,
+                           asset = EXCLUDED.asset,
+                           price = EXCLUDED.price,
+                           price_ts = EXCLUDED.price_ts,
+                           updated = now()
+                            """, (obj.get('last_trans_hash'), obj.get('last_trans_lt'), asset,
+                                  price, obj.get('timestamp')))
+            self.updated += 1
+
+    def get_core_price(self, asset: str, timestamp: int) -> float:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                select price from prices.core where asset = %s
+                and price_ts < %s order by price_ts desc limit 1
+                """, 
+                (asset, timestamp),
+            )
+            res = cursor.fetchone()
+            if not res:
+                return None
+            return float(res['price'])

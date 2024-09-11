@@ -22,7 +22,7 @@ if __name__ == "__main__":
     consumer = KafkaConsumer(
             group_id=group_id,
             bootstrap_servers=os.environ.get("KAFKA_BROKER"),
-            auto_offset_reset='earliest',
+            auto_offset_reset=os.environ.get("KAFKA_OFFSET_RESET", 'earliest'),
             enable_auto_commit=False
             )
     for topic in topics.split(","):

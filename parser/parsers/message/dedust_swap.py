@@ -3,6 +3,7 @@ from loguru import logger
 from db import DB
 from pytoniq_core import Cell, Address
 from model.dexswap import DexSwapParsed
+from parsers.message.swap_volume import estimate_volume
 
 
 # twin non-stable pools to avoid wrong prices estimation
@@ -64,4 +65,5 @@ class DedustSwap(Parser):
             reserve0=reserve0,
             reserve1=reserve1
         )
+        estimate_volume(swap, db)
         db.serialize(swap)
