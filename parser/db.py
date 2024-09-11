@@ -3,6 +3,8 @@ from psycopg2.extras import RealDictCursor
 from pytoniq_core import Address
 from dataclasses import asdict
 from loguru import logger
+import json
+from dataclasses import dataclass
 
 class DB():
     def __init__(self):
@@ -159,3 +161,22 @@ class DB():
             if not res:
                 return None
             return float(res['price'])
+        
+    # for debugging purposese
+    def get_messages_for_processing(self, tx_hash):
+        @dataclass
+        class FakeRecord:
+            value: any
+            topic: str
+
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                select * from messages where tx_hash = %s
+                """, 
+                (tx_hash,),
+            )
+            return list(map(lambda x: FakeRecord(value=json.dumps(dict(x)).encode('utf-8'), topic="ton.public.messages"),
+                            cursor.fetchall()))
+        
