@@ -39,25 +39,25 @@ def estimate_volume(swap: DexSwapParsed, db: DB):
     if swap_src_token in STABLES:
         volume_usd = swap.swap_src_amount / 1e6
         volume_ton = volume_usd / ton_price
-    if swap_dst_token in STABLES:
+    elif swap_dst_token in STABLES:
         volume_usd = swap.swap_dst_amount / 1e6
         volume_ton = volume_usd / ton_price
 
-    if swap_src_token in TONS:
+    elif swap_src_token in TONS:
         volume_ton = swap.swap_src_amount / 1e9
         volume_usd = volume_ton * ton_price
-    if swap_dst_token in TONS:
+    elif swap_dst_token in TONS:
         volume_ton = swap.swap_dst_amount / 1e9
         volume_usd = volume_ton * ton_price
 
-    if swap_src_token in LSDS:
+    elif swap_src_token in LSDS:
         lsd_price = db.get_core_price(swap_src_token, swap.swap_utime)
         if not lsd_price:
             logger.warning(f"No price for {swap_src_token} for {swap.swap_utime}")
             return
         volume_ton = swap.swap_src_amount / 1e9 * lsd_price
         volume_usd = volume_ton * ton_price
-    if swap_dst_token in TONS:
+    elif swap_dst_token in TONS:
         lsd_price = db.get_core_price(swap_dst_token, swap.swap_utime)
         if not lsd_price:
             logger.warning(f"No price for {swap_dst_token} for {swap.swap_utime}")
