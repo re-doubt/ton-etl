@@ -20,6 +20,9 @@ class NftHistoryParser(Parser):
         return True
 
     def handle_internal(self, obj: dict, db: DB):
+        if obj.get("tx_aborted"):
+            return
+
         current_owner_sale = db.get_nft_sale(obj.get("old_owner"))
         if not current_owner_sale:
             # TODO Add handler for not parsed sales
