@@ -34,8 +34,13 @@ if __name__ == "__main__":
     total = 0
     successful = 0
     PARSERS = generate_parsers(None if supported_parsers == '*' else set(supported_parsers.split(",")))
-    for msg in consumer:
+    generator = consumer
+    if os.environ.get("PROCESS_ONE_HASH"):
+        generator = db.get_messages_for_processing(os.environ.get("PROCESS_ONE_HASH"))
+    # for msg in consumer:
+    for msg in generator:
         try:
+            
             total += 1
             handled = 0
             obj = json.loads(msg.value.decode("utf-8"))
