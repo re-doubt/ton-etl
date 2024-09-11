@@ -5,6 +5,7 @@ from model.dexswap import DexSwapParsed
 from db import DB
 from loguru import logger
 from model.parser import Parser
+from pytoniq_core import Address
 
 USDT = Parser.uf2raw('EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs')
 jUSDT = Parser.uf2raw('EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA')
@@ -28,31 +29,38 @@ def estimate_volume(swap: DexSwapParsed, db: DB):
         logger.warning(f"No TON price found for {swap.swap_utime}")
         return
     ton_price = ton_price * 1e3 # normalize on decimals difference
-    if swap.swap_src_token in STABLES:
+    def normalize_addr(a):
+        if type(a) == Address:
+            return a.to_str(is_user_friendly=False).upper()
+        else:
+            return a
+    swap_src_token = normalize_addr(swap.swap_src_token)
+    swap_dst_token = normalize_addr(swap.swap_dst_token)
+    if swap_src_token in STABLES:
         volume_usd = swap.swap_src_amount / 1e6
         volume_ton = volume_usd / ton_price
-    if swap.swap_dst_token in STABLES:
+    if swap_dst_token in STABLES:
         volume_usd = swap.swap_dst_amount / 1e6
         volume_ton = volume_usd / ton_price
 
-    if swap.swap_src_token in TONS:
+    if swap_src_token in TONS:
         volume_ton = swap.swap_src_amount / 1e9
         volume_usd = volume_ton * ton_price
-    if swap.swap_dst_token in TONS:
+    if swap_dst_token in TONS:
         volume_ton = swap.swap_dst_amount / 1e9
         volume_usd = volume_ton * ton_price
 
-    if swap.swap_src_token in LSDS:
-        lsd_price = db.get_core_price(swap.swap_src_token, swap.swap_utime)
+    if swap_src_token in LSDS:
+        lsd_price = db.get_core_price(swap_src_token, swap.swap_utime)
         if not lsd_price:
-            logger.warning(f"No price for {swap.swap_src_token} for {swap.swap_utime}")
+            logger.warning(f"No price for {swap_src_token} for {swap.swap_utime}")
             return
         volume_ton = swap.swap_src_amount / 1e9 * lsd_price
         volume_usd = volume_ton * ton_price
-    if swap.swap_dst_token in TONS:
-        lsd_price = db.get_core_price(swap.swap_dst_token, swap.swap_utime)
+    if swap_dst_token in TONS:
+        lsd_price = db.get_core_price(swap_dst_token, swap.swap_utime)
         if not lsd_price:
-            logger.warning(f"No price for {swap.swap_dst_token} for {swap.swap_utime}")
+            logger.warning(f"No price for {swap_dst_token} for {swap.swap_utime}")
             return
         volume_ton = swap.swap_dst_amount / 1e9 * lsd_price
         volume_usd = volume_ton * ton_price
