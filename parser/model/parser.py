@@ -6,6 +6,7 @@ from db import DB
 
 
 TOPIC_MESSAGES = "ton.public.messages"
+TOPIC_ACCOUNT_STATES = "ton.public.latest_account_states"
 TOPIC_NFT_TRANSFERS = "ton.public.nft_transfers"
 
 """

@@ -1,15 +1,52 @@
 version: '3.9'
 
 services:
-  parser:
+  parser_nft:
     build: ./
     restart: always
+    environment:
+      - KAFKA_GROUP_ID=nft_history
+      - SUPPORTED_PARSERS=NftHistoryParser
+      - KAFKA_TOPICS=ton.public.nft_transfers
+      - COMMIT_BATCH_SIZE=20
     env_file:
       - parser.env
     logging:
       driver: local
       options:
         max-size: 10M
+
+  parser_core_prices:
+    build: ./
+    restart: always
+    environment:
+      - KAFKA_GROUP_ID=core_prices
+      - SUPPORTED_PARSERS=CorePricesUSDT
+      - KAFKA_TOPICS=ton.public.latest_account_states
+      - KAFKA_OFFSET_RESET=latest
+      - COMMIT_BATCH_SIZE=1
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
+  parser_messages:
+    build: ./
+    restart: always
+    environment:
+      - KAFKA_GROUP_ID=messages_parsers
+      - SUPPORTED_PARSERS=StonfiSwap,DedustSwap
+      - KAFKA_TOPICS=ton.public.messages
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
+
 networks:
   default:
     name: data_default

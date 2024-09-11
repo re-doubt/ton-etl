@@ -1,12 +1,16 @@
 from typing import Dict, List, Set
+from parsers.accounts.core_prices import CorePricesUSDT
 from parsers.message.dedust_swap import DedustSwap
+from parsers.message.stonfi_swap import StonfiSwap
 from parsers.nft_transfer.nft_history import NftHistoryParser
 from model.parser import Parser
 from loguru import logger
 
 _parsers = [
     DedustSwap(),
-    NftHistoryParser()
+    NftHistoryParser(),
+    StonfiSwap(),
+    CorePricesUSDT()
 ]
 
 """
