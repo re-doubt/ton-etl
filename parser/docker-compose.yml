@@ -46,6 +46,20 @@ services:
       options:
         max-size: 10M
 
+  parser_messages_comments:
+    build: ./
+    restart: always
+    environment:
+      - KAFKA_GROUP_ID=messages_contents
+      - SUPPORTED_PARSERS=CommentsDecoder
+      - KAFKA_TOPICS=ton.public.message_contents
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
 
 networks:
   default:

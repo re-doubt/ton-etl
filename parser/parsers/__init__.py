@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from parsers.message_contents.decode_comment import CommentsDecoder
 from parsers.accounts.core_prices import CorePricesUSDT
 from parsers.message.dedust_swap import DedustSwap
 from parsers.message.stonfi_swap import StonfiSwap
@@ -10,7 +11,8 @@ _parsers = [
     DedustSwap(),
     NftHistoryParser(),
     StonfiSwap(),
-    CorePricesUSDT()
+    CorePricesUSDT(),
+    CommentsDecoder()
 ]
 
 """
