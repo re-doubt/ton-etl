@@ -130,6 +130,16 @@ class DB():
                             """, tuple(values))
             self.updated += 1
 
+    def insert_message_comment(self, msg_hash, comment):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(f"""
+                insert into parsed.message_comments(hash, comment)
+                           values (%s, %s)
+                on conflict do nothing
+                            """, (msg_hash, comment))
+            self.updated += 1
+
     def insert_core_price(self, asset, price, obj):
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
