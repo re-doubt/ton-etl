@@ -50,6 +50,7 @@ states and prepares TvmEmulator for the child class.
 class EmulatorParser(Parser):
     def __init__(self, emulator_path):
         self.engine = EmulatorEngineC(emulator_path)
+        self.engine.emulator_set_verbosity_level(0)
 
     def topics(self):
         return [TOPIC_ACCOUNT_STATES]
@@ -64,12 +65,13 @@ class EmulatorParser(Parser):
     def _prepare_emulator(self, obj):
         data = Cell.one_from_boc(obj.get('data_boc'))
         code = Cell.one_from_boc(obj.get('code_boc'))
-        emulator = TvmEmulator(code, data, verbosity_level=5, engine=self.engine)
+        emulator = TvmEmulator(code, data, verbosity_level=0, engine=self.engine)
         emulator.set_c7(address=obj.get('account'),
                         unixtime=int(time.time()),
                         balance=10, 
                         rand_seed_hex="0443c4e42c6ae4c9e62b584098bc73a699c654130260ae0c4a8a24605921c0be", 
                         config=CONFIGCELL.get())
+
         return emulator
     
     def _execute_method(self, emulator, method, stack):

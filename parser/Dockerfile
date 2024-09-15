@@ -15,7 +15,7 @@ WORKDIR /
 RUN mkdir ton
 WORKDIR /ton
 
-COPY ./ton ./ton
+COPY ./ton ./
 
 RUN mkdir build && \
         cd build && \
