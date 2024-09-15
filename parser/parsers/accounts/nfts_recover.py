@@ -37,6 +37,12 @@ class NFTsRecover(EmulatorParser):
         # Check that NFT address is not faked, i.e. collection returns the same address for its index
         if collection_address is not None:
             collection_state = db.get_latest_account_state(collection_address)
+            if collection_state is None:
+                logger.warning(f"No state for collection {collection_address}")
+                return
+            if collection_state['data_boc'] is None:
+                logger.warning(f"No data boc for collection {collection_address}")
+                return
             collection_emulator = self._prepare_emulator(collection_state)
             
             original_address, = self._execute_method(collection_emulator, 'get_nft_address_by_index', [index])
