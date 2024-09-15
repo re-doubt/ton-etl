@@ -23,8 +23,12 @@ RUN mkdir build && \
         ninja emulator
 
 
-FROM python:3.9
-COPY --from=builder /ton/emulator/lib/* /usr/local/lib/
+FROM ubuntu:22.04
+COPY --from=builder /ton/build/emulator/libemulator.so /usr/local/lib/libemulator.so
+
+RUN apt-get update && \
+    apt-get install -y wget python3.9 python3-pip libpq-dev openssl libssl-dev libsecp256k1-dev libsodium-dev libmicrohttpd-dev liblz4-dev libjemalloc-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /opt/app/
 RUN pip3 install -r /opt/app/requirements.txt
@@ -37,4 +41,4 @@ COPY main.py /opt/app/
 ENV EMULATOR_LIBRARY=/usr/local/lib/libemulator.so
 
 WORKDIR /opt/app/
-CMD ["python", "main.py"]
+CMD ["python3", "main.py"]
