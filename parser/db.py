@@ -1,3 +1,4 @@
+from typing import Set
 from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
 from pytoniq_core import Address, Cell
@@ -155,7 +156,7 @@ class DB():
                 on conflict do nothing
                             """, (address.to_str(is_user_friendly=False).upper(), index,
                                   collection_address.to_str(is_user_friendly=False).upper() if collection_address else None,
-                                  owner_address.to_str(is_user_friendly=False).upper(), last_trans_lt,
+                                  owner_address.to_str(is_user_friendly=False).upper() if owner_address else None, last_trans_lt,
                                     code_hash, data_hash))
             self.updated += 1
 
@@ -190,6 +191,12 @@ class DB():
             if not res:
                 return None
             return float(res['price'])
+        
+    def get_uniq_nft_item_codes(self) -> Set[str]:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("select distinct code_hash as h from nft_items ni")
+            return set(map(lambda x: x['h'], cursor.fetchall()))
         
     # Returns the latest account state
     def get_latest_account_state(self, address: Address):

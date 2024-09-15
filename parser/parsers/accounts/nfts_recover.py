@@ -15,6 +15,16 @@ all NFTs as well
 class NFTsRecover(EmulatorParser):
     def __init__(self, emulator_path):
         super().__init__(emulator_path)
+
+    # For optimization reason we will parse only NFTs with codes that we already have in the DB
+    def prepare(self, db: DB):
+        self.uniq_codes = db.get_uniq_nft_item_codes()
+        logger.info(f"Found {len(self.uniq_codes)} unique NFT item codes")
+
+    def predicate(self, obj) -> bool:
+        if super().predicate(obj):
+            return obj['code_hash'] in self.uniq_codes
+        return False
     
     def _do_parse(self, obj, db: DB, emulator: TvmEmulator):
         nft_address = Address(obj['account'])
@@ -35,6 +45,7 @@ class NFTsRecover(EmulatorParser):
                 logger.warning(f"NFT address mismatch: {original_address} != {nft_address}")
                 return
 
+        logger.info(f"New NFT discovered: {nft_address}")
         # Ignore contnet at this method, because it requires one more get method invocation
         db.insert_nft_item(nft_address, index, collection_address, owner_address, obj['last_trans_lt'],
                            obj['code_hash'], obj['data_hash'])

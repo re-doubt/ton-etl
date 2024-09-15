@@ -24,6 +24,11 @@ Base class for parser
 """
 class Parser:
     """
+    To be invoked before starting parser with the DB instance
+    """
+    def prepare(self, db: DB):
+        pass
+    """
     Returns list of the topics this parser is able to handle data from
     """
     def topics(self):
