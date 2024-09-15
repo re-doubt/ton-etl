@@ -46,6 +46,9 @@ class CorePrices(Parser):
         db.insert_core_price(self.asset, price, obj)
     
 
+"""
+We will use TON/USDT pool to discover TON price based on the current reserves
+"""
 class CorePricesUSDT(CorePrices):
     def __init__(self, update_interval=60):
         super().__init__(account=Parser.uf2raw('EQD8TJ8xEWB1SpnRE4d89YO3jl0W0EiBnNS4IBaHaUmdfizE'), 
@@ -65,5 +68,47 @@ class CorePricesUSDT(CorePrices):
         logger.info(f"TON/USDT pool: {reserve0}, {reserve1}")
         self.update_price(1.0 * reserve0 / reserve1, obj, db)
 
-# TODO stTON and tsTON prices
+"""
+stTON (bemo) stores total TON staked and jetton supply in the account state in the first two values.
+"""
+class CorePricesLSDstTON(CorePrices):
+    def __init__(self, update_interval=3600):
+        super().__init__(account=Parser.uf2raw('EQDNhy-nxYFgUqzfUzImBEP67JqsyMIcyk2S5_RwNNEYku0k'), 
+                         asset=Parser.uf2raw('EQDNhy-nxYFgUqzfUzImBEP67JqsyMIcyk2S5_RwNNEYku0k'), 
+                         update_interval=update_interval)
 
+    def handle_internal(self, obj, db: DB):
+        cell = Cell.one_from_boc(Parser.require(obj.get('data_boc'))).begin_parse()
+
+        jetton_total_supply = cell.load_coins()
+        ton_total_supply = cell.load_coins()
+
+        
+        logger.info(f"stTON price: {jetton_total_supply}, {ton_total_supply}")
+        self.update_price(1.0 * ton_total_supply / jetton_total_supply, obj, db)
+
+
+"""
+tsTON (tonstakers) stores TON staked and jetton supply inside the account state
+accoring to the smart contract source code (https://github.com/ton-blockchain/liquid-staking-contract/blob/main/contracts/pool_storage.func)
+"""
+class CorePricesLSDtsTON(CorePrices):
+    def __init__(self, update_interval=3600):
+        super().__init__(account=Parser.uf2raw('EQCkWxfyhAkim3g2DjKQQg8T5P4g-Q1-K_jErGcDJZ4i-vqR'), 
+                         asset=Parser.uf2raw('EQC98_qAmNEptUtPc7W6xdHh_ZHrBUFpw5Ft_IzNU20QAJav'), 
+                         update_interval=update_interval)
+
+    def handle_internal(self, obj, db: DB):
+        cell = Cell.one_from_boc(Parser.require(obj.get('data_boc'))).begin_parse()
+
+        cell.skip_bits(9) # state + halted
+        total_balance = cell.load_coins()
+        cell = cell.load_ref().begin_parse()
+        cell.load_address() # minter_address
+        supply = cell.load_coins()
+
+        logger.info(f"tsTON total balance: {total_balance}, supply: {supply}")
+
+        
+        logger.info(f"tsTON price: {total_balance}, {supply}")
+        self.update_price(1.0 * total_balance / supply, obj, db)

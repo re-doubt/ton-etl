@@ -6,6 +6,11 @@ from loguru import logger
 import json
 from dataclasses import dataclass
 
+@dataclass
+class FakeRecord:
+    value: any
+    topic: str
+    
 class DB():
     def __init__(self):
         self.pool = pool.SimpleConnectionPool(1, 3)
@@ -174,10 +179,6 @@ class DB():
         
     # for debugging purposese
     def get_messages_for_processing(self, tx_hash):
-        @dataclass
-        class FakeRecord:
-            value: any
-            topic: str
 
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
@@ -188,5 +189,19 @@ class DB():
                 (tx_hash,),
             )
             return list(map(lambda x: FakeRecord(value=json.dumps(dict(x)).encode('utf-8'), topic="ton.public.messages"),
+                            cursor.fetchall()))
+        
+    # for debugging purposese
+    def get_account_state_for_processing(self, address):
+
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                select * from latest_account_states where account = %s
+                """, 
+                (address,),
+            )
+            return list(map(lambda x: FakeRecord(value=json.dumps(dict(x)).encode('utf-8'), topic="ton.public.latest_account_states"),
                             cursor.fetchall()))
         
