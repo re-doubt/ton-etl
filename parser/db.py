@@ -1,6 +1,6 @@
 from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
-from pytoniq_core import Address
+from pytoniq_core import Address, Cell
 from dataclasses import asdict
 from loguru import logger
 import json
@@ -145,6 +145,20 @@ class DB():
                             """, (msg_hash, comment))
             self.updated += 1
 
+    def insert_nft_item(self, address, index, collection_address, owner_address, last_trans_lt, code_hash, data_hash):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(f"""
+                insert into public.nft_items(address, index, collection_address, owner_address, 
+                           last_transaction_lt, code_hash, data_hash, init)
+                           values (%s, %s, %s, %s, %s, %s, %s, true)
+                on conflict do nothing
+                            """, (address.to_str(is_user_friendly=False).upper(), index,
+                                  collection_address.to_str(is_user_friendly=False).upper() if collection_address else None,
+                                  owner_address.to_str(is_user_friendly=False).upper(), last_trans_lt,
+                                    code_hash, data_hash))
+            self.updated += 1
+
     def insert_core_price(self, asset, price, obj):
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
@@ -176,6 +190,19 @@ class DB():
             if not res:
                 return None
             return float(res['price'])
+        
+    # Returns the latest account state
+    def get_latest_account_state(self, address: Address):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                select * from latest_account_states where account = %s
+                """, 
+                (address.to_str(is_user_friendly=False).upper(), )
+            )
+            res = cursor.fetchone()
+            return res
         
     # for debugging purposese
     def get_messages_for_processing(self, tx_hash):

@@ -9,6 +9,15 @@ TOPIC_MESSAGES = "ton.public.messages"
 TOPIC_MESSAGE_CONTENTS = "ton.public.message_contents"
 TOPIC_ACCOUNT_STATES = "ton.public.latest_account_states"
 TOPIC_NFT_TRANSFERS = "ton.public.nft_transfers"
+TOPIC_DEX_SWAPS = "ton.parsed.dex_swap_parsed"
+
+"""
+Base class for any kind of errors during parsing that are not critical
+and meant to be ignored. For example data format is broken and we aware of 
+it and not going to stop parsing.
+"""
+class NonCriticalParserError(Exception):
+    pass
 
 """
 Base class for parser
@@ -34,9 +43,12 @@ class Parser:
     
     def handle(self, obj, db: DB):
         if self.predicate(obj):
-            # TODO handle errors?
-            self.handle_internal(obj, db)
-            return True
+            try:
+                self.handle_internal(obj, db)
+                return True
+            except NonCriticalParserError as e:
+                print(f"Non critical error during handling object {obj}: {e}")
+                return False
         return False
     
     """
