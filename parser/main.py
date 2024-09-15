@@ -36,7 +36,9 @@ if __name__ == "__main__":
     PARSERS = generate_parsers(None if supported_parsers == '*' else set(supported_parsers.split(",")))
     generator = consumer
     if os.environ.get("PROCESS_ONE_HASH"):
-        generator = db.get_messages_for_processing(os.environ.get("PROCESS_ONE_HASH"))
+        generator = db.get_messages_for_processing(os.environ.get("PROCESS_ONE_HASH").upper())
+    elif os.environ.get("PROCESS_ONE_HASH_STATE"):
+        generator = db.get_account_state_for_processing(os.environ.get("PROCESS_ONE_HASH_STATE").upper())
     # for msg in consumer:
     for msg in generator:
         try:
