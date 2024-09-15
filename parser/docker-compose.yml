@@ -67,9 +67,6 @@ services:
       - KAFKA_GROUP_ID=recovery_nfts
       - SUPPORTED_PARSERS=NFTsRecover
       - KAFKA_TOPICS=ton.public.latest_account_states
-      - EMULATOR_LIBRARY=/opt/emulator.so
-    volumes:
-      - ${EMULATOR_LIBRARY}:/opt/emulator.so
     env_file:
       - parser.env
     logging:
