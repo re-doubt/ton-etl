@@ -18,6 +18,7 @@ class NFTsRecover(EmulatorParser):
 
     # For optimization reason we will parse only NFTs with codes that we already have in the DB
     def prepare(self, db: DB):
+        super().prepare(db)
         self.uniq_codes = db.get_uniq_nft_item_codes()
         logger.info(f"Found {len(self.uniq_codes)} unique NFT item codes")
 
@@ -30,7 +31,7 @@ class NFTsRecover(EmulatorParser):
         nft_address = Address(obj['account'])
 
         init, index, collection_address, \
-            owner_address, individual_content = self._execute_method(emulator, 'get_nft_data', [])
+            owner_address, individual_content = self._execute_method(emulator, 'get_nft_data', [], db, obj)
         
         collection_address = collection_address.load_address()
         if owner_address is not None:
@@ -46,7 +47,7 @@ class NFTsRecover(EmulatorParser):
                 return
             collection_emulator = self._prepare_emulator(collection_state)
             
-            original_address, = self._execute_method(collection_emulator, 'get_nft_address_by_index', [index])
+            original_address, = self._execute_method(collection_emulator, 'get_nft_address_by_index', [index], db, obj)
             original_address = original_address.load_address()
             if original_address != nft_address:
                 logger.warning(f"NFT address mismatch: {original_address} != {nft_address}")

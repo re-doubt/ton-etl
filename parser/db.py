@@ -167,6 +167,32 @@ class DB():
                                     code_hash, data_hash))
             self.updated += 1
 
+
+    def insert_jetton_wallet(self, address, balance, owner, jetton, last_trans_lt, code_hash, data_hash):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(f"""
+                insert into public.jetton_wallets(address, balance, owner, jetton, 
+                           last_transaction_lt, code_hash, data_hash)
+                           values (%s, %s, %s, %s, %s, %s, %s)
+                on conflict do nothing
+                            """, (address.to_str(is_user_friendly=False).upper(), balance,
+                                  serialize_addr(owner),
+                                  serialize_addr(jetton), last_trans_lt,
+                                    code_hash, data_hash))
+            self.updated += 1
+
+    def insert_mc_library(self, boc):
+        assert self.conn is not None
+        logger.info(f"Insert boc: {boc}")
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(f"""
+                insert into parsed.mc_libraries(boc)
+                           values(%s)
+                on conflict do nothing
+                            """, (boc, ))
+            self.updated += 1
+
     def insert_core_price(self, asset, price, obj):
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
@@ -203,6 +229,12 @@ class DB():
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute("select distinct code_hash as h from nft_items ni")
+            return set(map(lambda x: x['h'], cursor.fetchall()))
+        
+    def get_uniq_jetton_wallets_codes(self) -> Set[str]:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("select distinct code_hash as h from jetton_wallets ni")
             return set(map(lambda x: x['h'], cursor.fetchall()))
         
     # Returns the latest account state
@@ -245,4 +277,10 @@ class DB():
             )
             return list(map(lambda x: FakeRecord(value=json.dumps(dict(x)).encode('utf-8'), topic="ton.public.latest_account_states"),
                             cursor.fetchall()))
+        
+    def get_mc_libraries(self) -> []:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("select boc from parsed.mc_libraries")
+            return [x['boc'] for x in cursor.fetchall()]
         
