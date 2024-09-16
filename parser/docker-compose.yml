@@ -64,7 +64,8 @@ services:
     build: ./
     restart: always
     deploy:
-      - replicas: 4
+      mode: replicated
+      replicas: 4
     environment:
       - KAFKA_GROUP_ID=recovery_nfts
       - SUPPORTED_PARSERS=NFTsRecover
