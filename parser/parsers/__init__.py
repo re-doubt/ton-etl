@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from parsers.accounts.jetton_wallets_recover import JettonWalletsRecover
 from parsers.accounts.nfts_recover import NFTsRecover
 from parsers.message_contents.decode_comment import CommentsDecoder
 from parsers.accounts.core_prices import CorePricesLSDstTON, CorePricesLSDtsTON, CorePricesUSDT
@@ -21,6 +22,7 @@ _parsers = [
     CorePricesLSDtsTON(),
 
     NFTsRecover(EMULATOR_PATH),
+    JettonWalletsRecover(EMULATOR_PATH),
     
     CommentsDecoder()
 ]
