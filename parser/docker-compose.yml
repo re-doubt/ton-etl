@@ -60,6 +60,23 @@ services:
       options:
         max-size: 10M
 
+  parser_nfts_recover:
+    build: ./
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 4
+    environment:
+      - KAFKA_GROUP_ID=recovery_nfts
+      - SUPPORTED_PARSERS=NFTsRecover
+      - KAFKA_TOPICS=ton.public.latest_account_states
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
 
 networks:
   default:

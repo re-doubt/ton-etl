@@ -1,6 +1,7 @@
+from typing import Set, Union
 from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
-from pytoniq_core import Address
+from pytoniq_core import Address, ExternalAddress
 from dataclasses import asdict
 from loguru import logger
 import json
@@ -10,6 +11,13 @@ from dataclasses import dataclass
 class FakeRecord:
     value: any
     topic: str
+
+def serialize_addr(addr: Union[Address, ExternalAddress, None]) -> str:
+    if isinstance(addr, Address):
+        return addr.to_str(is_user_friendly=False).upper()
+    if isinstance(addr, ExternalAddress): # extrernal addresses are not supported
+        return None
+    return None
     
 class DB():
     def __init__(self):
@@ -54,7 +62,7 @@ class DB():
         assert type(jetton_wallet) == Address
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute("select jetton from jetton_wallets jw where address = %s",
-                           (jetton_wallet.to_str(is_user_friendly=False).upper(), ))
+                           (serialize_addr(jetton_wallet), ))
             res = cursor.fetchone()
             if not res:
                 return None
@@ -145,6 +153,20 @@ class DB():
                             """, (msg_hash, comment))
             self.updated += 1
 
+    def insert_nft_item(self, address, index, collection_address, owner_address, last_trans_lt, code_hash, data_hash):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(f"""
+                insert into public.nft_items(address, index, collection_address, owner_address, 
+                           last_transaction_lt, code_hash, data_hash, init)
+                           values (%s, %s, %s, %s, %s, %s, %s, true)
+                on conflict do nothing
+                            """, (address.to_str(is_user_friendly=False).upper(), index,
+                                  serialize_addr(collection_address),
+                                  serialize_addr(owner_address), last_trans_lt,
+                                    code_hash, data_hash))
+            self.updated += 1
+
     def insert_core_price(self, asset, price, obj):
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
@@ -176,6 +198,25 @@ class DB():
             if not res:
                 return None
             return float(res['price'])
+        
+    def get_uniq_nft_item_codes(self) -> Set[str]:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("select distinct code_hash as h from nft_items ni")
+            return set(map(lambda x: x['h'], cursor.fetchall()))
+        
+    # Returns the latest account state
+    def get_latest_account_state(self, address: Address):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                select * from latest_account_states where account = %s
+                """, 
+                (address.to_str(is_user_friendly=False).upper(), )
+            )
+            res = cursor.fetchone()
+            return res
         
     # for debugging purposese
     def get_messages_for_processing(self, tx_hash):

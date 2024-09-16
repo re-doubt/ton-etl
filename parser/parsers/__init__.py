@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from parsers.accounts.nfts_recover import NFTsRecover
 from parsers.message_contents.decode_comment import CommentsDecoder
 from parsers.accounts.core_prices import CorePricesLSDstTON, CorePricesLSDtsTON, CorePricesUSDT
 from parsers.message.dedust_swap import DedustSwap
@@ -6,6 +7,9 @@ from parsers.message.stonfi_swap import StonfiSwap
 from parsers.nft_transfer.nft_history import NftHistoryParser
 from model.parser import Parser
 from loguru import logger
+import os
+
+EMULATOR_PATH = os.environ.get("EMULATOR_LIBRARY")
 
 _parsers = [
     DedustSwap(),
@@ -15,6 +19,8 @@ _parsers = [
     CorePricesUSDT(),
     CorePricesLSDstTON(),
     CorePricesLSDtsTON(),
+
+    NFTsRecover(EMULATOR_PATH),
     
     CommentsDecoder()
 ]

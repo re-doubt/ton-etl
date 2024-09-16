@@ -7,7 +7,7 @@ The repository contains the code for the indexing pipeline of the re:doubt data 
 
 # Debeizium Configuration
 
-``sh
+````sh
 curl --location 'http://localhost:8083/connectors' \
    --header 'Accept: application/json' \
    --header 'Content-Type: application/json' \
@@ -34,7 +34,7 @@ curl --location 'http://localhost:8083/connectors' \
        "producer.override.max.request.size": "1073741824",
    }
 }'
-``
+````
 
 Also override max size settings in Kafka server.properties:
 ``sh
@@ -43,3 +43,9 @@ max.request.size=200000000
 message.max.bytes=200000000
 max.partition.fetch.bytes=200000000
 ``
+
+TODO:
+* indexer worker configuration
+* overall architecture chart
+* parser configuration
+* DB schema and indecies
