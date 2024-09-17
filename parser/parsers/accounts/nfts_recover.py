@@ -33,9 +33,17 @@ class NFTsRecover(EmulatorParser):
         init, index, collection_address, \
             owner_address, individual_content = self._execute_method(emulator, 'get_nft_data', [], db, obj)
         
-        collection_address = collection_address.load_address()
+        try:
+            collection_address = collection_address.load_address()
+        except Exception as e:
+            logger.warning(f"Failed to load collection address: {e}")
+            return
         if owner_address is not None:
-            owner_address = owner_address.load_address()
+            try:
+                owner_address = owner_address.load_address()
+            except Exception as e:
+                logger.warning(f"Failed to load owner address: {e}")
+                return
         # Check that NFT address is not faked, i.e. collection returns the same address for its index
         if collection_address is not None:
             collection_state = db.get_latest_account_state(collection_address)
