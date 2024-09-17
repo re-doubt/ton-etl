@@ -2,7 +2,9 @@ from model.parser import Parser, TOPIC_ACCOUNT_STATES
 from loguru import logger
 from db import DB
 from pytoniq_core import Cell, Address
-from model.dexswap import DexSwapParsed
+from parsers.accounts.emulator import EmulatorParser
+from pytvm.tvm_emulator.tvm_emulator import TvmEmulator
+
 
 """
 Discovers prices for the core assets, i.e.:
@@ -112,3 +114,18 @@ class CorePricesLSDtsTON(CorePrices):
         
         logger.info(f"tsTON price: {total_balance}, {supply}")
         self.update_price(1.0 * total_balance / supply, obj, db)
+
+
+class CorePricesStormTrade(CorePrices, EmulatorParser):
+    def __init__(self, emulator_path, vault, lp_jetton, update_interval=3600):
+        EmulatorParser.__init__(self, emulator_path)
+        CorePrices.__init__(self, account=vault, asset=lp_jetton, update_interval=update_interval)
+        
+    def predicate(self, obj) -> bool:
+        # checks that we are handling Storm vault
+        return EmulatorParser.predicate(self, obj) and CorePrices.predicate(self, obj)
+
+    def _do_parse(self, obj, db: DB, emulator: TvmEmulator): 
+        _, _, lp_total_supply, free_balance, _, _, _, _ = self._execute_method(emulator, 'get_vault_data', [], db, obj)
+        
+        self.update_price(1.0 * free_balance / lp_total_supply, obj, db)
