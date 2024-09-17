@@ -3,7 +3,7 @@ from parsers.swaps.price_discovery import PriceDiscovery
 from parsers.accounts.jetton_wallets_recover import JettonWalletsRecover
 from parsers.accounts.nfts_recover import NFTsRecover
 from parsers.message_contents.decode_comment import CommentsDecoder
-from parsers.accounts.core_prices import CorePricesLSDstTON, CorePricesLSDtsTON, CorePricesUSDT
+from parsers.accounts.core_prices import CorePricesLSDstTON, CorePricesLSDtsTON, CorePricesStormTrade, CorePricesUSDT
 from parsers.message.dedust_swap import DedustSwap
 from parsers.message.stonfi_swap import StonfiSwap
 from parsers.nft_transfer.nft_history import NftHistoryParser
@@ -24,6 +24,15 @@ _parsers = [
     CorePricesUSDT(),
     CorePricesLSDstTON(),
     CorePricesLSDtsTON(),
+    # TON Vault
+    CorePricesStormTrade(EMULATOR_PATH, Parser.uf2raw('EQDpJnZP89Jyxz3euDaXXFUhwCWtaOeRmiUJTi3jGYgF8fnj'),
+                          Parser.uf2raw('EQCNY2AQ3ZDYwJAqx_nzl9i9Xhd_Ex7izKJM6JTxXRnO6n1F')),
+    # TON Vault
+    CorePricesStormTrade(EMULATOR_PATH, Parser.uf2raw('EQAG8_BzwlWkmqb9zImr9RJjjgZZCLMOQXP9PR0B1PYHvfSS'),
+                         Parser.uf2raw('EQCNY2AQ3ZDYwJAqx_nzl9i9Xhd_Ex7izKJM6JTxXRnO6n1F')),
+    # USDT Vault
+    CorePricesStormTrade(EMULATOR_PATH, Parser.uf2raw('EQAz6ehNfL7_8NI7OVh1Qg46HsuC4kFpK-icfqK9J3Frd6CJ'),
+                         Parser.uf2raw('EQCup4xxCulCcNwmOocM9HtDYPU8xe0449tQLp6a-5BLEegW')),
 
     NFTsRecover(EMULATOR_PATH),
     JettonWalletsRecover(EMULATOR_PATH),
