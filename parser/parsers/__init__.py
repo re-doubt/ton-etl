@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from parsers.swaps.price_discovery import PriceDiscovery
 from parsers.accounts.jetton_wallets_recover import JettonWalletsRecover
 from parsers.accounts.nfts_recover import NFTsRecover
 from parsers.message_contents.decode_comment import CommentsDecoder
@@ -11,11 +12,14 @@ from loguru import logger
 import os
 
 EMULATOR_PATH = os.environ.get("EMULATOR_LIBRARY")
+MIN_SWAP_VOLUME_FOR_PRICE = int(os.environ.get("MIN_SWAP_VOLUME_FOR_PRICE", "1"))
 
 _parsers = [
     DedustSwap(),
     NftHistoryParser(),
     StonfiSwap(),
+
+    PriceDiscovery(MIN_SWAP_VOLUME_FOR_PRICE),
 
     CorePricesUSDT(),
     CorePricesLSDstTON(),
