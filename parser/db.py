@@ -119,6 +119,7 @@ class DB():
 
     def serialize(self, obj):
         table = obj.__tablename__
+        schema = getattr(obj, '__schema__', 'parsed')
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
             names = []
@@ -138,7 +139,7 @@ class DB():
             placeholders.append('now()')
             placeholders.append('now()')
             cursor.execute(f"""
-                insert into parsed.{table}({",".join(names)}) values ({",".join(placeholders)})
+                insert into {schema}.{table}({",".join(names)}) values ({",".join(placeholders)})
                 on conflict do nothing
                             """, tuple(values))
             self.updated += 1
@@ -284,3 +285,33 @@ class DB():
             cursor.execute("select boc from parsed.mc_libraries")
             return [x['boc'] for x in cursor.fetchall()]
         
+    """
+    Calculates weighted average price for the base asset using latest prices for all pools and
+    updates the prices.agg_prices table. Trades for the last {average_window} seconds are used for
+    the calculation. Every price has weight that is equal to its volume multipleid by time_lag,
+    which is ranged from 1 to 0 in exponential order. The more recent the price the higher its weight.
+    """
+    def update_agg_prices(self, base, price_time, average_window=1800):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(f"""
+            insert into prices.agg_prices(base, price_time, price_ton, price_usd, created, updated)
+            with latest_prices as (
+                select price_ton, price_usd,
+                volume_usd, volume_ton,
+                pow(2, -1. * (%s - swap_utime) / %s) as time_lag
+                from prices.dex_trade where base = %s
+                and swap_utime <= %s and swap_utime > %s - %s 
+            )
+            select %s as base,
+            %s as price_time,
+            sum(price_ton * time_lag * volume_ton) / sum(volume_ton * time_lag) as price_ton,
+            sum(price_usd * time_lag * volume_usd) / sum(volume_usd * time_lag) as price_usd,
+            now() as created, now() as updated
+            from latest_prices
+            on conflict (base, price_time) do update
+            set price_ton = EXCLUDED.price_ton,
+            price_usd = EXCLUDED.price_usd,
+            updated = now()
+                            """, (price_time, average_window, base, price_time, price_time, average_window, base, price_time))
+            self.updated += 1

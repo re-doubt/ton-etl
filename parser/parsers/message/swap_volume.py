@@ -18,6 +18,33 @@ STABLES = [USDT, jUSDT]
 TONS = [pTON, TON]
 LSDS = [stTON, tsTON]
 
+QUOTE_ASSET_TYPE_TON = "TON"
+QUOTE_ASSET_TYPE_STABLE = "STABLE"
+QUOTE_ASSET_TYPE_LSD = "LSD"
+QUOTE_ASSET_TYPE_OTHER = "OTHER"
+
+"""
+Deterministically returns base and quote tokens and quote asset type
+"""
+def base_quote(left: str, right: str) -> (str, str, str):
+    if left in STABLES and right in STABLES:
+        return (min(left, right), max(left, right), QUOTE_ASSET_TYPE_STABLE)
+    if left in STABLES:
+        return (right, left, QUOTE_ASSET_TYPE_STABLE)
+    if right in STABLES:
+        return (left, right, QUOTE_ASSET_TYPE_STABLE)
+    if left in TONS and right in TONS: # meaningless..
+        return (min(left, right), min(left, right), QUOTE_ASSET_TYPE_TON)
+    if left in TONS:
+        return (right, left, QUOTE_ASSET_TYPE_TON)
+    if right in TONS:
+        return (left, right, QUOTE_ASSET_TYPE_TON)
+    if left in LSDS:
+        return (right, left, QUOTE_ASSET_TYPE_LSD)
+    if right in LSDS:
+        return (left, right, QUOTE_ASSET_TYPE_LSD)
+    return (min(left, right), max(left, right), QUOTE_ASSET_TYPE_OTHER)
+
 """
 Estimates swap volume using current core prices
 Updates swap inplace

@@ -94,6 +94,20 @@ services:
       options:
         max-size: 10M
 
+  parser_dex_price_discovery:
+    build: ./
+    restart: always
+    environment:
+      - KAFKA_GROUP_ID=dex_prices
+      - SUPPORTED_PARSERS=PriceDiscovery
+      - KAFKA_TOPICS=ton.parsed.dex_swap_parsed
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
 
 networks:
   default:
