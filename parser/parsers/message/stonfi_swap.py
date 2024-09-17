@@ -80,8 +80,14 @@ class StonfiSwap(Parser):
         else:
             logger.warning(f"Wallet addresses in swap message id={obj.get('msg_hash')} and payment message  don't match")
         
-        src_master = Parser.require(db.get_wallet_master(src_wallet_address))
-        dst_master = Parser.require(db.get_wallet_master(dst_wallet_address))
+        src_master = db.get_wallet_master(src_wallet_address)
+        dst_master = db.get_wallet_master(dst_wallet_address)
+        if not src_master:
+            logger.warning(f"Wallet not found for {src_wallet_address}")
+            return
+        if not dst_master:
+            logger.warning(f"Wallet not found for {dst_wallet_address}")
+            return
 
         swap = DexSwapParsed(
             tx_hash=Parser.require(obj.get('tx_hash', None)),
