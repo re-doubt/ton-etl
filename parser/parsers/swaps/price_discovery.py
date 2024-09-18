@@ -79,7 +79,7 @@ class PriceDiscovery(Parser):
                 return
             price_ton = price * lsd_price
             ton_price = db.get_core_price(USDT, swap_utime)
-            price_ton = price_ton * ton_price
+            price_usd = price_ton * ton_price
 
         trade = DexTrade(
             tx_hash=obj['tx_hash'],
