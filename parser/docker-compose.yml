@@ -92,23 +92,22 @@ services:
   #     driver: local
   #     options:
   #       max-size: 10M
-
-  parser_jetton_wallets_recover:
-    build: ./
-    restart: always
-    deploy:
-      mode: replicated
-      replicas: 4
-    environment:
-      - KAFKA_GROUP_ID=recovery_jetton_wallets
-      - SUPPORTED_PARSERS=JettonWalletsRecover
-      - KAFKA_TOPICS=ton.public.latest_account_states
-    env_file:
-      - parser.env
-    logging:
-      driver: local
-      options:
-        max-size: 10M
+  # parser_jetton_wallets_recover:
+  #   build: ./
+  #   restart: always
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 4
+  #   environment:
+  #     - KAFKA_GROUP_ID=recovery_jetton_wallets
+  #     - SUPPORTED_PARSERS=JettonWalletsRecover
+  #     - KAFKA_TOPICS=ton.public.latest_account_states
+  #   env_file:
+  #     - parser.env
+  #   logging:
+  #     driver: local
+  #     options:
+  #       max-size: 10M
 
   parser_dex_price_discovery:
     build: ./

@@ -153,7 +153,7 @@ def estimate_tvl(pool: DexPool, db: DB):
         if not left_price :
             logger.warning(f"No price for {jetton_left} for {pool.last_updated}")
             return
-        if not jetton_right :
+        if not right_price :
             logger.warning(f"No price for {right_price} for {pool.last_updated}")
             return
         tvl_ton = (pool.reserves_left * left_price + pool.reserves_right * right_price) / 1e9
