@@ -65,7 +65,7 @@ services:
     restart: always
     deploy:
       mode: replicated
-      replicas: 4
+      replicas: 1
     environment:
       - KAFKA_GROUP_ID=dex_tvl_parsing
       - SUPPORTED_PARSERS=TVLPoolStateParser
