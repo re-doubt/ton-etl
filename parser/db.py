@@ -30,6 +30,7 @@ class DB():
         # Stores the number of rows with update to control commit frequency
         self.updated = 0
         self.conn = None
+        self.dex_pools_cache = set()
         
     """
     Acquires connection from the pool. After the end of the session caller has to release it
@@ -335,6 +336,8 @@ class DB():
             self.updated += 1
 
     def discover_dex_pool(self, swap: DexSwapParsed):
+        if swap.swap_pool in self.dex_pools_cache:
+            return
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(f"""
@@ -342,6 +345,7 @@ class DB():
                            values (%s, %s, %s)
                 on conflict do nothing
                             """, (swap.swap_pool, swap.platform, swap.swap_utime))
+            self.dex_pools_cache.add(swap.swap_pool)
             
     """
     Returns all dex pools as DexPool objects with jetton addresses filled only
