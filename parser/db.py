@@ -1,4 +1,4 @@
-from typing import Set, Union
+from typing import Dict, Set, Union
 from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
 from pytoniq_core import Address, ExternalAddress
@@ -8,6 +8,7 @@ import json
 from dataclasses import dataclass
 
 from model.dexswap import DexSwapParsed
+from model.dexpool import DexPool
 
 @dataclass
 class FakeRecord:
@@ -228,6 +229,21 @@ class DB():
                 return None
             return float(res['price'])
         
+    def get_agg_price(self, asset: str, timestamp: int) -> float:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                select price_ton from prices.agg_prices where base = %s
+                and price_time < %s order by price_time desc limit 1
+                """, 
+                (asset, timestamp),
+            )
+            res = cursor.fetchone()
+            if not res:
+                return None
+            return float(res['price_ton'])
+        
     def get_uniq_nft_item_codes(self) -> Set[str]:
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
@@ -322,7 +338,65 @@ class DB():
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(f"""
-                insert into prices.dex_pools(pool, platform, discovered_at)
+                insert into prices.dex_pool(pool, platform, discovered_at)
                            values (%s, %s, %s)
                 on conflict do nothing
                             """, (swap.swap_pool, swap.platform, swap.swap_utime))
+            
+    """
+    Returns all dex pools as DexPool objects with jetton addresses filled only
+    """
+    def get_all_dex_pools(self) -> Dict[str, DexPool]:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("select pool, platform, jetton_left, jetton_right from prices.dex_pool")
+            output = {}
+            for row in cursor.fetchall():
+                pool = DexPool(
+                    pool=row['pool'],
+                    platform=row['platform'],
+                    jetton_left=row['jetton_left'],
+                    jetton_right=row['jetton_right']
+                )
+                if pool.jetton_left:
+                    pool.jetton_left = Address(pool.jetton_left)
+                if pool.jetton_right:
+                    pool.jetton_right = Address(pool.jetton_right)
+                output[row['pool']] = pool
+            return output
+        
+
+    def update_dex_pool_jettons(self, pool: DexPool):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(f"""
+                update prices.dex_pool
+                           set jetton_left = %s, jetton_right = %s
+                           where pool = %s
+                            """, (serialize_addr(pool.jetton_left), serialize_addr(pool.jetton_right), pool.pool))
+            for jetton in [pool.jetton_left, pool.jetton_right]:
+                cursor.execute("""
+                    insert into prices.dex_pool_link(jetton, pool)
+                            values (%s, %s)
+                    on conflict do nothing
+                                """, (serialize_addr(jetton), pool.pool))
+            self.updated += 1
+
+    def update_dex_pool_state(self, pool: DexPool):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(f"""
+                update prices.dex_pool
+                           set reserves_left = %s, reserves_right = %s, total_supply = %s,
+                           tvl_usd = %s, tvl_ton = %s, last_updated = %s, is_liquid = %s
+                           where pool = %s and (last_updated < %s or last_updated is null)
+                            """, (pool.reserves_left, pool.reserves_right, pool.total_supply,
+                                  pool.tvl_usd, pool.tvl_ton, pool.last_updated, pool.is_liquid, pool.pool, pool.last_updated))
+            
+            cursor.execute(f"""
+                insert into prices.dex_pool_history (pool, timestamp, reserves_left, reserves_right, total_supply, tvl_usd, tvl_ton)
+                        values (%s, %s, %s, %s, %s, %s, %s)
+                        on conflict do nothing
+                            """, (pool.pool, pool.last_updated, pool.reserves_left, pool.reserves_right, 
+                                  pool.total_supply, pool.tvl_usd, pool.tvl_ton))
+            self.updated += 1

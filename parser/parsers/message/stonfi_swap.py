@@ -2,7 +2,7 @@ from model.parser import Parser, TOPIC_MESSAGES
 from loguru import logger
 from db import DB
 from pytoniq_core import Cell, Address
-from model.dexswap import DexSwapParsed
+from model.dexswap import DEX_STON, DexSwapParsed
 from parsers.message.swap_volume import estimate_volume
 
 STONFI_ROUTER = Parser.uf2raw('EQB3ncyBUTjZUA5EnFKR5_EnOMI9V1tTEAAPaiU71gc4TiUt')
@@ -93,7 +93,7 @@ class StonfiSwap(Parser):
             tx_hash=Parser.require(obj.get('tx_hash', None)),
             msg_hash=Parser.require(obj.get('msg_hash', None)),
             trace_id=Parser.require(obj.get('trace_id', None)),
-            platform="ston.fi",
+            platform=DEX_STON,
             swap_utime=Parser.require(obj.get('created_at', None)),
             swap_user=from_user,
             swap_pool=Parser.require(obj.get('source', None)),

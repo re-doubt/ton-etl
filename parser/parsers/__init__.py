@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from parsers.accounts.tvl import TVLPoolStateParser
 from parsers.swaps.price_discovery import PriceDiscovery
 from parsers.accounts.jetton_wallets_recover import JettonWalletsRecover
 from parsers.accounts.nfts_recover import NFTsRecover
@@ -33,6 +34,7 @@ _parsers = [
     # USDT Vault
     CorePricesStormTrade(EMULATOR_PATH, Parser.uf2raw('EQAz6ehNfL7_8NI7OVh1Qg46HsuC4kFpK-icfqK9J3Frd6CJ'),
                          Parser.uf2raw('EQCup4xxCulCcNwmOocM9HtDYPU8xe0449tQLp6a-5BLEegW')),
+    TVLPoolStateParser(EMULATOR_PATH),
 
     NFTsRecover(EMULATOR_PATH),
     JettonWalletsRecover(EMULATOR_PATH),

@@ -59,16 +59,16 @@ services:
       driver: local
       options:
         max-size: 10M
-
-  parser_nfts_recover:
+        
+  parser_dex_tvl_parsing:
     build: ./
     restart: always
     deploy:
       mode: replicated
       replicas: 4
     environment:
-      - KAFKA_GROUP_ID=recovery_nfts
-      - SUPPORTED_PARSERS=NFTsRecover
+      - KAFKA_GROUP_ID=dex_tvl_parsing
+      - SUPPORTED_PARSERS=TVLPoolStateParser
       - KAFKA_TOPICS=ton.public.latest_account_states
     env_file:
       - parser.env
@@ -76,6 +76,22 @@ services:
       driver: local
       options:
         max-size: 10M
+  # parser_nfts_recover:
+  #   build: ./
+  #   restart: always
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 4
+  #   environment:
+  #     - KAFKA_GROUP_ID=recovery_nfts
+  #     - SUPPORTED_PARSERS=NFTsRecover
+  #     - KAFKA_TOPICS=ton.public.latest_account_states
+  #   env_file:
+  #     - parser.env
+  #   logging:
+  #     driver: local
+  #     options:
+  #       max-size: 10M
 
   parser_jetton_wallets_recover:
     build: ./
