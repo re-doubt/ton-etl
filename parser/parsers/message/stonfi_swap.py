@@ -107,3 +107,4 @@ class StonfiSwap(Parser):
         )
         estimate_volume(swap, db)
         db.serialize(swap)
+        db.discover_dex_pool(swap)

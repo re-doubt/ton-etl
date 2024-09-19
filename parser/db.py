@@ -7,6 +7,8 @@ from loguru import logger
 import json
 from dataclasses import dataclass
 
+from model.dexswap import DexSwapParsed
+
 @dataclass
 class FakeRecord:
     value: any
@@ -315,3 +317,12 @@ class DB():
             updated = now()
                             """, (price_time, average_window, base, price_time, price_time, average_window, base, price_time))
             self.updated += 1
+
+    def discover_dex_pool(self, swap: DexSwapParsed):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(f"""
+                insert into prices.dex_pools(pool, platform, discovered_at)
+                           values (%s, %s, %s)
+                on conflict do nothing
+                            """, (swap.swap_pool, swap.platform, swap.swap_utime))
