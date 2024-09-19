@@ -70,6 +70,7 @@ services:
       - KAFKA_GROUP_ID=dex_tvl_parsing
       - SUPPORTED_PARSERS=TVLPoolStateParser
       - KAFKA_TOPICS=ton.public.latest_account_states
+      - COMMIT_BATCH_SIZE=1
     env_file:
       - parser.env
     logging:
