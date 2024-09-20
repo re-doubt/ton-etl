@@ -1,0 +1,51 @@
+version: "3.9"
+
+x-indexer-environment: &index-worker
+  POSTGRES_DIALECT: ${POSTGRES_DIALECT:-postgresql+asyncpg}
+  POSTGRES_HOST:
+  POSTGRES_PORT:
+  POSTGRES_USER:
+  POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+  POSTGRES_DBNAME:
+  POSTGRES_DBROOT:
+  POSTGRES_PUBLISH_PORT:
+  TON_WORKER_FROM:
+  TON_WORKER_BINARY: ton-index-postgres-v2
+
+services:
+  index-worker:
+    build:
+      context: ton-index-cpp
+      dockerfile: Dockerfile
+    secrets:
+      - postgres_password
+    volumes:
+      - ${TON_WORKER_DBROOT:-./}:/tondb
+    environment:
+      POSTGRES_DIALECT: ${POSTGRES_DIALECT:-postgresql+asyncpg}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_DBNAME: ${POSTGRES_DBNAME}
+      POSTGRES_DBROOT: ${POSTGRES_DBROOT}
+      POSTGRES_PUBLISH_PORT: ${POSTGRES_PUBLISH_PORT}
+      TON_WORKER_FROM: ${TON_WORKER_FROM}
+      TON_WORKER_BINARY: ton-index-postgres-v2
+    networks:
+      internal:
+    command: --from ${TON_WORKER_FROM:-1}
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: "1000000"
+        hard: "1000000"
+
+networks:
+  internal:
+    attachable: true
+    external: false
+
+secrets:
+  postgres_password:
+    file: ${POSTGRES_PASSWORD_FILE:-private/postgres_password}

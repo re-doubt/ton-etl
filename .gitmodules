@@ -1,3 +1,6 @@
 [submodule "parser/ton"]
 	path = parser/ton
 	url = https://github.com/ton-blockchain/ton.git
+[submodule "indexer/ton-index-worker"]
+	path = indexer/ton-index-worker
+	url = https://github.com/toncenter/ton-index-worker

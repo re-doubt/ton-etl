@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   postgres:
-    image: debezium/postgres:16-alpine
+    image: debezium/postgres:16
     ports:
       - 5432:5432
     volumes:
@@ -26,7 +26,8 @@ services:
     image: bitnami/kafka:3.4
     container_name: cdc-using-debezium-kafka
     volumes:
-      - ./kafka:/bitnami/kafka
+      - /kafka:/bitnami/kafka
+      - ./server.properties:/opt/bitnami/kafka/config/server.properties
     hostname: cdc-using-debezium-kafka
     restart: always
     ports:
@@ -42,7 +43,7 @@ services:
       KAFKA_CFG_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
   cdc-using-debezium-connect:
-    image: debezium/connect:2.3
+    image: debezium/connect:2.7
     container_name: cdc-using-debezium-connect
     hostname: cdc-using-debezium-connect
     restart: always
@@ -55,7 +56,7 @@ services:
       OFFSET_STORAGE_TOPIC: my_connect_offsets
       STATUS_STORAGE_TOPIC: my_connect_statuses
       ENABLE_DEBEZIUM_SCRIPTING: 'true'
-      CONNECT_CONNECTOR_CLIENT_CONFIG_OVERRIDE_POLICY: 'true'
+        #      CONNECT_CONNECTOR_CLIENT_CONFIG_OVERRIDE_POLICY: 'true'
     links:
       - cdc-using-debezium-kafka
       - postgres
