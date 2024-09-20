@@ -117,12 +117,10 @@ class EmulatorParser(Parser):
         result = emulator.run_get_method(method=method, stack=stack)
         if not result['success']:
             raise EmulatorException(f"Method {method} execution failed: {result}")
-        if result['vm_exit_code'] == 9 and 'missing_library' in result:
+        if result['vm_exit_code'] == 9 and 'missing_library' in result and result['missing_library'] is not None:
             missing_library = result['missing_library']
 
             logger.warning(f"Got missing library {missing_library}: {result}")
-            if missing_library is None:
-                raise EmulatorException(f"Empty library link, ignoring")
             lib = asyncio.run(self.get_lib(missing_library))
             db.insert_mc_library(base64.b64encode(lib.to_boc()).decode())
             self.prepare(db)

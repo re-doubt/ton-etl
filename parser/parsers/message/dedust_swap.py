@@ -2,7 +2,8 @@ from model.parser import Parser, TOPIC_MESSAGES
 from loguru import logger
 from db import DB
 from pytoniq_core import Cell, Address
-from model.dexswap import DexSwapParsed
+from model.dexswap import DEX_DEDUST, DexSwapParsed
+from model.dedust import read_dedust_asset
 from parsers.message.swap_volume import estimate_volume
 
 
@@ -12,6 +13,7 @@ BLACKLIST = set([
     Parser.uf2raw('EQA0a6c40n_Kejx_Wj0vowdeYCFYG9XnLdLMRHihXc27cng5'), 
     Parser.uf2raw('EQDpuDAY31FH2jM9PysFsmJ3aXMMReGYb_P65aDOXVYDcCJX')
 ])
+    
 class DedustSwap(Parser):
     
     def topics(self):
@@ -23,21 +25,12 @@ class DedustSwap(Parser):
             obj.get("direction", None) == "out" and \
             obj.get("destination", 'None') is None and \
             not obj.get("source", None) in BLACKLIST
-    
-    def _read_dedust_asset(self, cell):
-        kind = cell.load_uint(4)
-        if kind == 0:
-            return Address("EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c")
-        else:
-            wc = cell.load_uint(8)
-            account_id = cell.load_bytes(32) # 256 bits
-            return Address((wc, account_id))
 
     def handle_internal(self, obj, db: DB):
         cell = Parser.message_body(obj, db).begin_parse()
         op_id = cell.load_uint(32) # swap#9c610de3
-        asset_in = self._read_dedust_asset(cell)
-        asset_out = self._read_dedust_asset(cell)
+        asset_in = read_dedust_asset(cell)
+        asset_out = read_dedust_asset(cell)
         amount_in = cell.load_coins()
         amount_out = cell.load_coins()
         if amount_in == 0 or amount_out == 0:
@@ -53,7 +46,7 @@ class DedustSwap(Parser):
             tx_hash=Parser.require(obj.get('tx_hash', None)),
             msg_hash=Parser.require(obj.get('msg_hash', None)),
             trace_id=Parser.require(obj.get('trace_id', None)),
-            platform="dedust",
+            platform=DEX_DEDUST,
             swap_utime=Parser.require(obj.get('created_at', None)),
             swap_user=sender_addr,
             swap_pool=Parser.require(obj.get('source', None)),
@@ -67,3 +60,4 @@ class DedustSwap(Parser):
         )
         estimate_volume(swap, db)
         db.serialize(swap)
+        db.discover_dex_pool(swap)

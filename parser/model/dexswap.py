@@ -26,6 +26,9 @@ CREATE TABLE parsed.dex_swap_parsed (
 );
 """
 
+DEX_DEDUST = "dedust"
+DEX_STON = "ston.fi"
+
 @dataclass
 class DexSwapParsed:
     __tablename__ = 'dex_swap_parsed'
