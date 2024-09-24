@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from parsers.message.tradoor_trades import TradoorPerpOrder
 from parsers.accounts.tvl import TVLPoolStateParser
 from parsers.swaps.price_discovery import PriceDiscovery
 from parsers.accounts.jetton_wallets_recover import JettonWalletsRecover
@@ -19,6 +20,7 @@ _parsers = [
     DedustSwap(),
     NftHistoryParser(),
     StonfiSwap(),
+    TradoorPerpOrder(),
 
     PriceDiscovery(MIN_SWAP_VOLUME_FOR_PRICE),
 

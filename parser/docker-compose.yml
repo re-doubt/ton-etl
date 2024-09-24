@@ -46,6 +46,21 @@ services:
       options:
         max-size: 10M
 
+  parser_messages_tradoor:
+    build: ./
+    restart: always
+    environment:
+      - KAFKA_GROUP_ID=tradoor_initial_parser
+      - SUPPORTED_PARSERS=TradoorPerpOrder
+      - KAFKA_TOPICS=ton.public.messages
+      - COMMIT_BATCH_SIZE=1
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
   parser_messages_comments:
     build: ./
     restart: always

@@ -119,6 +119,12 @@ with [DedustSwap](./parser/parsers/message/dedust_swap.py) and [StonfiSwap](./pa
 Each parser estimates deal volume in TON and USD using core prices (see below).
 
 
+### tradoor_perp_order
+
+Contains decoded Tradoor Perp Order events. Produced from messages table stream
+with [TradoorPerpOrder](./parser/parsers/message/tradoor_trades.py) parser. 
+
+
 ## prices
 
 Tables related to DeFi - DEX trades, TVL, LSD prices, etc..
