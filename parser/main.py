@@ -39,7 +39,7 @@ if __name__ == "__main__":
             parser.prepare(db)
     generator = consumer
     if os.environ.get("PROCESS_ONE_HASH"):
-        generator = db.get_messages_for_processing(os.environ.get("PROCESS_ONE_HASH").upper())
+        generator = db.get_messages_for_processing(os.environ.get("PROCESS_ONE_HASH"))
     elif os.environ.get("PROCESS_ONE_HASH_STATE"):
         generator = db.get_account_state_for_processing(os.environ.get("PROCESS_ONE_HASH_STATE").upper())
     # for msg in consumer:
