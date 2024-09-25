@@ -124,6 +124,10 @@ Each parser estimates deal volume in TON and USD using core prices (see below).
 Contains decoded Tradoor Perp Order events. Produced from messages table stream
 with [TradoorPerpOrder](./parser/parsers/message/tradoor_trades.py) parser. 
 
+### tradoor_option_order
+
+Contains decoded Tradoor Option Order events. Produced from messages table stream
+with [TradoorOptionOrder](./parser/parsers/message/tradoor_trades.py) parser. 
 
 ## prices
 
