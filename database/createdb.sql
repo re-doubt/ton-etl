@@ -46,3 +46,23 @@ CREATE TABLE parsed.tradoor_option_order (
     created timestamp NULL,
     updated timestamp NULL
 );
+
+-- GasPump events
+
+create type parsed.gaspump_event as enum('DeployAndBuyEmitEvent', 'BuyEmitEvent', 'SellEmitEvent');
+
+CREATE TABLE parsed.gaspump_trade (
+    tx_hash bpchar(44) NULL primary key,
+    trace_id bpchar(44) NULL,
+    event_time int4 NULL,
+    jetton_master varchar NULL,
+    event_type parsed.gaspump_event  NULL,
+    trader_address varchar null,
+    ton_amount numeric NULL,
+    jetton_amount numeric NULL,
+    fee_ton_amount numeric NULL,
+    input_ton_amount numeric NULL,
+    bonding_curve_overflow bool NULL,
+    created timestamp NULL,
+    updated timestamp NULL
+);

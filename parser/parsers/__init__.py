@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from parsers.message.gaspump import GasPumpTrade
 from parsers.message.tradoor_trades import TradoorOptionOrder, TradoorPerpOrder
 from parsers.accounts.tvl import TVLPoolStateParser
 from parsers.swaps.price_discovery import PriceDiscovery
@@ -22,6 +23,7 @@ _parsers = [
     StonfiSwap(),
     TradoorPerpOrder(),
     TradoorOptionOrder(),
+    GasPumpTrade(),
 
     PriceDiscovery(MIN_SWAP_VOLUME_FOR_PRICE),
 
