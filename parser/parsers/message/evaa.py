@@ -110,10 +110,10 @@ class EvaaWithdrawParser(Parser):
         cell.load_uint(32)  # 0x211
 
         withdraw = EvaaWithdraw(
-            tx_hash=Parser.require(parent_message("tx_hash", None)),
-            msg_hash=Parser.require(parent_message("msg_hash", None)),
-            trace_id=Parser.require(parent_message("trace_id", None)),
-            utime=Parser.require(parent_message("created_at", None)),
+            tx_hash=Parser.require(parent_message.get("tx_hash", None)),
+            msg_hash=Parser.require(parent_message.get("msg_hash", None)),
+            trace_id=Parser.require(parent_message.get("trace_id", None)),
+            utime=Parser.require(parent_message.get("created_at", None)),
             successful=Parser.require(db.is_tx_successful(Parser.require(obj.get("tx_hash", None)))),
             query_id=cell.load_uint(64),
             owner_address=cell.load_address(),
@@ -166,10 +166,10 @@ class EvaaLiquidationParser(Parser):
         ref = cell.load_ref().begin_parse()
 
         liqudation = EvaaLiquidation(
-            tx_hash=Parser.require(parent_message("tx_hash", None)),
-            msg_hash=Parser.require(parent_message("msg_hash", None)),
-            trace_id=Parser.require(parent_message("trace_id", None)),
-            utime=Parser.require(parent_message("created_at", None)),
+            tx_hash=Parser.require(parent_message.get("tx_hash", None)),
+            msg_hash=Parser.require(parent_message.get("msg_hash", None)),
+            trace_id=Parser.require(parent_message.get("trace_id", None)),
+            utime=Parser.require(parent_message.get("created_at", None)),
             successful=Parser.require(db.is_tx_successful(Parser.require(obj.get("tx_hash", None)))),
             query_id=cell.load_uint(64),
             owner_address=cell.load_address(),
