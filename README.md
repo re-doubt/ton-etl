@@ -129,6 +129,11 @@ with [TradoorPerpOrder](./parser/parsers/message/tradoor_trades.py) parser.
 Contains decoded Tradoor Option Order events. Produced from messages table stream
 with [TradoorOptionOrder](./parser/parsers/message/tradoor_trades.py) parser. 
 
+### gaspump_trade
+
+Contains decoded GasPump trade events. Produced from messages table stream
+with [GasPumpTrade](./parser/parsers/message/gaspump.py) parser. 
+
 ## prices
 
 Tables related to DeFi - DEX trades, TVL, LSD prices, etc..
