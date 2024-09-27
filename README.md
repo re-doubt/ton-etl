@@ -115,7 +115,7 @@ from nft_transfers stream, also uses getgems_nft_sales and getgems_nft_auctions 
 ### dex_swap_parsed
 
 Contains decoded DEX swaps events for DeDust and Ston.fi. Produced from messages table stream
-with [DedustSwap](./parser/parsers/message/dedust_swap.py) and [StonfiSwap](./parser/parsers/message/stonfi_swap.py) parsers. 
+with [DedustSwap](./parser/parsers/message/dedust_swap.py), [StonfiSwap](./parser/parsers/message/stonfi_swap.py) and [StonfiSwapV2](./parser/parsers/message/stonfi_swap_v2.py) parsers. 
 Each parser estimates deal volume in TON and USD using core prices (see below).
 
 
@@ -175,8 +175,8 @@ Contains the history of DEX pools changes. Produced by [TVLPoolStateParser](./pa
 
 Helper table to map pools tokens to pools. Having this table it is possible to get top tokens by TVL:
 ```sql
-select jetton, sum(tvl_usd) / 2 as total_tvl from tonalytica.dex_pool_link
-join tonalytica.dex_pool using (pool)
+select jetton, sum(tvl_usd) / 2 as total_tvl from prices.dex_pool_link
+join prices.dex_pool using (pool)
 where tvl_usd > 0
 group by 1 order by total_tvl desc limit 10
 ```

@@ -89,3 +89,39 @@ CREATE TABLE parsed.gaspump_trade (
     created timestamp NULL,
     updated timestamp NULL
 );
+
+
+-- DEX Swaps
+CREATE TYPE public."dex_name" AS ENUM (
+	'dedust',
+	'ston.fi');
+
+CREATE TABLE parsed.dex_swap_parsed (
+	tx_hash bpchar(44) NULL,
+	msg_hash bpchar(44) NOT NULL,
+	trace_id bpchar(44) NULL,
+	platform public."dex_name" NULL,
+	swap_utime int8 NULL,
+	swap_user varchar NULL,
+	swap_pool varchar NULL,
+	swap_src_token varchar NULL,
+	swap_dst_token varchar NULL,
+	swap_src_amount numeric NULL,
+	swap_dst_amount numeric NULL,
+	referral_address varchar NULL,
+	reserve0 numeric NULL,
+	reserve1 numeric NULL,
+	query_id numeric NULL,
+	min_out numeric NULL,
+	volume_usd numeric NULL,
+	volume_ton numeric NULL,
+	created timestamp NULL,
+	updated timestamp NULL,
+	CONSTRAINT dex_swap_parsed_pkey PRIMARY KEY (msg_hash)
+);
+CREATE INDEX dex_swap_parsed_swap_utime_idx ON parsed.dex_swap_parsed USING btree (swap_utime);
+CREATE INDEX dex_swap_parsed_tx_hash_idx ON parsed.dex_swap_parsed USING btree (tx_hash);
+
+-- ston.fi V2 support
+ALTER TYPE public.dex_name ADD VALUE 'ston.fi_v2' AFTER 'ston.fi';
+ALTER TABLE parsed.dex_swap_parsed ADD column if not exists router varchar NULL;
