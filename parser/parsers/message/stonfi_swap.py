@@ -45,6 +45,7 @@ class StonfiSwap(Parser):
         tx = Parser.require(db.is_tx_successful(Parser.require(obj.get('tx_hash', None))))
         if not tx:
             logger.info(f"Skipping failed tx for {obj.get('tx_hash', None)}")
+            return
 
         parent_body = db.get_parent_message_body(obj.get('msg_hash'))
         if not parent_body:
@@ -53,7 +54,7 @@ class StonfiSwap(Parser):
         cell = Cell.one_from_boc(parent_body).begin_parse()
         
         op_id = cell.load_uint(32) # 0x25938561
-        assert op_id == 0x25938561, "Parent message for ston.fi swap is {op_id}"
+        assert op_id == 0x25938561, f"Parent message for ston.fi swap is {op_id}"
         parent_query_id = cell.load_uint(64)
 
         to_address = cell.load_address()

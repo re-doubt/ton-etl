@@ -28,6 +28,7 @@ CREATE TABLE parsed.dex_swap_parsed (
 
 DEX_DEDUST = "dedust"
 DEX_STON = "ston.fi"
+DEX_STON_V2 = "ston.fi_v2"
 
 @dataclass
 class DexSwapParsed:
@@ -51,3 +52,4 @@ class DexSwapParsed:
     min_out: decimal.Decimal = None
     volume_usd: decimal.Decimal = None
     volume_ton: decimal.Decimal = None
+    router: str = None

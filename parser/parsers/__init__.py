@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from parsers.message.stonfi_swap_v2 import StonfiSwapV2
 from parsers.message.gaspump import GasPumpTrade
 from parsers.message.tradoor_trades import TradoorOptionOrder, TradoorPerpOrder, TradoorPerpPositionChange
 from parsers.accounts.tvl import TVLPoolStateParser
@@ -21,6 +22,7 @@ _parsers = [
     DedustSwap(),
     NftHistoryParser(),
     StonfiSwap(),
+    StonfiSwapV2(),
     TradoorPerpOrder(),
     TradoorOptionOrder(),
     TradoorPerpPositionChange(),

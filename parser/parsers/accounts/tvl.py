@@ -6,7 +6,7 @@ from loguru import logger
 from db import DB
 from pytoniq_core import Cell, Address, begin_cell
 from model.dexpool import DexPool
-from model.dexswap import DEX_DEDUST, DEX_STON
+from model.dexswap import DEX_DEDUST, DEX_STON, DEX_STON_V2
 from model.dedust import read_dedust_asset
 from parsers.message.swap_volume import estimate_tvl
 from pytvm.tvm_emulator.tvm_emulator import TvmEmulator
@@ -59,8 +59,12 @@ class TVLPoolStateParser(EmulatorParser):
             else:
                 raise e
 
-        if pool.platform == DEX_STON:
-            pool.reserves_left, pool.reserves_right, wallet0_address, wallet1_address, _, _, _, _, _, _ = self._execute_method(emulator, 'get_pool_data', [], db, obj)
+        if pool.platform == DEX_STON or pool.platform == DEX_STON_V2:
+            if pool.platform == DEX_STON:
+                pool.reserves_left, pool.reserves_right, wallet0_address, wallet1_address, _, _, _, _, _, _ = self._execute_method(emulator, 'get_pool_data', [], db, obj)
+            else:
+                # V2
+                _, _, _, pool.reserves_left, pool.reserves_right, wallet0_address, wallet1_address, _, _, _, _, _ = self._execute_method(emulator, 'get_pool_data', [], db, obj)
             # logger.info(f"STON pool data: {pool.reserves_left}, {pool.reserves_right}")
             wallet0_address = wallet0_address.load_address() # jetton wallet address
             wallet1_address = wallet1_address.load_address()
