@@ -139,6 +139,21 @@ with [TradoorOptionOrder](./parser/parsers/message/tradoor_trades.py) parser.
 Contains decoded GasPump trade events. Produced from messages table stream
 with [GasPumpTrade](./parser/parsers/message/gaspump.py) parser. 
 
+### evaa_supply
+
+Contains decoded EVAA supply events. Produced from messages table stream
+with [EvaaSupplyParser](./parser/parsers/message/evaa.py). 
+
+### evaa_withdraw
+
+Contains decoded EVAA withdraw events. Produced from messages table stream
+with [EvaaWithdrawAndLiquidationParser](./parser/parsers/message/evaa.py). 
+
+### evaa_liquidation
+
+Contains decoded EVAA liquidation events. Produced from messages table stream
+with [EvaaWithdrawAndLiquidationParser](./parser/parsers/message/evaa.py). 
+
 ## prices
 
 Tables related to DeFi - DEX trades, TVL, LSD prices, etc..

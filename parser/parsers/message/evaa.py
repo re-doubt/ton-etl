@@ -76,8 +76,7 @@ class EvaaWithdrawAndLiquidationParser(Parser):
 
         parent_message = db.get_parent_message_with_body(obj.get("msg_hash"))
         if not parent_message:
-            logger.warning(f"Unable to find parent message for {obj.get('msg_hash')}")
-            return
+            raise Exception(f"Unable to find parent message for {obj.get('msg_hash')}")
 
         logger.info(
             f"Parsing EVAA withdraw_collateralized/liquidate_satisfied message {Parser.require(parent_message.get('msg_hash', None))}"
