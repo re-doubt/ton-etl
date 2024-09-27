@@ -26,6 +26,7 @@ CREATE TABLE parsed.tradoor_perp_position_change (
     tx_hash bpchar(44) NULL primary key,
     trace_id bpchar(44) NULL,
     event_time int4 NULL,
+    is_increased boolean NULL,
     trx_id numeric NULL,
     order_id numeric NULL,
     op_type int4 NULL,
@@ -40,9 +41,6 @@ CREATE TABLE parsed.tradoor_perp_position_change (
     trade_price numeric NULL,
     trigger_price numeric NULL,
     entry_price numeric NULL,
-    funding_fee numeric NULL,
-    rollover_fee numeric NULL,
-    trading_fee numeric NULL,
     created timestamp NULL,
     updated timestamp NULL
 );

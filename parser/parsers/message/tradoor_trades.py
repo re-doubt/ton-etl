@@ -43,26 +43,31 @@ class TradoorPerpOrder(Parser):
 
         db.serialize(event)
 
+POSITION_INCREASED = Parser.opcode_signed(0x47596abe)
+POSITION_DECREASED = Parser.opcode_signed(0x2353464c)
+
 class TradoorPerpPositionChange(Parser):
     
     def topics(self):
         return [TOPIC_MESSAGES]
 
     def predicate(self, obj) -> bool:
-        # only external messages not blacklist
-        return obj.get("opcode", None) == Parser.opcode_signed(0x47596abe) and \
+        # only external messages with specific opcode from main vault
+        opcode = obj.get("opcode", None)
+        return (opcode == POSITION_INCREASED or opcode == POSITION_DECREASED) and \
             obj.get("direction", None) == "out" and \
             obj.get("destination", 'None') is None and \
             obj.get("source", None) == TRADOOR_MAIN_VAULT
 
     def handle_internal(self, obj, db: DB):
         cell = Parser.message_body(obj, db).begin_parse()
-        cell.load_uint(32) # 0x47596abe
+        opcode = cell.load_uint(32)
         ref = cell.load_ref().begin_parse()
         event = TradoorPerpPositionEvent(
             tx_hash=Parser.require(obj.get('tx_hash', None)),
             trace_id=Parser.require(obj.get('trace_id', None)),
             event_time=Parser.require(obj.get('created_at', None)),
+            is_increased=opcode == POSITION_INCREASED,
             trx_id=cell.load_uint(64),
             order_id=cell.load_uint(64),
             op_type=cell.load_uint(8),
@@ -75,10 +80,7 @@ class TradoorPerpPositionChange(Parser):
             size_delta=cell.load_uint(128),
             size_after=cell.load_coins(),
             trade_price=ref.load_uint(128),
-            entry_price=ref.load_uint(128),
-            funding_fee=ref.load_uint(128),
-            rollover_fee=ref.load_coins(),
-            trading_fee=ref.load_coins()
+            entry_price=ref.load_uint(128)
         )
 
         db.serialize(event)

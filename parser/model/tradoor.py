@@ -29,6 +29,7 @@ class TradoorPerpPositionEvent:
     tx_hash: str
     trace_id: str
     event_time: int
+    is_increased: bool
     trx_id: decimal.Decimal
     order_id: decimal.Decimal
     op_type: int
@@ -42,9 +43,6 @@ class TradoorPerpPositionEvent:
     size_after: decimal.Decimal
     trade_price: decimal.Decimal
     entry_price: decimal.Decimal
-    funding_fee: decimal.Decimal
-    rollover_fee: decimal.Decimal
-    trading_fee: decimal.Decimal
 
 
 @dataclass
