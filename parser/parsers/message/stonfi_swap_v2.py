@@ -51,6 +51,13 @@ class StonfiSwapV2(Parser):
         excesses_address = cell.load_address()
         excesses_address_2 = cell.load_address()
         exit_code = cell.load_uint(32)
+
+        if exit_code != 0xc64370e5: # swap_ok
+            logger.debug(f"Message is not a payment to user, exit code {exit_code}")
+            return
+
+        custom_payload = cell.load_maybe_ref()
+    
         additional_info = cell.load_ref().begin_parse()
         fwd_ton_amount = additional_info.load_coins()
         amount0_out = additional_info.load_coins()
@@ -59,9 +66,6 @@ class StonfiSwapV2(Parser):
         token1_address = additional_info.load_address()
         logger.info(f"{owner} {exit_code} {fwd_ton_amount} {amount0_out} {token0_address} {amount1_out} {token1_address}")
 
-        if exit_code != 0xc64370e5: # swap_ok
-            logger.debug(f"Message is not a payment to user, exit code {exit_code}")
-            return
 
         tx = Parser.require(db.is_tx_successful(Parser.require(obj.get('tx_hash', None))))
         if not tx:
