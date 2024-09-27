@@ -22,6 +22,29 @@ CREATE TABLE parsed.tradoor_perp_order (
     updated timestamp NULL
 );
 
+CREATE TABLE parsed.tradoor_perp_position_change (
+    tx_hash bpchar(44) NULL primary key,
+    trace_id bpchar(44) NULL,
+    event_time int4 NULL,
+    is_increased boolean NULL,
+    trx_id numeric NULL,
+    order_id numeric NULL,
+    op_type int4 NULL,
+    position_id numeric NULL,
+    address varchar NULL,
+    token_id int4 NULL,
+    is_long boolean NULL,
+    margin_delta numeric NULL,
+    margin_after numeric NULL,
+    size_delta numeric NULL,
+    size_after numeric NULL,
+    trade_price numeric NULL,
+    trigger_price numeric NULL,
+    entry_price numeric NULL,
+    created timestamp NULL,
+    updated timestamp NULL
+);
+
 
 CREATE TABLE parsed.tradoor_option_order (
     tx_hash bpchar(44) NULL primary key,
