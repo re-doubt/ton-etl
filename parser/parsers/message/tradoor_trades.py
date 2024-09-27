@@ -2,7 +2,7 @@ from model.parser import Parser, TOPIC_MESSAGES
 from loguru import logger
 from db import DB
 from pytoniq_core import Cell, Address
-from model.tradoor import TradoorOptionOrderEvent, TradoorPerpOrderEvent
+from model.tradoor import TradoorOptionOrderEvent, TradoorPerpOrderEvent, TradoorPerpPositionEvent
 from parsers.message.swap_volume import estimate_volume
 
 
@@ -39,6 +39,46 @@ class TradoorPerpOrder(Parser):
             order_id=cell.load_uint(64),
             trx_id=cell.load_uint(64),
             request_time=cell.load_uint(32),
+        )
+
+        db.serialize(event)
+
+class TradoorPerpPositionChange(Parser):
+    
+    def topics(self):
+        return [TOPIC_MESSAGES]
+
+    def predicate(self, obj) -> bool:
+        # only external messages not blacklist
+        return obj.get("opcode", None) == Parser.opcode_signed(0x47596abe) and \
+            obj.get("direction", None) == "out" and \
+            obj.get("destination", 'None') is None and \
+            obj.get("source", None) == TRADOOR_MAIN_VAULT
+
+    def handle_internal(self, obj, db: DB):
+        cell = Parser.message_body(obj, db).begin_parse()
+        cell.load_uint(32) # 0x47596abe
+        ref = cell.load_ref().begin_parse()
+        event = TradoorPerpPositionEvent(
+            tx_hash=Parser.require(obj.get('tx_hash', None)),
+            trace_id=Parser.require(obj.get('trace_id', None)),
+            event_time=Parser.require(obj.get('created_at', None)),
+            trx_id=cell.load_uint(64),
+            order_id=cell.load_uint(64),
+            op_type=cell.load_uint(8),
+            position_id=cell.load_uint(64),
+            address=cell.load_address(),
+            token_id=cell.load_uint(16),            
+            is_long=cell.load_uint(1) == 1,
+            margin_delta=cell.load_uint(128),
+            margin_after=cell.load_coins(),
+            size_delta=cell.load_uint(128),
+            size_after=cell.load_coins(),
+            trade_price=ref.load_uint(128),
+            entry_price=ref.load_uint(128),
+            funding_fee=ref.load_uint(128),
+            rollover_fee=ref.load_coins(),
+            trading_fee=ref.load_coins()
         )
 
         db.serialize(event)

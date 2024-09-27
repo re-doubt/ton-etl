@@ -23,6 +23,31 @@ class TradoorPerpOrderEvent:
 
 
 @dataclass
+class TradoorPerpPositionEvent:
+    __tablename__ = 'tradoor_perp_position_change'
+
+    tx_hash: str
+    trace_id: str
+    event_time: int
+    trx_id: decimal.Decimal
+    order_id: decimal.Decimal
+    op_type: int
+    position_id: int
+    address: str
+    token_id: int
+    is_long: bool
+    margin_delta: decimal.Decimal
+    margin_after: decimal.Decimal
+    size_delta: decimal.Decimal
+    size_after: decimal.Decimal
+    trade_price: decimal.Decimal
+    entry_price: decimal.Decimal
+    funding_fee: decimal.Decimal
+    rollover_fee: decimal.Decimal
+    trading_fee: decimal.Decimal
+
+
+@dataclass
 class TradoorOptionOrderEvent:
     __tablename__ = 'tradoor_option_order'
 

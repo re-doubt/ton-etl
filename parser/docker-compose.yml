@@ -37,8 +37,23 @@ services:
     restart: always
     environment:
       - KAFKA_GROUP_ID=messages_parsers
-      - SUPPORTED_PARSERS=StonfiSwap,DedustSwap,TradoorPerpOrder,TradoorOptionOrder,GasPumpTrade
+      - SUPPORTED_PARSERS=StonfiSwap,DedustSwap,TradoorPerpOrder,TradoorOptionOrder,GasPumpTrade,TradoorPerpPositionChange
       - KAFKA_TOPICS=ton.public.messages
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
+  parser_messages_tradoor_position:
+    build: ./
+    restart: always
+    environment:
+      - KAFKA_GROUP_ID=tradoor_position_parser
+      - SUPPORTED_PARSERS=TradoorPerpPositionChange
+      - KAFKA_TOPICS=ton.public.messages
+      - COMMIT_BATCH_SIZE=1
     env_file:
       - parser.env
     logging:
