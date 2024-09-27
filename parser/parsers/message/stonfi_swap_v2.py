@@ -6,9 +6,8 @@ from model.dexswap import DEX_STON, DEX_STON_V2, DexSwapParsed
 from parsers.message.swap_volume import estimate_volume
 
 """
-https://docs.ston.fi/docs/developer-section/api-reference-v2/ops - op codes
-
-List of routers supported by ston.fi
+Implementation of parser for V2 ston.fi swap - https://docs.ston.fi/docs/developer-section/api-reference-v2
+V2 version allows to use multiple routers (below). TODO: sync list with ston.fi API https://api.ston.fi/v1/pools?dex_v2=true
 """
 ROUTERS = set(map(Parser.uf2raw, [
     'EQABT9GCyDI60CbC4c6uS33HFDwaqd6MddiwIIw7CXTgNR3A',
