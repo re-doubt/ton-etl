@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pytoniq_core import Address
 
 
 @dataclass
@@ -13,8 +14,8 @@ class EvaaSupply:
     successful: bool
     query_id: int
     amount: int  # amount_supplied
-    asset_id: str
-    owner_address: str
+    asset_id: Address
+    owner_address: Address
     repay_amount_principal: int
     supply_amount_principal: int
 
@@ -31,8 +32,8 @@ class EvaaWithdraw:
     successful: bool
     query_id: int
     amount: int  # withdraw_amount_current
-    asset_id: str
-    owner_address: str
+    asset_id: Address
+    owner_address: Address
     borrow_amount_principal: int
     reclaim_amount_principal: int
     approved: bool
@@ -53,10 +54,10 @@ class EvaaLiquidation:
     protocol_gift: int
     collateral_reward: int
     min_collateral_amount: int
-    transferred_asset_id: str
-    collateral_asset_id: str
-    owner_address: str
-    liquidator_address: str
+    transferred_asset_id: Address
+    collateral_asset_id: Address
+    owner_address: Address
+    liquidator_address: Address
     delta_loan_principal: int
     delta_collateral_principal: int
     approved: bool

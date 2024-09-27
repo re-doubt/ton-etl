@@ -130,8 +130,8 @@ ALTER TABLE parsed.dex_swap_parsed ADD column if not exists router varchar NULL;
 -- EVAA
 
 CREATE TABLE parsed.evaa_supply (
-    msg_hash bpchar(44) NULL primary key,
-    tx_hash bpchar(44) NULL,
+    tx_hash bpchar(44) NULL primary key,
+    msg_hash bpchar(44) NULL,
     trace_id bpchar(44) NULL,
     utime int4 NULL,
     successful boolean NULL,
@@ -146,8 +146,8 @@ CREATE TABLE parsed.evaa_supply (
 );
 
 CREATE TABLE parsed.evaa_withdraw (
-    msg_hash bpchar(44) NULL primary key,
-    tx_hash bpchar(44) NULL,
+    tx_hash bpchar(44) NULL primary key,
+    msg_hash bpchar(44) NULL,
     trace_id bpchar(44) NULL,
     utime int4 NULL,
     successful boolean NULL,
@@ -163,8 +163,8 @@ CREATE TABLE parsed.evaa_withdraw (
 );
 
 CREATE TABLE parsed.evaa_liquidation (
-    msg_hash bpchar(44) NULL primary key,
-    tx_hash bpchar(44) NULL,
+    tx_hash bpchar(44) NULL primary key,
+    msg_hash bpchar(44) NULL,
     trace_id bpchar(44) NULL,
     utime int4 NULL,
     successful boolean NULL,
