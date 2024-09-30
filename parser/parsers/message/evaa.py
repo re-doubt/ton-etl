@@ -117,10 +117,12 @@ class EvaaWithdrawAndLiquidationParser(Parser):
                 delta_loan_principal=ref.load_int(64),
                 amount=ref.load_uint(64),
                 protocol_gift=ref.load_uint(64),
+                new_user_loan_principal=ref.load_uint(64),
                 collateral_asset_id=evaa_asset_to_address(ref.load_uint(256)),
                 delta_collateral_principal=ref.load_int(64),
                 collateral_reward=ref.load_uint(64),
                 min_collateral_amount=ref.load_uint(64),
+                new_user_collateral_principal=ref.load_uint(64),
                 approved=approved,
             )
             logger.info(f"Adding EVAA liquidation {liqudation}")

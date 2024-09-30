@@ -60,4 +60,6 @@ class EvaaLiquidation:
     liquidator_address: Address
     delta_loan_principal: int
     delta_collateral_principal: int
+    new_user_loan_principal: int
+    new_user_collateral_principal: int
     approved: bool
