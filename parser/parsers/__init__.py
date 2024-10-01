@@ -10,6 +10,7 @@ from parsers.message_contents.decode_comment import CommentsDecoder
 from parsers.accounts.core_prices import CorePricesLSDstTON, CorePricesLSDtsTON, CorePricesStormTrade, CorePricesUSDT
 from parsers.message.dedust_swap import DedustSwap
 from parsers.message.stonfi_swap import StonfiSwap
+from parsers.message.evaa import EvaaSupplyParser, EvaaWithdrawAndLiquidationParser
 from parsers.nft_transfer.nft_history import NftHistoryParser
 from model.parser import Parser
 from loguru import logger
@@ -27,6 +28,8 @@ _parsers = [
     TradoorOptionOrder(),
     TradoorPerpPositionChange(),
     GasPumpTrade(),
+    EvaaSupplyParser(),
+    EvaaWithdrawAndLiquidationParser(),
 
     PriceDiscovery(MIN_SWAP_VOLUME_FOR_PRICE),
 

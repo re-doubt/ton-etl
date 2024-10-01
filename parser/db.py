@@ -89,6 +89,24 @@ class DB():
                 return None
             return res['body']
 
+    """
+    Returns parent message with message body
+    """
+    def get_parent_message_with_body(self, msg_hash) -> dict:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                select m.*, mc.body from trace_edges te
+                join messages m on m.tx_hash = te.left_tx and m.direction ='in'
+                join message_contents mc on mc.hash = m.body_hash 
+                where te.msg_hash = %s
+                """, 
+                (msg_hash, ),
+            )
+            res = cursor.fetchone()
+            return res
+
     def get_nft_sale(self, address: str) -> dict:
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
@@ -107,7 +125,7 @@ class DB():
             res = cursor.fetchone()
             return res
         
-    def is_tx_successful(self, tx_hash: str) -> dict:
+    def is_tx_successful(self, tx_hash: str) -> bool:
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(

@@ -125,3 +125,64 @@ CREATE INDEX dex_swap_parsed_tx_hash_idx ON parsed.dex_swap_parsed USING btree (
 -- ston.fi V2 support
 ALTER TYPE public.dex_name ADD VALUE 'ston.fi_v2' AFTER 'ston.fi';
 ALTER TABLE parsed.dex_swap_parsed ADD column if not exists router varchar NULL;
+
+
+-- EVAA
+
+CREATE TABLE parsed.evaa_supply (
+    tx_hash bpchar(44) NULL primary key,
+    msg_hash bpchar(44) NULL,
+    trace_id bpchar(44) NULL,
+    utime int4 NULL,
+    successful boolean NULL,
+    query_id numeric NULL,
+    amount numeric NULL,
+    asset_id varchar NULL,
+    owner_address varchar NULL,
+    repay_amount_principal numeric NULL,
+    supply_amount_principal numeric NULL,
+    created timestamp NULL,
+    updated timestamp NULL
+);
+
+CREATE TABLE parsed.evaa_withdraw (
+    tx_hash bpchar(44) NULL primary key,
+    msg_hash bpchar(44) NULL,
+    trace_id bpchar(44) NULL,
+    utime int4 NULL,
+    successful boolean NULL,
+    query_id numeric NULL,
+    amount numeric NULL,
+    asset_id varchar NULL,
+    owner_address varchar NULL,
+    borrow_amount_principal numeric NULL,
+    reclaim_amount_principal numeric NULL,
+    recipient_address varchar NULL,
+    approved boolean NULL,
+    created timestamp NULL,
+    updated timestamp NULL
+);
+
+CREATE TABLE parsed.evaa_liquidation (
+    tx_hash bpchar(44) NULL primary key,
+    msg_hash bpchar(44) NULL,
+    trace_id bpchar(44) NULL,
+    utime int4 NULL,
+    successful boolean NULL,
+    query_id numeric NULL,
+    amount numeric NULL,
+    protocol_gift numeric NULL,
+    collateral_reward numeric NULL,
+    min_collateral_amount numeric NULL,
+    transferred_asset_id varchar NULL,
+    collateral_asset_id varchar NULL,
+    owner_address varchar NULL,
+    liquidator_address varchar NULL,
+    delta_loan_principal numeric NULL,
+    delta_collateral_principal numeric NULL,
+    new_user_loan_principal numeric NULL,
+    new_user_collateral_principal numeric NULL,
+    approved boolean NULL,
+    created timestamp NULL,
+    updated timestamp NULL
+);
