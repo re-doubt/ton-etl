@@ -3,6 +3,7 @@ from loguru import logger
 from db import DB
 from model.parser import Parser, TOPIC_JETTON_WALLETS
 from model.jetton_wallet_balance import JettonWalletBalance
+from parsers.utils import decode_decimal
 
 
 class JettonWalletBalancesParser(Parser):
@@ -19,7 +20,7 @@ class JettonWalletBalancesParser(Parser):
             tx_lt=obj.get("last_transaction_lt", None),
             jetton_master=obj.get("jetton", None),
             owner=obj.get("owner", None),
-            balance=obj.get("balance", None)
+            balance=decode_decimal(obj.get("balance", None))
         )
         logger.info(f"Adding jetton wallet balance {balance}")
         db.serialize(balance)
