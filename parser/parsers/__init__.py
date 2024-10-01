@@ -12,6 +12,7 @@ from parsers.message.dedust_swap import DedustSwap
 from parsers.message.stonfi_swap import StonfiSwap
 from parsers.message.evaa import EvaaSupplyParser, EvaaWithdrawAndLiquidationParser
 from parsers.nft_transfer.nft_history import NftHistoryParser
+from parsers.jetton_wallets.jetton_wallet_balances import JettonWalletBalancesParser
 from model.parser import Parser
 from loguru import logger
 import os
@@ -50,7 +51,9 @@ _parsers = [
     NFTsRecover(EMULATOR_PATH),
     JettonWalletsRecover(EMULATOR_PATH),
     
-    CommentsDecoder()
+    CommentsDecoder(),
+
+    JettonWalletBalancesParser()
 ]
 
 """

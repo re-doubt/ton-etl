@@ -15,7 +15,6 @@ class JettonWalletBalancesParser(Parser):
 
     def handle_internal(self, obj: dict, db: DB):
         balance = JettonWalletBalance(
-            tx_hash=Parser.require(obj.get("tx_hash", None)),
             address=obj.get("address", None),
             tx_lt=obj.get("last_transaction_lt", None),
             jetton_master=obj.get("jetton", None),
