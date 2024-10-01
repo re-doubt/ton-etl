@@ -36,6 +36,7 @@ class EvaaWithdraw:
     owner_address: Address
     borrow_amount_principal: int
     reclaim_amount_principal: int
+    recipient_address: Address
     approved: bool
 
 

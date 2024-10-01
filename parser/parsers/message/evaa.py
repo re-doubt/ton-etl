@@ -81,10 +81,19 @@ class EvaaWithdrawAndLiquidationParser(Parser):
         logger.info(
             f"Parsing EVAA withdraw_collateralized/liquidate_satisfied message {Parser.require(parent_message.get('msg_hash', None))}"
         )
+
+        is_new_liquidation_msg = False
+        if Parser.require(parent_message.get("created_at", None)) > 1716051631:
+            is_new_liquidation_msg = True
+
         cell = Cell.one_from_boc(Parser.require(parent_message.get("body"))).begin_parse()
         parent_op = cell.load_uint(32)  # 0x211 / 0x311
 
         if parent_op == 0x211:
+            recipient_address = None
+            if cell.refs:
+                ref = cell.load_ref().begin_parse()
+                recipient_address = ref.load_address()
             withdraw = EvaaWithdraw(
                 tx_hash=Parser.require(parent_message.get("tx_hash", None)),
                 msg_hash=Parser.require(parent_message.get("msg_hash", None)),
@@ -97,6 +106,7 @@ class EvaaWithdrawAndLiquidationParser(Parser):
                 amount=cell.load_uint(64),
                 borrow_amount_principal=cell.load_uint(64),
                 reclaim_amount_principal=cell.load_uint(64),
+                recipient_address=recipient_address,
                 approved=approved,
             )
             logger.info(f"Adding EVAA withdraw {withdraw}")
@@ -117,12 +127,12 @@ class EvaaWithdrawAndLiquidationParser(Parser):
                 delta_loan_principal=ref.load_int(64),
                 amount=ref.load_uint(64),
                 protocol_gift=ref.load_uint(64),
-                new_user_loan_principal=ref.load_uint(64),
+                new_user_loan_principal=ref.load_uint(64) if is_new_liquidation_msg else None,
                 collateral_asset_id=evaa_asset_to_address(ref.load_uint(256)),
                 delta_collateral_principal=ref.load_int(64),
                 collateral_reward=ref.load_uint(64),
                 min_collateral_amount=ref.load_uint(64),
-                new_user_collateral_principal=ref.load_uint(64),
+                new_user_collateral_principal=ref.load_uint(64) if is_new_liquidation_msg else None,
                 approved=approved,
             )
             logger.info(f"Adding EVAA liquidation {liqudation}")
