@@ -157,6 +157,7 @@ CREATE TABLE parsed.evaa_withdraw (
     owner_address varchar NULL,
     borrow_amount_principal numeric NULL,
     reclaim_amount_principal numeric NULL,
+    recipient_address varchar NULL,
     approved boolean NULL,
     created timestamp NULL,
     updated timestamp NULL
@@ -179,6 +180,8 @@ CREATE TABLE parsed.evaa_liquidation (
     liquidator_address varchar NULL,
     delta_loan_principal numeric NULL,
     delta_collateral_principal numeric NULL,
+    new_user_loan_principal numeric NULL,
+    new_user_collateral_principal numeric NULL,
     approved boolean NULL,
     created timestamp NULL,
     updated timestamp NULL
