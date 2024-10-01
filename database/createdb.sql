@@ -194,7 +194,7 @@ CREATE TABLE parsed.jetton_wallet_balances (
     jetton_master varchar NULL,
     owner varchar NULL,
     balance numeric NULL,
-	created timestamp NULL,
-	updated timestamp NULL,
+    created timestamp NULL,
+    updated timestamp NULL,
     PRIMARY KEY(address, tx_lt)
 );
