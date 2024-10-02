@@ -35,6 +35,7 @@ class EvaaWithdraw:
     amount: int  # withdraw_amount_current
     asset_id: Address
     owner_address: Address
+    user_new_principal: int
     borrow_amount_principal: int
     reclaim_amount_principal: int
     recipient_address: Address

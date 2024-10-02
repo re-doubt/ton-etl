@@ -106,6 +106,7 @@ class EvaaWithdrawAndLiquidationParser(Parser):
                 owner_address=cell.load_address(),
                 asset_id=evaa_asset_to_address(cell.load_uint(256)),
                 amount=cell.load_uint(64),
+                user_new_principal=cell.load_int(64) if is_v4_contract(parent_message.get("created_at")) else None,
                 borrow_amount_principal=cell.load_int(64),
                 reclaim_amount_principal=cell.load_int(64),
                 recipient_address=recipient_address,
