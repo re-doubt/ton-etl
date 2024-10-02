@@ -13,6 +13,10 @@ def evaa_asset_to_address(asset_id: int):
     return Address((0, asset_id.to_bytes(32, "big")))
 
 
+def is_v4_contract(utime: int) -> bool:
+    return Parser.require(utime) > 1716051631
+
+
 class EvaaSupplyParser(Parser):
     def topics(self):
         return [TOPIC_MESSAGES]
@@ -39,8 +43,9 @@ class EvaaSupplyParser(Parser):
             owner_address=cell.load_address(),
             asset_id=evaa_asset_to_address(cell.load_uint(256)),
             amount=cell.load_uint(64),
-            repay_amount_principal=cell.load_uint(64),
-            supply_amount_principal=cell.load_uint(64),
+            user_new_principal=cell.load_int(64) if is_v4_contract(obj.get("created_at")) else None,
+            repay_amount_principal=cell.load_int(64),
+            supply_amount_principal=cell.load_int(64),
         )
         logger.info(f"Adding EVAA supply {supply}")
         db.serialize(supply)
@@ -82,10 +87,6 @@ class EvaaWithdrawAndLiquidationParser(Parser):
             f"Parsing EVAA withdraw_collateralized/liquidate_satisfied message {Parser.require(parent_message.get('msg_hash', None))}"
         )
 
-        is_new_liquidation_msg = False
-        if Parser.require(parent_message.get("created_at", None)) > 1716051631:
-            is_new_liquidation_msg = True
-
         cell = Cell.one_from_boc(Parser.require(parent_message.get("body"))).begin_parse()
         parent_op = cell.load_uint(32)  # 0x211 / 0x311
 
@@ -104,8 +105,8 @@ class EvaaWithdrawAndLiquidationParser(Parser):
                 owner_address=cell.load_address(),
                 asset_id=evaa_asset_to_address(cell.load_uint(256)),
                 amount=cell.load_uint(64),
-                borrow_amount_principal=cell.load_uint(64),
-                reclaim_amount_principal=cell.load_uint(64),
+                borrow_amount_principal=cell.load_int(64),
+                reclaim_amount_principal=cell.load_int(64),
                 recipient_address=recipient_address,
                 approved=approved,
             )
@@ -127,12 +128,12 @@ class EvaaWithdrawAndLiquidationParser(Parser):
                 delta_loan_principal=ref.load_int(64),
                 amount=ref.load_uint(64),
                 protocol_gift=ref.load_uint(64),
-                new_user_loan_principal=ref.load_uint(64) if is_new_liquidation_msg else None,
+                new_user_loan_principal=ref.load_int(64) if is_v4_contract(parent_message.get("created_at")) else None,
                 collateral_asset_id=evaa_asset_to_address(ref.load_uint(256)),
                 delta_collateral_principal=ref.load_int(64),
                 collateral_reward=ref.load_uint(64),
                 min_collateral_amount=ref.load_uint(64),
-                new_user_collateral_principal=ref.load_uint(64) if is_new_liquidation_msg else None,
+                new_user_collateral_principal=ref.load_int(64) if is_v4_contract(parent_message.get("created_at")) else None,
                 approved=approved,
             )
             logger.info(f"Adding EVAA liquidation {liqudation}")

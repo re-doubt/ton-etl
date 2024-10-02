@@ -16,6 +16,7 @@ class EvaaSupply:
     amount: int  # amount_supplied
     asset_id: Address
     owner_address: Address
+    user_new_principal: int
     repay_amount_principal: int
     supply_amount_principal: int
 
