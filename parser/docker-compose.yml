@@ -124,6 +124,21 @@ services:
       options:
         max-size: 10M
 
+  parser_jetton_wallets:
+    build: ./
+    restart: always
+    environment:
+      - KAFKA_GROUP_ID=jetton_wallet_balances
+      - SUPPORTED_PARSERS=JettonWalletBalancesParser
+      - KAFKA_TOPICS=ton.public.jetton_wallets
+      - COMMIT_BATCH_SIZE=20
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
 
 networks:
   default:

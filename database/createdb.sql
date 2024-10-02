@@ -126,7 +126,6 @@ CREATE INDEX dex_swap_parsed_tx_hash_idx ON parsed.dex_swap_parsed USING btree (
 ALTER TYPE public.dex_name ADD VALUE 'ston.fi_v2' AFTER 'ston.fi';
 ALTER TABLE parsed.dex_swap_parsed ADD column if not exists router varchar NULL;
 
-
 -- EVAA
 
 CREATE TABLE parsed.evaa_supply (
@@ -185,4 +184,17 @@ CREATE TABLE parsed.evaa_liquidation (
     approved boolean NULL,
     created timestamp NULL,
     updated timestamp NULL
+);
+
+-- Jetton wallet balances
+
+CREATE TABLE parsed.jetton_wallet_balances (
+    address varchar NULL,
+    tx_lt int8 NULL,
+    jetton_master varchar NULL,
+    owner varchar NULL,
+    balance numeric NULL,
+    created timestamp NULL,
+    updated timestamp NULL,
+    PRIMARY KEY(address, tx_lt)
 );
