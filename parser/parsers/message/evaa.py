@@ -13,6 +13,7 @@ def evaa_asset_to_address(asset_id: int):
     return Address((0, asset_id.to_bytes(32, "big")))
 
 
+# v4 update was made with this tx: XUL1eBYPbMd2fHydBGgojhqYEHsNi1bmSDS1xGGrwPo=
 def is_v4_contract(utime: int) -> bool:
     return Parser.require(utime) > 1716051631
 
