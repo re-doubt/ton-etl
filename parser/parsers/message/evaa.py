@@ -6,7 +6,10 @@ from model.parser import Parser, TOPIC_MESSAGES
 from model.evaa import EvaaSupply, EvaaWithdraw, EvaaLiquidation
 
 
-EVAA = Parser.uf2raw("EQC8rUZqR_pWV1BylWUlPNBzyiTYVoBEmQkMIQDZXICfnuRr")
+EVAA_POOLS = [
+    Parser.uf2raw("EQC8rUZqR_pWV1BylWUlPNBzyiTYVoBEmQkMIQDZXICfnuRr"),
+    Parser.uf2raw("EQBIlZX2URWkXCSg3QF2MJZU-wC5XkBoLww-hdWk2G37Jc6N"),
+]
 
 
 def evaa_asset_to_address(asset_id: int):
@@ -26,7 +29,7 @@ class EvaaSupplyParser(Parser):
         return (
             obj.get("opcode", None) == Parser.opcode_signed(0x11a)
             and obj.get("direction", None) == "in"
-            and obj.get("destination", None) == EVAA
+            and obj.get("destination", None) in EVAA_POOLS
         )
 
     def handle_internal(self, obj, db: DB):
@@ -47,6 +50,7 @@ class EvaaSupplyParser(Parser):
             user_new_principal=cell.load_int(64) if is_v4_contract(obj.get("created_at")) else None,
             repay_amount_principal=cell.load_int(64),
             supply_amount_principal=cell.load_int(64),
+            pool_address=obj.get("destination", None),
         )
         logger.info(f"Adding EVAA supply {supply}")
         db.serialize(supply)
@@ -57,7 +61,7 @@ class EvaaWithdrawAndLiquidationParser(Parser):
         return [TOPIC_MESSAGES]
 
     def predicate(self, obj) -> bool:
-        return obj.get("direction", None) == "in" and obj.get("source", None) == EVAA
+        return obj.get("direction", None) == "in" and obj.get("source", None) in EVAA_POOLS
 
     def handle_internal(self, obj, db: DB):
         cell = Parser.message_body(obj, db).begin_parse()
@@ -110,6 +114,7 @@ class EvaaWithdrawAndLiquidationParser(Parser):
                 borrow_amount_principal=cell.load_int(64),
                 reclaim_amount_principal=cell.load_int(64),
                 recipient_address=recipient_address,
+                pool_address=obj.get("source", None),
                 approved=approved,
             )
             logger.info(f"Adding EVAA withdraw {withdraw}")
@@ -136,6 +141,7 @@ class EvaaWithdrawAndLiquidationParser(Parser):
                 collateral_reward=ref.load_uint(64),
                 min_collateral_amount=ref.load_uint(64),
                 new_user_collateral_principal=ref.load_int(64) if is_v4_contract(parent_message.get("created_at")) else None,
+                pool_address=obj.get("source", None),
                 approved=approved,
             )
             logger.info(f"Adding EVAA liquidation {liqudation}")
