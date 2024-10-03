@@ -6,9 +6,9 @@ services:
     restart: always
     deploy:
       mode: replicated
-      replicas: 4
+      replicas: 12
     environment:
-      - KAFKA_GROUP_ID=s3_exporter_messages
+      - KAFKA_GROUP_ID=s3_exporter_messages_2
       - KAFKA_TOPICS=ton.public.messages
       - CONVERTER=messages
     env_file:
