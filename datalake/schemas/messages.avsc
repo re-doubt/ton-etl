@@ -1,0 +1,148 @@
+{
+  "namespace": "ton",
+  "type": "record",
+  "name": "messages",
+  "fields": [
+    {
+      "name": "tx_hash",
+      "type": "string"
+    },
+    {
+      "name": "tx_lt",
+      "type": "long"
+    },
+    {
+      "name": "msg_hash",
+      "type": "string"
+    },
+    {
+      "name": "direction",
+      "type": "string"
+    },
+    {
+      "name": "trace_id",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "source",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "destination",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "value",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "fwd_fee",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "ihr_fee",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "created_lt",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "created_at",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "opcode",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "ihr_disabled",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "bounce",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "bounced",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "import_fee",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "body_hash",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "body_boc",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "comment",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "init_state_hash",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "__lsn",
+      "type": [
+        "long"
+      ]
+    }
+  ]
+}

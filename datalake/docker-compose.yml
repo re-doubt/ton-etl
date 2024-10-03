@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+  exporter_messages:
+    build: ./
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 4
+    environment:
+      - KAFKA_GROUP_ID=s3_exporter_messages
+      - KAFKA_TOPICS=ton.public.messages
+      - CONVERTER=messages
+    env_file:
+      - exporter.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
+networks:
+  default:
+    name: data_default
+    external: true
