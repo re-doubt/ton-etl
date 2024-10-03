@@ -186,6 +186,10 @@ CREATE TABLE parsed.evaa_liquidation (
     updated timestamp NULL
 );
 
+ALTER TABLE parsed.evaa_supply ADD column if not exists user_new_principal numeric NULL;
+
+ALTER TABLE parsed.evaa_withdraw ADD column if not exists user_new_principal numeric NULL;
+
 -- Jetton wallet balances
 
 CREATE TABLE parsed.jetton_wallet_balances (
