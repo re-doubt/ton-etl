@@ -1,3 +1,4 @@
+import base64
 import psycopg2
 from loguru import logger
 from pytoniq_core import Cell
@@ -19,7 +20,7 @@ class MessageConverter(Converter):
             if not res:
                 logger.warning("Unable to find message body for hash {body_hash}")
                 return obj
-            obj['body_boc'] = res['body']
+            obj['body_boc'] = base64.b64decode(res['body'])
             cell = Cell.one_from_boc(res['body']).begin_parse()
             try:
                 obj['comment'] = cell.load_snake_string().replace('\x00', '')

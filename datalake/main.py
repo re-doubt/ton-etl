@@ -59,12 +59,13 @@ if __name__ == "__main__":
             __op = obj.get('__op', None)
             if not (__op == 'c' or __op == 'r'): # ignore everything apart from new items (c - new item, r - initial snapshot)
                 continue
-            # logger.info(total)
+
             if writer is None:
                 writer = DataFileWriter(open(AVRO_TMP_BUFFER, "wb"), DatumWriter(), converter.schema)
             count += 1
             for f in FIELDS_TO_REMOVE:
                 del obj[f]
+            obj['__id'] = "{msg.partition}_{msg.offset}_{msg.timestamp}"
             writer.append(converter.convert(obj))
             writer.flush() # TODO optimize and avoid flushing after every message
             file_size = os.path.getsize(AVRO_TMP_BUFFER)
