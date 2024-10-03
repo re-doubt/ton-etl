@@ -19,6 +19,7 @@ class EvaaSupply:
     user_new_principal: int
     repay_amount_principal: int
     supply_amount_principal: int
+    pool_address: str
 
 
 @dataclass
@@ -39,6 +40,7 @@ class EvaaWithdraw:
     borrow_amount_principal: int
     reclaim_amount_principal: int
     recipient_address: Address
+    pool_address: str
     approved: bool
 
 
@@ -65,4 +67,5 @@ class EvaaLiquidation:
     delta_collateral_principal: int
     new_user_loan_principal: int
     new_user_collateral_principal: int
+    pool_address: str
     approved: bool
