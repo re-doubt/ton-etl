@@ -19,6 +19,7 @@ from converters.nft_transfers import NftTransfersConverter
 from converters.dex_swaps import DexSwapsConverter
 from converters.gaspump import GasPumpConverter
 from converters.agg_prices import AggPricesConverter
+from converters.tradoor_position_change import TradoorPositionChangeConverter
 
 
 AVRO_TMP_BUFFER = "tmp_buffer.avro"
@@ -31,7 +32,8 @@ CONVERTERS = {
     "nft_transfers": NftTransfersConverter(),
     "dex_swaps": DexSwapsConverter(),
     "gaspump_trades": GasPumpConverter(),
-    "agg_prices": AggPricesConverter()
+    "agg_prices": AggPricesConverter(),
+    "tradoor_position_change": TradoorPositionChangeConverter()
 }
 
 if __name__ == "__main__":
@@ -82,11 +84,18 @@ if __name__ == "__main__":
 
             if writer is None:
                 writer = DataFileWriter(open(AVRO_TMP_BUFFER, "wb"), DatumWriter(), converter.schema)
-            count += 1
             for f in FIELDS_TO_REMOVE:
                 del obj[f]
             obj['__id'] = f"{msg.partition}_{msg.offset}_{msg.timestamp}"
-            writer.append(converter.convert(obj))
+            if converter.strict:
+                writer.append(converter.convert(obj))
+            else:
+                try:
+                    writer.append(converter.convert(obj))
+                except Exception as e:
+                    logger.error(f"Failed to convert item {obj}: {e} {traceback.format_exc()}")
+                    continue
+            count += 1
             writer.flush() # TODO optimize and avoid flushing after every message
             file_size = os.path.getsize(AVRO_TMP_BUFFER)
             if file_size > max_file_size or (time.time() - last_commit > commit_interval and file_size > min_commit_size):

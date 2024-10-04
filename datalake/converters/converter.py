@@ -7,11 +7,12 @@ Also includes list of numeric fields which should be converted to double instead
 {scale:, value:} json notation by debezium.
 """
 class Converter:
-    def __init__(self, schema_name, numeric_fields=[], ignored_fields=[]):
+    def __init__(self, schema_name, numeric_fields=[], ignored_fields=[], strict=True):
         with open(schema_name, "rb") as s:
             self.schema = avro.schema.parse(s.read())
         self.numeric_fields = numeric_fields
         self.ignored_fields = ignored_fields
+        self.strict = strict
 
     def convert(self, obj):
         for field in self.ignored_fields:

@@ -54,6 +54,10 @@ Additional to standard fields we are adding comment field from forward_payload (
 
 [AVRO schema](./schemas/gaspump_trades.avsc)
 
+## Tradoor position change exporter
+
+[AVRO schema](./schemas/tradoor_perp_position_change.avsc)
+
 ## Blocks exporter
 
 [AVRO schema](./schemas/blocks.avsc)
