@@ -103,8 +103,27 @@ services:
       - KAFKA_GROUP_ID=s3_exporter_gaspump
       - KAFKA_TOPIC=ton.parsed.gaspump_trade
       - CONVERTER=gaspump_trades
-      - MIN_COMMIT_SIZE=10000
-      - COMMIT_INTERVAL=3600
+      - MIN_COMMIT_SIZE=1000
+      - COMMIT_INTERVAL=7200
+    env_file:
+      - exporter.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
+  exporter_agg_prices:
+    build: ./
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      - KAFKA_GROUP_ID=s3_exporter_agg_prices
+      - KAFKA_TOPIC=ton.prices.agg_prices
+      - CONVERTER=agg_prices
+      - MIN_COMMIT_SIZE=1000
+      - COMMIT_INTERVAL=14400
     env_file:
       - exporter.env
     logging:

@@ -37,6 +37,13 @@ Note that some fields are supported not for all DEXes:
 
 Volume in USD and TON is caluldated only for swaps with TON, USDT or staked TON.
 
+## Aggregated prices exporter
+
+[AVRO schema](./schemas/agg_prices.avsc)
+
+Not that prices are converting raw token amount (without decimals) into TON and USD amount without decimals as well.
+To get final amount in TON and USD one should devided by 10^9 and 10^6 respectively.
+
 ## NFT transfers exporter
 
 [AVRO schema](./schemas/nft_transfers.avsc)
