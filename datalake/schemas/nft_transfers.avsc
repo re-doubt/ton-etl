@@ -1,0 +1,119 @@
+{
+  "namespace": "ton",
+  "type": "record",
+  "name": "nft_transfers",
+  "fields": [
+    {
+      "name": "tx_hash",
+      "type": "string"
+    },
+    {
+      "name": "tx_lt",
+      "type": "long"
+    },
+    {
+      "name": "tx_now",
+      "type": "int"
+    },
+    {
+      "name": "tx_aborted",
+      "type": "boolean"
+    },
+    {
+      "name": "query_id",
+      "type": [
+        "double",
+        "null"
+      ]
+    },
+    {
+      "name": "nft_item_address",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "nft_item_index",
+      "type": [
+        "double",
+        "null"
+      ]
+    },
+    {
+      "name": "nft_collection_address",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "old_owner",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "new_owner",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "response_destination",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "custom_payload",
+      "type": [
+        "bytes",
+        "null"
+      ]
+    },
+    {
+      "name": "forward_amount",
+      "type": [
+        "double",
+        "null"
+      ]
+    },
+    {
+      "name": "forward_payload",
+      "type": [
+        "bytes",
+        "null"
+      ]
+    },
+    {
+      "name": "comment",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "trace_id",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "__lsn",
+      "type": [
+        "long"
+      ]
+    },
+    {
+      "name": "__id",
+      "type": [
+        "string"
+      ]
+    }
+  ]
+}

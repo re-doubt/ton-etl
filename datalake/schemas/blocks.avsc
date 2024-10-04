@@ -1,0 +1,220 @@
+{
+  "namespace": "ton",
+  "type": "record",
+  "name": "blocks",
+  "fields": [
+    {
+      "name": "workchain",
+      "type": "int"
+    },
+    {
+      "name": "shard",
+      "type": "long"
+    },
+    {
+      "name": "seqno",
+      "type": "int"
+    },
+    {
+      "name": "root_hash",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "file_hash",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "mc_block_workchain",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "mc_block_shard",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "mc_block_seqno",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "global_id",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "version",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "after_merge",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "before_split",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "after_split",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "want_merge",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "want_split",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "key_block",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "vert_seqno_incr",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "flags",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "gen_utime",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "start_lt",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "end_lt",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "validator_list_hash_short",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "gen_catchain_seqno",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "min_ref_mc_seqno",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "prev_key_block_seqno",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "vert_seqno",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "master_ref_seqno",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "rand_seed",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "created_by",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "tx_count",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "__lsn",
+      "type": [
+        "long"
+      ]
+    },
+    {
+      "name": "__id",
+      "type": [
+        "string"
+      ]
+    }
+  ]
+}

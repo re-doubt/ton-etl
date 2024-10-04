@@ -75,6 +75,12 @@ To run parsers just simply use ``docker-compose up -d`` in [parser](./parser/) d
 Each parser can handle multiple event types (described in the DB schema part), also 
 you can scale number of parser instances to handle more events per second.
 
+## Datalake exporter
+
+Datalake exporter listens to Kafka topics with specific tables and exports data to S3. AVRO file format
+is used to export data. After the launch exporter discovers schema from PostgresDB and use this schema for
+AVRO serialization.
+
 # DB Schema
 
 DB contains multiple schemas:
