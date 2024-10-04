@@ -43,6 +43,10 @@ Volume in USD and TON is caluldated only for swaps with TON, USDT or staked TON.
 
 Additional to standard fields we are adding comment field from forward_payload (if it is present).
 
+## GasPump trades exporter
+
+[AVRO schema](./schemas/gaspump_trades.avsc)
+
 ## Blocks exporter
 
 [AVRO schema](./schemas/blocks.avsc)
