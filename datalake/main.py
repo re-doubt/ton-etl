@@ -20,12 +20,14 @@ from converters.dex_swaps import DexSwapsConverter
 from converters.gaspump import GasPumpConverter
 from converters.agg_prices import AggPricesConverter
 from converters.tradoor_position_change import TradoorPositionChangeConverter
+from converters.transactions import TransactionsConverter
 
 
 AVRO_TMP_BUFFER = "tmp_buffer.avro"
 
 CONVERTERS = {
     "messages": MessageConverter(),
+    "transactions": TransactionsConverter(),
     "jetton_transfers": JettonTransfersConverter(),
     "jetton_burns": JettonBurnsConverter(),
     "blocks": BlocksConverter(),

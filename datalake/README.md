@@ -3,6 +3,16 @@
 Datalake exporters are responsible for exporting data from Kafka to S3. It converts messages to Avro format, 
 apply additional transformations and uploads them to S3.
 
+## Blocks exporter
+
+[AVRO schema](./schemas/blocks.avsc)
+
+## Transactions exporter
+
+[AVRO schema](./schemas/transactions.avsc).
+
+Additionaly we are adding account_state_code_hash_after and account_state_balance_after fields.
+
 ## Messages exporter
 
 [AVRO schema](./schemas/messages.avsc)
@@ -57,7 +67,3 @@ Additional to standard fields we are adding comment field from forward_payload (
 ## Tradoor position change exporter
 
 [AVRO schema](./schemas/tradoor_perp_position_change.avsc)
-
-## Blocks exporter
-
-[AVRO schema](./schemas/blocks.avsc)

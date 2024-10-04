@@ -35,7 +35,7 @@ if __name__ == "__main__":
                     avro_type = 'string'
                 elif data_type == 'bigint':
                     avro_type = 'long'
-                elif data_type == 'integer':
+                elif data_type == 'integer' or data_type == 'smallint':
                     avro_type = 'int'
                 elif data_type == 'boolean':
                     avro_type = 'boolean'

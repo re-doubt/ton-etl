@@ -1,0 +1,521 @@
+{
+  "namespace": "ton",
+  "type": "record",
+  "name": "transactions",
+  "fields": [
+    {
+      "name": "account",
+      "type": "string"
+    },
+    {
+      "name": "hash",
+      "type": "string"
+    },
+    {
+      "name": "lt",
+      "type": "long"
+    },
+    {
+      "name": "block_workchain",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "block_shard",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "block_seqno",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "mc_block_seqno",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "trace_id",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "prev_trans_hash",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "prev_trans_lt",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "now",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "orig_status",
+      "type": [
+        {
+          "type": "enum",
+          "name": "orig_status",
+          "symbols": ["uninit", "frozen", "active", "nonexist"]
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "end_status",
+      "type": [
+        {
+          "type": "enum",
+          "name": "end_status",
+          "symbols": ["uninit", "frozen", "active", "nonexist"]
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "total_fees",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "account_state_hash_before",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "account_state_hash_after",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "account_state_code_hash_after",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "account_state_balance_after",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "descr",
+      "type": [
+        {
+          "type": "enum",
+          "name": "descr",
+          "symbols": ["ord", "storage", "tick_tock", "split_prepare", "split_install", "merge_prepare", "merge_install"]
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "aborted",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "destroyed",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "credit_first",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "is_tock",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "installed",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "storage_fees_collected",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "storage_fees_due",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "storage_status_change",
+      "type": [
+        {
+          "type": "enum",
+          "name": "storage_status_change_type",
+          "symbols": ["unchanged", "frozen", "deleted"]
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "credit_due_fees_collected",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "credit",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "compute_skipped",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "skipped_reason",
+      "type": [
+        {
+          "type": "enum",
+          "name": "skipped_reason_type",
+          "symbols": ["no_state", "bad_state", "no_gas", "suspended"]
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "compute_success",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "compute_msg_state_used",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "compute_account_activated",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "compute_gas_fees",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "compute_gas_used",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "compute_gas_limit",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "compute_gas_credit",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "compute_mode",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "compute_exit_code",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "compute_exit_arg",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "compute_vm_steps",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "compute_vm_init_state_hash",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "compute_vm_final_state_hash",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "action_success",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "action_valid",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "action_no_funds",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "action_status_change",
+      "type": [
+        {
+          "type": "enum",
+          "name": "action_status_change_type",
+          "symbols": ["unchanged", "frozen", "deleted"]
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "action_total_fwd_fees",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "action_total_action_fees",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "action_result_code",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "action_result_arg",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "action_tot_actions",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "action_spec_actions",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "action_skipped_actions",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "action_msgs_created",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "action_action_list_hash",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "action_tot_msg_size_cells",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "action_tot_msg_size_bits",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "bounce",
+      "type": [
+        {
+          "type": "enum",
+          "name": "bounce_type",
+          "symbols": ["negfunds", "nofunds", "ok"]
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "bounce_msg_size_cells",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "bounce_msg_size_bits",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "bounce_req_fwd_fees",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "bounce_msg_fees",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "bounce_fwd_fees",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "split_info_cur_shard_pfx_len",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "split_info_acc_split_depth",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "split_info_this_addr",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "split_info_sibling_addr",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "__lsn",
+      "type": [
+        "long"
+      ]
+    },
+    {
+      "name": "__id",
+      "type": [
+        "string"
+      ]
+    }
+  ]
+}
