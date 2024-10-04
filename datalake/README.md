@@ -22,6 +22,10 @@ But from analytical perspective it is useful to have this field.
 [AVRO schema](./schemas/jetton_transfers.avsc)
 Additional to standard fields we are adding comment field from forward_payload (if it is present).
 
+## Jetton burns exporter
+
+[AVRO schema](./schemas/jetton_burns.avsc)
+
 ## Blocks exporter
 
 [AVRO schema](./schemas/blocks.avsc)

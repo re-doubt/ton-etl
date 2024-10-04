@@ -14,6 +14,7 @@ from avro.io import DatumWriter
 from converters.messages import MessageConverter
 from converters.jetton_transfers import JettonTransfersConverter
 from converters.blocks import BlocksConverter
+from datalake.converters.jetton_burns import JettonBurnsConverter
 
 
 AVRO_TMP_BUFFER = "tmp_buffer.avro"
@@ -21,6 +22,7 @@ AVRO_TMP_BUFFER = "tmp_buffer.avro"
 CONVERTERS = {
     "messages": MessageConverter(),
     "jetton_transfers": JettonTransfersConverter(),
+    "jetton_burns": JettonBurnsConverter(),
     "blocks": BlocksConverter()
 }
 
