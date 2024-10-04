@@ -13,13 +13,15 @@ from avro.datafile import DataFileWriter
 from avro.io import DatumWriter
 from converters.messages import MessageConverter
 from converters.jetton_transfers import JettonTransfersConverter
+from converters.blocks import BlocksConverter
 
 
 AVRO_TMP_BUFFER = "tmp_buffer.avro"
 
 CONVERTERS = {
     "messages": MessageConverter(),
-    "jetton_transfers": JettonTransfersConverter()
+    "jetton_transfers": JettonTransfersConverter(),
+    "blocks": BlocksConverter()
 }
 
 if __name__ == "__main__":

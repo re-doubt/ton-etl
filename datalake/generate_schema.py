@@ -13,6 +13,7 @@ from kafka import KafkaConsumer
 if __name__ == "__main__":
     schema_name = os.environ.get("DB_SCHEMA", "public")
     table_name = os.environ.get("DB_TABLE", "messages")
+    ignore_fields = os.environ.get("IGNORE_FIELDS", "").split(",")
 
     logger.info(f"Discovering schema for {schema_name}.{table_name}")
     schema = {
@@ -26,6 +27,8 @@ if __name__ == "__main__":
         with conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(f"select * from information_schema.columns where table_schema = %s and table_name = %s", (schema_name, table_name))
             for row in cursor.fetchall():
+                if row['column_name'] in ignore_fields:
+                    continue
                 # logger.info(f"Discovered column: {row}")
                 data_type = row['data_type']
                 if data_type == 'character varying' or data_type == 'character' or data_type == 'text':
