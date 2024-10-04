@@ -34,6 +34,11 @@ if __name__ == "__main__":
     max_file_size = int(os.environ.get("MAX_FILE_SIZE", '100000000'))
     log_interval = int(os.environ.get("LOG_INTERVAL", '10'))
 
+    # We should commit after commit_interval
+    commit_interval = int(os.environ.get("COMMIT_INTERVAL", '7200'))
+    # But only if we have at least min_commit_size in the buffer
+    min_commit_size = int(os.environ.get("MIN_COMMIT_SIZE", '1000000'))
+
     datalake_s3_bucket = os.environ.get("DATALAKE_S3_BUCKET")
     datalake_s3_prefix = os.environ.get("DATALAKE_S3_PREFIX")
 
@@ -51,6 +56,7 @@ if __name__ == "__main__":
     consumer.subscribe(topic)
 
     last = time.time()
+    last_commit = time.time()
     total = 0
     writer = None
     count = 0
@@ -73,16 +79,17 @@ if __name__ == "__main__":
             writer.append(converter.convert(obj))
             writer.flush() # TODO optimize and avoid flushing after every message
             file_size = os.path.getsize(AVRO_TMP_BUFFER)
-            if file_size > max_file_size:
+            if file_size > max_file_size or (time.time() - last_commit > commit_interval and file_size > min_commit_size):
                 writer.close()
                 # TODO use object timestamp for partition
                 partition = datetime.now().strftime('%Y%m%d')
                 path = f"{datalake_s3_prefix}{converter.name()}/upload_date={partition}/{msg.partition}_{msg.offset}_{msg.timestamp}.avro"
-                logger.info(f"Going to flush file, total size is {file_size}B, {count} items to {path}")
-                # using YYYYMMDD as partition key, and also use lsn from the last event as 
+                logger.info(f"Going to flush file, total size is {file_size}B, {time.time() - last_commit}s since last commit, {count} items to {path}")
+
                 s3.upload_file(AVRO_TMP_BUFFER, datalake_s3_bucket, path)
                 writer = None
                 now = time.time()
+                last_commit = time.time()
                 logger.info(f"{1.0 * total / (now - last):0.2f} Kafka messages per second")
                 last = now
                 total = 0

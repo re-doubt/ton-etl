@@ -35,6 +35,25 @@ services:
       options:
         max-size: 10M
 
+  exporter_blocks:
+    build: ./
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      - KAFKA_GROUP_ID=s3_exporter_blocks
+      - KAFKA_TOPIC=ton.public.blocks
+      - CONVERTER=blocks
+      - MIN_COMMIT_SIZE=10000
+      - COMMIT_INTERVAL=3600
+    env_file:
+      - exporter.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
 networks:
   default:
     name: data_default
