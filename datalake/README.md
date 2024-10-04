@@ -1,7 +1,11 @@
 # Datalake exporters
 
-Datalake exporters are responsible for exporting data from Kafka to S3. It converts messages to Avro format, 
+Datalake exporters are responsible for exporting data from Kafka to AWS S3. It converts messages to Avro format, 
 apply additional transformations and uploads them to S3.
+
+Datalake locations:
+* Test environment: s3://ton-blockchain-public-datalake-test/v5/
+* Production environment: Work in progress..
 
 ## Blocks exporter
 
