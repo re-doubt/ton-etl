@@ -14,7 +14,7 @@ from avro.io import DatumWriter
 from converters.messages import MessageConverter
 from converters.jetton_transfers import JettonTransfersConverter
 from converters.blocks import BlocksConverter
-from datalake.converters.jetton_burns import JettonBurnsConverter
+from converters.jetton_burns import JettonBurnsConverter
 
 
 AVRO_TMP_BUFFER = "tmp_buffer.avro"
@@ -86,7 +86,7 @@ if __name__ == "__main__":
                 # TODO use object timestamp for partition
                 partition = datetime.now().strftime('%Y%m%d')
                 path = f"{datalake_s3_prefix}{converter.name()}/upload_date={partition}/{msg.partition}_{msg.offset}_{msg.timestamp}.avro"
-                logger.info(f"Going to flush file, total size is {file_size}B, {time.time() - last_commit}s since last commit, {count} items to {path}")
+                logger.info(f"Going to flush file, total size is {file_size}B, {time.time() - last_commit:0.1f}s since last commit, {count} items to {path}")
 
                 s3.upload_file(AVRO_TMP_BUFFER, datalake_s3_bucket, path)
                 writer = None
