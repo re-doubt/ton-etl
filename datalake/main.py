@@ -15,6 +15,7 @@ from converters.messages import MessageConverter
 from converters.jetton_transfers import JettonTransfersConverter
 from converters.blocks import BlocksConverter
 from converters.jetton_burns import JettonBurnsConverter
+from converters.nft_transfers import NftTransfersConverter
 
 
 AVRO_TMP_BUFFER = "tmp_buffer.avro"
@@ -23,7 +24,8 @@ CONVERTERS = {
     "messages": MessageConverter(),
     "jetton_transfers": JettonTransfersConverter(),
     "jetton_burns": JettonBurnsConverter(),
-    "blocks": BlocksConverter()
+    "blocks": BlocksConverter(),
+    "nft_transfers": NftTransfersConverter()
 }
 
 if __name__ == "__main__":

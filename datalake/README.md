@@ -26,6 +26,11 @@ Additional to standard fields we are adding comment field from forward_payload (
 
 [AVRO schema](./schemas/jetton_burns.avsc)
 
+## NFT transfers exporter
+
+[AVRO schema](./schemas/nft_transfers.avsc)
+Additional to standard fields we are adding comment field from forward_payload (if it is present).
+
 ## Blocks exporter
 
 [AVRO schema](./schemas/blocks.avsc)
