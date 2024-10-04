@@ -16,6 +16,7 @@ from converters.jetton_transfers import JettonTransfersConverter
 from converters.blocks import BlocksConverter
 from converters.jetton_burns import JettonBurnsConverter
 from converters.nft_transfers import NftTransfersConverter
+from converters.dex_swaps import DexSwapsConverter
 
 
 AVRO_TMP_BUFFER = "tmp_buffer.avro"
@@ -25,7 +26,8 @@ CONVERTERS = {
     "jetton_transfers": JettonTransfersConverter(),
     "jetton_burns": JettonBurnsConverter(),
     "blocks": BlocksConverter(),
-    "nft_transfers": NftTransfersConverter()
+    "nft_transfers": NftTransfersConverter(),
+    "dex_swaps": DexSwapsConverter()
 }
 
 if __name__ == "__main__":

@@ -74,6 +74,25 @@ services:
       options:
         max-size: 10M
 
+  exporter_dex_swaps:
+    build: ./
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      - KAFKA_GROUP_ID=s3_exporter_dex_swaps
+      - KAFKA_TOPIC=ton.parsed.dex_swap_parsed
+      - CONVERTER=dex_swaps
+      - MIN_COMMIT_SIZE=100000
+      - COMMIT_INTERVAL=3600
+    env_file:
+      - exporter.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
   exporter_blocks:
     build: ./
     restart: always
