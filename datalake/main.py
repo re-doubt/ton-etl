@@ -12,12 +12,14 @@ import avro.schema
 from avro.datafile import DataFileWriter
 from avro.io import DatumWriter
 from converters.messages import MessageConverter
+from converters.jetton_transfers import JettonTransfersConverter
 
 
 AVRO_TMP_BUFFER = "tmp_buffer.avro"
 
 CONVERTERS = {
-    "messages": MessageConverter()
+    "messages": MessageConverter(),
+    "jetton_transfers": JettonTransfersConverter()
 }
 
 if __name__ == "__main__":
@@ -65,21 +67,21 @@ if __name__ == "__main__":
             count += 1
             for f in FIELDS_TO_REMOVE:
                 del obj[f]
-            obj['__id'] = "{msg.partition}_{msg.offset}_{msg.timestamp}"
+            obj['__id'] = f"{msg.partition}_{msg.offset}_{msg.timestamp}"
             writer.append(converter.convert(obj))
             writer.flush() # TODO optimize and avoid flushing after every message
             file_size = os.path.getsize(AVRO_TMP_BUFFER)
-            # logger.info(f"File size: {file_size}")
             if file_size > max_file_size:
                 writer.close()
+                # TODO use object timestamp for partition
                 partition = datetime.now().strftime('%Y%m%d')
-                path = f"{datalake_s3_prefix}upload_date={partition}/{msg.partition}_{msg.offset}_{msg.timestamp}.avro"
+                path = f"{datalake_s3_prefix}{converter.name()}/upload_date={partition}/{msg.partition}_{msg.offset}_{msg.timestamp}.avro"
                 logger.info(f"Going to flush file, total size is {file_size}B, {count} items to {path}")
                 # using YYYYMMDD as partition key, and also use lsn from the last event as 
                 s3.upload_file(AVRO_TMP_BUFFER, datalake_s3_bucket, path)
                 writer = None
                 now = time.time()
-                logger.info(f"{1.0 * total / (now - last):0.2f} Kafka messages per second {total} {now} {last}")
+                logger.info(f"{1.0 * total / (now - last):0.2f} Kafka messages per second")
                 last = now
                 total = 0
                 consumer.commit()

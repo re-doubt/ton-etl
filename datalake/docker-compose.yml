@@ -8,9 +8,26 @@ services:
       mode: replicated
       replicas: 12
     environment:
-      - KAFKA_GROUP_ID=s3_exporter_messages_2
-      - KAFKA_TOPICS=ton.public.messages
+      - KAFKA_GROUP_ID=s3_exporter_messages_3
+      - KAFKA_TOPIC=ton.public.messages
       - CONVERTER=messages
+    env_file:
+      - exporter.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
+  exporter_jetton_transfers:
+    build: ./
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 2
+    environment:
+      - KAFKA_GROUP_ID=s3_exporter_jetton_transfer
+      - KAFKA_TOPIC=ton.public.jetton_transfers
+      - CONVERTER=jetton_transfers
     env_file:
       - exporter.env
     logging:

@@ -28,7 +28,7 @@ if __name__ == "__main__":
             for row in cursor.fetchall():
                 # logger.info(f"Discovered column: {row}")
                 data_type = row['data_type']
-                if data_type == 'character varying' or data_type == 'character':
+                if data_type == 'character varying' or data_type == 'character' or data_type == 'text':
                     avro_type = 'string'
                 elif data_type == 'bigint':
                     avro_type = 'long'
@@ -36,6 +36,8 @@ if __name__ == "__main__":
                     avro_type = 'int'
                 elif data_type == 'boolean':
                     avro_type = 'boolean'
+                elif data_type == 'numeric':
+                    avro_type = 'double'
                 elif data_type == 'USER-DEFINED':
                     logger.warning(f"Using string for field {row['column_name']} with user-defined type")
                     avro_type = 'string'
@@ -51,6 +53,10 @@ if __name__ == "__main__":
     schema['fields'].append({
         'name': '__lsn',
         'type': ['long']
+    })
+    schema['fields'].append({
+        'name': '__id',
+        'type': ['string']
     })
 
     with open(sys.argv[1], "wt") as out:
