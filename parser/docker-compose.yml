@@ -37,7 +37,7 @@ services:
     restart: always
     environment:
       - KAFKA_GROUP_ID=messages_parsers
-      - SUPPORTED_PARSERS=StonfiSwap,StonfiSwapV2,DedustSwap,TradoorPerpOrder,TradoorOptionOrder,GasPumpTrade,TradoorPerpPositionChange,EvaaSupplyParser,EvaaWithdrawAndLiquidationParser
+      - SUPPORTED_PARSERS=StonfiSwap,StonfiSwapV2,DedustSwap,TradoorPerpOrder,TradoorOptionOrder,GasPumpTrade,TradoorPerpPositionChange,EvaaSupplyParser,EvaaWithdrawAndLiquidationParser,StormCompleteOrderParser,StormExecuteOrderParser,StormUpdatePositionParser,StormUpdateStopLossPositionParser,StormTradeNotificationParser
       - KAFKA_TOPICS=ton.public.messages
     env_file:
       - parser.env
