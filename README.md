@@ -160,6 +160,27 @@ with [EvaaWithdrawAndLiquidationParser](./parser/parsers/message/evaa.py).
 Contains decoded EVAA liquidation events. Produced from messages table stream
 with [EvaaWithdrawAndLiquidationParser](./parser/parsers/message/evaa.py). 
 
+### storm_execute_order
+
+Contains decoded Storm Trade order execution events. Produced from messages table stream
+with [StormExecuteOrderParser](./parser/parsers/message/stormtrade.py). 
+
+### storm_complete_order
+
+Contains decoded Storm Trade order completion events. Produced from messages table stream
+with [StormCompleteOrderParser](./parser/parsers/message/stormtrade.py). 
+
+### storm_update_position
+
+Contains decoded Storm Trade position update events. Produced from messages table stream
+with [StormUpdatePositionParser](./parser/parsers/message/stormtrade.py) 
+and [StormUpdateStopLossPositionParser](./parser/parsers/message/stormtrade.py). 
+
+### storm_trade_notification
+
+Contains decoded Storm Trade notification events. Produced from messages table stream
+with [StormTradeNotificationParser](./parser/parsers/message/stormtrade.py). 
+
 ## prices
 
 Tables related to DeFi - DEX trades, TVL, LSD prices, etc..
