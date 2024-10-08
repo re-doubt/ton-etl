@@ -26,7 +26,7 @@ class StormExecuteOrderParser(Parser):
 
         order = cell.load_ref().begin_parse()
         position = cell.load_ref().begin_parse()
-        oracle_payload = cell.load_ref().begin_parse()
+        oracle_payload = cell.load_ref().begin_parse().load_ref().begin_parse()
 
         order_type = order.load_uint(4)
 
@@ -83,10 +83,10 @@ class StormExecuteOrderParser(Parser):
         """
         price_data#_ price:Coins spread:Coins timestamp:uint32 asset_id:uint16 = OraclePriceData
         """
-        oracle_price = oracle_payload.read_coins()
-        spread = oracle_payload.read_coins()
-        oracle_timestamp = oracle_payload.read_uint(32)
-        asset_id = oracle_payload.read_uint(16)
+        oracle_price = oracle_payload.load_coins()
+        spread = oracle_payload.load_coins()
+        oracle_timestamp = oracle_payload.load_uint(32)
+        asset_id = oracle_payload.load_uint(16)
 
         execute_order = StormExecuteOrder(
             tx_hash=Parser.require(obj.get("tx_hash")),
