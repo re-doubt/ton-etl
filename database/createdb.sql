@@ -208,3 +208,21 @@ CREATE TABLE parsed.jetton_wallet_balances (
     updated timestamp NULL,
     PRIMARY KEY(address, tx_lt)
 );
+
+CREATE TABLE parsed.jetton_mint (
+    tx_hash bpchar(44) NULL primary key,
+    msg_hash bpchar(44) NULL,
+    trace_id bpchar(44) NULL,
+    utime int4 NULL,
+    successful boolean NULL,
+    query_id numeric NULL,
+    amount numeric NULL,
+    minter varchar NULL,
+    from_address varchar NULL,
+    wallet varchar NULL,
+    response_destination varchar NULL,
+    forward_ton_amount numeric NULL,
+    forward_payload bytea NULL,
+    created timestamp NULL,
+    updated timestamp NULL
+);
