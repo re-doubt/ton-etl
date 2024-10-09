@@ -118,6 +118,11 @@ message_contents items.
 Contains NFT transfers, sales and auctions history. Produced by [NftHistoryParser](./parser/parsers/nft_transfer/nft_history.py)
 from nft_transfers stream, also uses getgems_nft_sales and getgems_nft_auctions items.
 
+### jetton_mint
+
+Contains jetton mint events. Produced from messages table stream
+with [JettonMintParser](./parser/parsers/message/jetton_mint.py). 
+
 ### dex_swap_parsed
 
 Contains decoded DEX swaps events for DeDust and Ston.fi. Produced from messages table stream
