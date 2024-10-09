@@ -37,6 +37,11 @@ message.max.bytes=200000000
 max.partition.fetch.bytes=200000000
 ````
 
+Also for better observability you can add JMX exporter to Kafka:
+1. Download [jmx_exporter](https://github.com/prometheus/jmx_exporter/releases/tag/1.0.1)
+2. Download kafka config for jmx exporter [kafka-2_0_0.yml](https://github.com/prometheus/jmx_exporter/blob/main/example_configs/kafka-2_0_0.yml)
+3. Metrics would be available on localhost:7072/metrics
+
 
 After starting you can create Debeizum connector:
 
