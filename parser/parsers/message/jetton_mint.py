@@ -66,3 +66,48 @@ class JettonMintParser(Parser):
         )
         logger.info(f"Adding jetton mint {mint}")
         db.serialize(mint)
+
+
+"""
+Hipo project implemented alternative op-code for mint activity, see
+https://github.com/HipoFinance/contract/blob/main/contracts/schema.tlb
+
+tokens_minted#5445efee
+    query_id:uint64
+    tokens:Coins
+    coins:Coins
+    owner:MsgAddress
+    round_since:uint32
+        = InternalMsgBody;
+"""
+class HipoTokensMinted(Parser):
+    def topics(self):
+        return [TOPIC_MESSAGES]
+
+    def predicate(self, obj: dict) -> bool:
+        return obj.get("opcode") == Parser.opcode_signed(0x5445efee) and obj.get("direction") == "in"
+
+    def handle_internal(self, obj: dict, db: DB):
+        logger.info(f"Parsing Hipo tokens mint message {Parser.require(obj.get('msg_hash'))}")
+        cell = Parser.message_body(obj, db).begin_parse()
+        cell.load_uint(32)  # tokens_minted#5445efee
+        query_id = cell.load_uint(64)  # query_id:uint64
+        amount = cell.load_coins()  # tokens:Coins
+
+        mint = JettonMint(
+            tx_hash=Parser.require(obj.get("tx_hash")),
+            msg_hash=Parser.require(obj.get("msg_hash")),
+            trace_id=Parser.require(obj.get("trace_id")),
+            utime=Parser.require(obj.get("created_at")),
+            successful=Parser.require(db.is_tx_successful(Parser.require(obj.get("tx_hash")))),
+            query_id=query_id,
+            amount=amount,
+            minter=Parser.require(obj.get("source")),
+            wallet=Parser.require(obj.get("destination")),
+            from_address=None,
+            response_destination=None,
+            forward_ton_amount=None,
+            forward_payload=None,
+        )
+        logger.info(f"Adding Hipo tokens_minted event {mint}")
+        db.serialize(mint)

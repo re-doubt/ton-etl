@@ -11,7 +11,7 @@ from parsers.accounts.core_prices import CorePricesLSDstTON, CorePricesLSDtsTON,
 from parsers.message.dedust_swap import DedustSwap
 from parsers.message.stonfi_swap import StonfiSwap
 from parsers.message.evaa import EvaaSupplyParser, EvaaWithdrawAndLiquidationParser
-from parsers.message.jetton_mint import JettonMintParser
+from parsers.message.jetton_mint import JettonMintParser, HipoTokensMinted
 from parsers.nft_transfer.nft_history import NftHistoryParser
 from parsers.jetton_wallets.jetton_wallet_balances import JettonWalletBalancesParser
 from model.parser import Parser
@@ -33,6 +33,7 @@ _parsers = [
     EvaaSupplyParser(),
     EvaaWithdrawAndLiquidationParser(),
     JettonMintParser(),
+    HipoTokensMinted(),
 
     PriceDiscovery(MIN_SWAP_VOLUME_FOR_PRICE),
 
