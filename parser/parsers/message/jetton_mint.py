@@ -1,9 +1,11 @@
 from loguru import logger
-from pytoniq_core import Cell, Address
 
 from db import DB
 from model.parser import Parser, TOPIC_MESSAGES
 from model.jetton_mint import JettonMint
+
+
+HTON_MASTER = Parser.uf2raw("EQDPdq8xjAhytYqfGSX8KcFWIReCufsB9Wdg0pLlYSO_h76w")
 
 
 """
@@ -85,7 +87,11 @@ class HipoTokensMinted(Parser):
         return [TOPIC_MESSAGES]
 
     def predicate(self, obj: dict) -> bool:
-        return obj.get("opcode") == Parser.opcode_signed(0x5445efee) and obj.get("direction") == "in"
+        return (
+            obj.get("opcode") == Parser.opcode_signed(0x5445efee)
+            and obj.get("direction") == "in"
+            and obj.get("source") == HTON_MASTER
+        )
 
     def handle_internal(self, obj: dict, db: DB):
         logger.info(f"Parsing Hipo tokens mint message {Parser.require(obj.get('msg_hash'))}")
