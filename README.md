@@ -64,7 +64,7 @@ curl --location 'http://localhost:8083/connectors' \
        "key.converter.schemas.enable": "false",
        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
        "value.converter.schemas.enable": "false",
-       "producer.override.max.request.size": "1073741824",
+       "producer.override.max.request.size": "1073741824"
    }
 }'
 ````
