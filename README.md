@@ -71,6 +71,16 @@ curl --location 'http://localhost:8083/connectors' \
 
 ## Parser
 
+Before running parser you need to prepare local env file parser.env in [parser](./parser/) directory:
+```sh
+PGDATABASE=ton_index_v2
+PGHOST=postgres
+PGUSER=postgres
+PGPORT=5432
+PGPASSWORD= <<< your password here
+KAFKA_BROKER=cdc-using-debezium-kafka:29092
+```
+
 To run parsers just simply use ``docker-compose up -d`` in [parser](./parser/) directory.
 Each parser can handle multiple event types (described in the DB schema part), also 
 you can scale number of parser instances to handle more events per second.
