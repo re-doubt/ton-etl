@@ -188,5 +188,5 @@ services:
 
 networks:
   default:
-    name: data_default
+    name: database_default
     external: true
