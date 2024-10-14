@@ -172,13 +172,13 @@ services:
     restart: always
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: 2
     environment:
-      - KAFKA_GROUP_ID=exporter_test
+      - KAFKA_GROUP_ID=exporter_archive_blocks
       - KAFKA_TOPIC=ton.public.blocks
       - CONVERTER=blocks
-      - MIN_COMMIT_SIZE=10000
-      - COMMIT_INTERVAL=3600
+      - MAX_FILE_SIZE=100000000
+      - PARTITION_MODE=adding_date
     env_file:
       - exporter.env
     logging:
