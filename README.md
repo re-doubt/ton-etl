@@ -65,6 +65,7 @@ curl --location 'http://localhost:8083/connectors' \
        "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
        "transforms.unwrap.add.fields": "op,table,lsn,source.ts_ms",
        "transforms.unwrap.add.headers": "db",
+       "transforms.unwrap.delete.tombstone.handling.mode": "drop",
        "key.converter": "org.apache.kafka.connect.json.JsonConverter",
        "key.converter.schemas.enable": "false",
        "value.converter": "org.apache.kafka.connect.json.JsonConverter",

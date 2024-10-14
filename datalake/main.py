@@ -24,6 +24,7 @@ from converters.transactions import TransactionsConverter
 
 
 AVRO_TMP_BUFFER = "tmp_buffer.avro"
+FLUSH_INTERVAL = 100
 
 CONVERTERS = {
     "messages": MessageConverter(),
@@ -57,7 +58,7 @@ if __name__ == "__main__":
     datalake_s3_prefix = os.environ.get("DATALAKE_S3_PREFIX")
 
 
-    FIELDS_TO_REMOVE = ['__op', '__table', '__source_ts_ms']
+    FIELDS_TO_REMOVE = ['__op', '__table', '__source_ts_ms', '__lsn']
 
     consumer = KafkaConsumer(
             group_id=group_id,
@@ -76,7 +77,23 @@ if __name__ == "__main__":
     count = 0
     s3 = boto3.client('s3')
 
+    current_partition = None
+
     for msg in consumer:
+        def flush_file(partition):
+            writer.close()
+            path = f"{datalake_s3_prefix}{converter.name()}/upload_date={partition}/{msg.partition}_{msg.offset}_{msg.timestamp}.avro"
+            logger.info(f"Going to flush file, total size is {file_size}B, {time.time() - last_commit:0.1f}s since last commit, {count} items to {path}")
+
+            s3.upload_file(AVRO_TMP_BUFFER, datalake_s3_bucket, path)
+            writer = None
+            now = time.time()
+            last_commit = time.time()
+            logger.info(f"{1.0 * total / (now - last):0.2f} Kafka messages per second")
+            last = now
+            total = 0
+            consumer.commit()
+
         try:
             total += 1
             obj = json.loads(msg.value.decode("utf-8"))
@@ -84,37 +101,38 @@ if __name__ == "__main__":
             if not (__op == 'c' or __op == 'r'): # ignore everything apart from new items (c - new item, r - initial snapshot)
                 continue
 
+            local_partition = converter.partition(obj)
+            if current_partition is None:
+                current_partition = local_partition
+
+            if current_partition != local_partition:
+                logger.info(f"Switching to partition {local_partition}, last partition was {current_partition}")
+                if count > 0:
+                    flush_file(current_partition)
+                current_partition = local_partition
+
             if writer is None:
                 writer = DataFileWriter(open(AVRO_TMP_BUFFER, "wb"), DatumWriter(), converter.schema)
+
             for f in FIELDS_TO_REMOVE:
                 del obj[f]
-            obj['__id'] = f"{msg.partition}_{msg.offset}_{msg.timestamp}"
+            
             if converter.strict:
                 writer.append(converter.convert(obj))
+                count += 1
             else:
                 try:
                     writer.append(converter.convert(obj))
                 except Exception as e:
                     logger.error(f"Failed to convert item {obj}: {e} {traceback.format_exc()}")
                     continue
-            count += 1
-            writer.flush() # TODO optimize and avoid flushing after every message
-            file_size = os.path.getsize(AVRO_TMP_BUFFER)
-            if file_size > max_file_size or (time.time() - last_commit > commit_interval and file_size > min_commit_size):
-                writer.close()
-                # TODO use object timestamp for partition
-                partition = datetime.now().strftime('%Y%m%d')
-                path = f"{datalake_s3_prefix}{converter.name()}/upload_date={partition}/{msg.partition}_{msg.offset}_{msg.timestamp}.avro"
-                logger.info(f"Going to flush file, total size is {file_size}B, {time.time() - last_commit:0.1f}s since last commit, {count} items to {path}")
 
-                s3.upload_file(AVRO_TMP_BUFFER, datalake_s3_bucket, path)
-                writer = None
-                now = time.time()
-                last_commit = time.time()
-                logger.info(f"{1.0 * total / (now - last):0.2f} Kafka messages per second")
-                last = now
-                total = 0
-                consumer.commit()
+            if total % FLUSH_INTERVAL == 0:
+                writer.flush()
+            
+            file_size = os.path.getsize(AVRO_TMP_BUFFER)
+            if file_size > max_file_size:
+                flush_file(current_partition)
                 
         except Exception as e:
             logger.error(f"Failted to process item {msg}: {e} {traceback.format_exc()}")
