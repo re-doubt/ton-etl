@@ -13,7 +13,7 @@ import boto3
 import avro.schema
 from avro.datafile import DataFileWriter
 from avro.io import DatumWriter
-from converters.messages import MessageConverter
+from converters.messages import MessageConverter, MessageWithDataConverter
 from converters.jetton_transfers import JettonTransfersConverter
 from converters.blocks import BlocksConverter
 from converters.jetton_burns import JettonBurnsConverter
@@ -30,6 +30,7 @@ FLUSH_INTERVAL = 100
 
 CONVERTERS = {
     "messages": MessageConverter(),
+    "messages_with_data": MessageWithDataConverter(),
     "transactions": TransactionsConverter(),
     "jetton_transfers": JettonTransfersConverter(),
     "jetton_burns": JettonBurnsConverter(),

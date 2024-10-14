@@ -1,7 +1,7 @@
 {
   "namespace": "ton",
   "type": "record",
-  "name": "messages",
+  "name": "messages_with_data",
   "fields": [
     {
       "name": "tx_hash",
@@ -122,6 +122,13 @@
       ]
     },
     {
+      "name": "body_boc",
+      "type": [
+        "bytes",
+        "null"
+      ]
+    },
+    {
       "name": "comment",
       "type": [
         "string",
@@ -132,6 +139,13 @@
       "name": "init_state_hash",
       "type": [
         "string",
+        "null"
+      ]
+    },
+    {
+      "name": "init_state_boc",
+      "type": [
+        "bytes",
         "null"
       ]
     }
