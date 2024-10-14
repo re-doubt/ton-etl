@@ -1,171 +1,171 @@
 version: '3.9'
 
 services:
-  exporter_messages:
-    build: ./
-    restart: always
-    deploy:
-      mode: replicated
-      replicas: 12
-    environment:
-      - KAFKA_GROUP_ID=s3_exporter_messages_3
-      - KAFKA_TOPIC=ton.public.messages
-      - CONVERTER=messages
-    env_file:
-      - exporter.env
-    logging:
-      driver: local
-      options:
-        max-size: 10M
+  # exporter_messages:
+  #   build: ./
+  #   restart: always
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 12
+  #   environment:
+  #     - KAFKA_GROUP_ID=s3_exporter_messages_3
+  #     - KAFKA_TOPIC=ton.public.messages
+  #     - CONVERTER=messages
+  #   env_file:
+  #     - exporter.env
+  #   logging:
+  #     driver: local
+  #     options:
+  #       max-size: 10M
 
-  exporter_transactions:
-    build: ./
-    restart: always
-    deploy:
-      mode: replicated
-      replicas: 4
-    environment:
-      - KAFKA_GROUP_ID=s3_exporter_transactions
-      - KAFKA_TOPIC=ton.public.transactions
-      - CONVERTER=transactions
-    env_file:
-      - exporter.env
-    logging:
-      driver: local
-      options:
-        max-size: 10M
+  # exporter_transactions:
+  #   build: ./
+  #   restart: always
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 4
+  #   environment:
+  #     - KAFKA_GROUP_ID=s3_exporter_transactions
+  #     - KAFKA_TOPIC=ton.public.transactions
+  #     - CONVERTER=transactions
+  #   env_file:
+  #     - exporter.env
+  #   logging:
+  #     driver: local
+  #     options:
+  #       max-size: 10M
 
-  exporter_jetton_transfers:
-    build: ./
-    restart: always
-    deploy:
-      mode: replicated
-      replicas: 2
-    environment:
-      - KAFKA_GROUP_ID=s3_exporter_jetton_transfer
-      - KAFKA_TOPIC=ton.public.jetton_transfers
-      - CONVERTER=jetton_transfers
-    env_file:
-      - exporter.env
-    logging:
-      driver: local
-      options:
-        max-size: 10M
+  # exporter_jetton_transfers:
+  #   build: ./
+  #   restart: always
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 2
+  #   environment:
+  #     - KAFKA_GROUP_ID=s3_exporter_jetton_transfer
+  #     - KAFKA_TOPIC=ton.public.jetton_transfers
+  #     - CONVERTER=jetton_transfers
+  #   env_file:
+  #     - exporter.env
+  #   logging:
+  #     driver: local
+  #     options:
+  #       max-size: 10M
 
-  exporter_jetton_burns:
-    build: ./
-    restart: always
-    deploy:
-      mode: replicated
-      replicas: 1
-    environment:
-      - KAFKA_GROUP_ID=s3_exporter_jetton_burns
-      - KAFKA_TOPIC=ton.public.jetton_burns
-      - CONVERTER=jetton_burns
-      - MIN_COMMIT_SIZE=10000
-      - MAX_FILE_SIZE=10000000
-      - COMMIT_INTERVAL=3600
-    env_file:
-      - exporter.env
-    logging:
-      driver: local
-      options:
-        max-size: 10M
+  # exporter_jetton_burns:
+  #   build: ./
+  #   restart: always
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   environment:
+  #     - KAFKA_GROUP_ID=s3_exporter_jetton_burns
+  #     - KAFKA_TOPIC=ton.public.jetton_burns
+  #     - CONVERTER=jetton_burns
+  #     - MIN_COMMIT_SIZE=10000
+  #     - MAX_FILE_SIZE=10000000
+  #     - COMMIT_INTERVAL=3600
+  #   env_file:
+  #     - exporter.env
+  #   logging:
+  #     driver: local
+  #     options:
+  #       max-size: 10M
 
-  exporter_nft_transfers:
-    build: ./
-    restart: always
-    deploy:
-      mode: replicated
-      replicas: 1
-    environment:
-      - KAFKA_GROUP_ID=s3_exporter_nft_transfers
-      - KAFKA_TOPIC=ton.public.nft_transfers
-      - CONVERTER=nft_transfers
-      - MIN_COMMIT_SIZE=100000
-      - COMMIT_INTERVAL=3600
-    env_file:
-      - exporter.env
-    logging:
-      driver: local
-      options:
-        max-size: 10M
+  # exporter_nft_transfers:
+  #   build: ./
+  #   restart: always
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   environment:
+  #     - KAFKA_GROUP_ID=s3_exporter_nft_transfers
+  #     - KAFKA_TOPIC=ton.public.nft_transfers
+  #     - CONVERTER=nft_transfers
+  #     - MIN_COMMIT_SIZE=100000
+  #     - COMMIT_INTERVAL=3600
+  #   env_file:
+  #     - exporter.env
+  #   logging:
+  #     driver: local
+  #     options:
+  #       max-size: 10M
 
-  exporter_dex_swaps:
-    build: ./
-    restart: always
-    deploy:
-      mode: replicated
-      replicas: 1
-    environment:
-      - KAFKA_GROUP_ID=s3_exporter_dex_swaps
-      - KAFKA_TOPIC=ton.parsed.dex_swap_parsed
-      - CONVERTER=dex_swaps
-      - MIN_COMMIT_SIZE=100000
-      - COMMIT_INTERVAL=3600
-    env_file:
-      - exporter.env
-    logging:
-      driver: local
-      options:
-        max-size: 10M
+  # exporter_dex_swaps:
+  #   build: ./
+  #   restart: always
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   environment:
+  #     - KAFKA_GROUP_ID=s3_exporter_dex_swaps
+  #     - KAFKA_TOPIC=ton.parsed.dex_swap_parsed
+  #     - CONVERTER=dex_swaps
+  #     - MIN_COMMIT_SIZE=100000
+  #     - COMMIT_INTERVAL=3600
+  #   env_file:
+  #     - exporter.env
+  #   logging:
+  #     driver: local
+  #     options:
+  #       max-size: 10M
 
-  exporter_gaspump:
-    build: ./
-    restart: always
-    deploy:
-      mode: replicated
-      replicas: 1
-    environment:
-      - KAFKA_GROUP_ID=s3_exporter_gaspump
-      - KAFKA_TOPIC=ton.parsed.gaspump_trade
-      - CONVERTER=gaspump_trades
-      - MIN_COMMIT_SIZE=1000
-      - COMMIT_INTERVAL=7200
-    env_file:
-      - exporter.env
-    logging:
-      driver: local
-      options:
-        max-size: 10M
+  # exporter_gaspump:
+  #   build: ./
+  #   restart: always
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   environment:
+  #     - KAFKA_GROUP_ID=s3_exporter_gaspump
+  #     - KAFKA_TOPIC=ton.parsed.gaspump_trade
+  #     - CONVERTER=gaspump_trades
+  #     - MIN_COMMIT_SIZE=1000
+  #     - COMMIT_INTERVAL=7200
+  #   env_file:
+  #     - exporter.env
+  #   logging:
+  #     driver: local
+  #     options:
+  #       max-size: 10M
 
-  exporter_agg_prices:
-    build: ./
-    restart: always
-    deploy:
-      mode: replicated
-      replicas: 1
-    environment:
-      - KAFKA_GROUP_ID=s3_exporter_agg_prices
-      - KAFKA_TOPIC=ton.prices.agg_prices
-      - CONVERTER=agg_prices
-      - MIN_COMMIT_SIZE=1000
-      - COMMIT_INTERVAL=14400
-    env_file:
-      - exporter.env
-    logging:
-      driver: local
-      options:
-        max-size: 10M
+  # exporter_agg_prices:
+  #   build: ./
+  #   restart: always
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   environment:
+  #     - KAFKA_GROUP_ID=s3_exporter_agg_prices
+  #     - KAFKA_TOPIC=ton.prices.agg_prices
+  #     - CONVERTER=agg_prices
+  #     - MIN_COMMIT_SIZE=1000
+  #     - COMMIT_INTERVAL=14400
+  #   env_file:
+  #     - exporter.env
+  #   logging:
+  #     driver: local
+  #     options:
+  #       max-size: 10M
 
-  exporter_tradoor:
-    build: ./
-    restart: always
-    deploy:
-      mode: replicated
-      replicas: 1
-    environment:
-      - KAFKA_GROUP_ID=s3_exporter_tradoor
-      - KAFKA_TOPIC=ton.parsed.tradoor_perp_position_change
-      - CONVERTER=tradoor_position_change
-      - MIN_COMMIT_SIZE=1000
-      - COMMIT_INTERVAL=7200
-    env_file:
-      - exporter.env
-    logging:
-      driver: local
-      options:
-        max-size: 10M
+  # exporter_tradoor:
+  #   build: ./
+  #   restart: always
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   environment:
+  #     - KAFKA_GROUP_ID=s3_exporter_tradoor
+  #     - KAFKA_TOPIC=ton.parsed.tradoor_perp_position_change
+  #     - CONVERTER=tradoor_position_change
+  #     - MIN_COMMIT_SIZE=1000
+  #     - COMMIT_INTERVAL=7200
+  #   env_file:
+  #     - exporter.env
+  #   logging:
+  #     driver: local
+  #     options:
+  #       max-size: 10M
 
   exporter_blocks:
     build: ./
@@ -174,7 +174,7 @@ services:
       mode: replicated
       replicas: 1
     environment:
-      - KAFKA_GROUP_ID=s3_exporter_blocks
+      - KAFKA_GROUP_ID=exporter_test
       - KAFKA_TOPIC=ton.public.blocks
       - CONVERTER=blocks
       - MIN_COMMIT_SIZE=10000

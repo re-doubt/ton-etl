@@ -7,3 +7,6 @@ from converters.converter import Converter
 class BlocksConverter(Converter):
     def __init__(self):
         super().__init__("schemas/blocks.avsc")
+
+    def timestamp(self, obj):
+        return obj['gen_utime']
