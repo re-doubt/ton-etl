@@ -115,9 +115,23 @@
       ]
     },
     {
+      "name": "account_state_code_hash_before",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
       "name": "account_state_code_hash_after",
       "type": [
         "string",
+        "null"
+      ]
+    },
+    {
+      "name": "account_state_balance_before",
+      "type": [
+        "long",
         "null"
       ]
     },

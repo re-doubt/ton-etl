@@ -18,23 +18,6 @@ services:
   #     options:
   #       max-size: 10M
 
-  # exporter_transactions:
-  #   build: ./
-  #   restart: always
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 4
-  #   environment:
-  #     - KAFKA_GROUP_ID=s3_exporter_transactions
-  #     - KAFKA_TOPIC=ton.public.transactions
-  #     - CONVERTER=transactions
-  #   env_file:
-  #     - exporter.env
-  #   logging:
-  #     driver: local
-  #     options:
-  #       max-size: 10M
-
   # exporter_jetton_transfers:
   #   build: ./
   #   restart: always
@@ -172,11 +155,30 @@ services:
     restart: always
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: 4
     environment:
       - KAFKA_GROUP_ID=exporter_archive_blocks
       - KAFKA_TOPIC=ton.public.blocks
       - CONVERTER=blocks
+      - MAX_FILE_SIZE=100000000
+      - PARTITION_MODE=adding_date
+    env_file:
+      - exporter.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
+  exporter_transactions:
+    build: ./
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 4
+    environment:
+      - KAFKA_GROUP_ID=exporter_archive_transactions
+      - KAFKA_TOPIC=ton.public.transactions
+      - CONVERTER=transactions
       - MAX_FILE_SIZE=100000000
       - PARTITION_MODE=adding_date
     env_file:
