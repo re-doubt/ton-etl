@@ -191,8 +191,8 @@ Tables related to DeFi - DEX trades, TVL, LSD prices, etc..
 TON/USDT prices, LSD prices and other prices originated from single smart-contracts.
 
 * TON/USDT price is recovered by [CorePricesUSDT](./parser/parsers/accounts/core_prices.py) parser from ston.fi TON/USDT pool
-* [CorePricesLSDstTON](./parser/parsers/accounts/core_prices.py) and [CorePricesLSDtsTON](./parser/parsers/accounts/core_prices.py) are used
-to extract prices for stTON and tsTON
+* [CorePricesLSDstTON](./parser/parsers/accounts/core_prices.py), [CorePricesHipoTON](./parser/parsers/accounts/core_prices.py) and [CorePricesLSDtsTON](./parser/parsers/accounts/core_prices.py) are used
+to extract prices for stTON, hTON and tsTON
 * [CorePricesStormTrade](./parser/parsers/accounts/core_prices.py) extracts vaults converstion rate between LP token and underlying asset
 
 ###  dex_trade

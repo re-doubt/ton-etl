@@ -21,7 +21,7 @@ services:
     restart: always
     environment:
       - KAFKA_GROUP_ID=core_prices
-      - SUPPORTED_PARSERS=CorePricesUSDT,CorePricesLSDstTON,CorePricesLSDtsTON,CorePricesStormTrade
+      - SUPPORTED_PARSERS=CorePricesUSDT,CorePricesLSDstTON,CorePricesLSDtsTON,CorePricesStormTrade,CorePricesHipoTON
       - KAFKA_TOPICS=ton.public.latest_account_states
       - KAFKA_OFFSET_RESET=latest
       - COMMIT_BATCH_SIZE=1
@@ -142,5 +142,5 @@ services:
 
 networks:
   default:
-    name: data_default
+    name: database_default
     external: true

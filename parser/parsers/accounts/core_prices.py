@@ -115,6 +115,23 @@ class CorePricesLSDtsTON(CorePrices):
         logger.info(f"tsTON price: {total_balance}, {supply}")
         self.update_price(1.0 * total_balance / supply, obj, db)
 
+class CorePricesHipoTON(CorePrices, EmulatorParser):
+    def __init__(self, emulator_path, update_interval=3600):
+        EmulatorParser.__init__(self, emulator_path)
+        CorePrices.__init__(self, account=Parser.uf2raw('EQCLyZHP4Xe8fpchQz76O-_RmUhaVc_9BAoGyJrwJrcbz2eZ'), 
+                         asset=Parser.uf2raw('EQDPdq8xjAhytYqfGSX8KcFWIReCufsB9Wdg0pLlYSO_h76w'), 
+                         update_interval=update_interval)
+        
+    def predicate(self, obj) -> bool:
+        return EmulatorParser.predicate(self, obj) and CorePrices.predicate(self, obj)
+
+    def _do_parse(self, obj, db: DB, emulator: TvmEmulator): 
+        response = self._execute_method(emulator, 'get_treasury_state', [], db, obj)
+        total_coins = int(response[0])
+        total_tokens = int(response[1])
+        
+        self.update_price(1.0 * total_coins / total_tokens, obj, db)
+
 
 class CorePricesStormTrade(CorePrices, EmulatorParser):
     def __init__(self, emulator_path, vault, lp_jetton, update_interval=3600):
