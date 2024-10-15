@@ -129,8 +129,8 @@ class CorePricesHipoTON(CorePrices, EmulatorParser):
         response = self._execute_method(emulator, 'get_treasury_state', [], db, obj)
         total_coins = int(response[0])
         total_tokens = int(response[1])
-        
-        self.update_price(1.0 * total_coins / total_tokens, obj, db)
+        if total_tokens > 0:
+            self.update_price(1.0 * total_coins / total_tokens, obj, db)
 
 
 class CorePricesStormTrade(CorePrices, EmulatorParser):
