@@ -22,11 +22,27 @@ if __name__ == "__main__":
     tmp_location = os.environ.get("TMP_LOCATION")
     workgroup = os.environ.get("ATHENA_WORKGROUP")
 
+    athena = boto3.client("athena", region_name="us-east-1")
+
+    def execute_athena_query(query, database=source_database):
+        response = athena.start_query_execution(QueryString=query,
+                                                QueryExecutionContext={"Database": database},
+                                                WorkGroup=workgroup)
+        query_id = response['QueryExecutionId']
+        while True:
+            response = athena.get_query_execution(QueryExecutionId=query_id)
+            if response['QueryExecution']['Status']['State'] == 'SUCCEEDED':
+                break
+            time.sleep(5)
+            logger.info(f"Query {query_id} is still running: {response['QueryExecution']['Status']['State']}")
+
+    logger.info(f"Preparing source table {source_database}.{source_table}")
+    execute_athena_query(f"MSCK REPAIR TABLE {source_table}", database=source_database)
+
     logger.info(f"Repartitioning table {source_database}.{source_table} => {target_database}.{target_table} "
                 f"for date {partition_date} on field {repartition_field}")
 
     glue = boto3.client("glue", region_name="us-east-1")
-    athena = boto3.client("athena", region_name="us-east-1")
     source_table_meta = glue.get_table(DatabaseName=source_database, Name=source_table)
     logger.info(source_table_meta)
     
@@ -82,16 +98,9 @@ if __name__ == "__main__":
     """
     logger.info(f"Running SQL code to convert data into single file dataset {sql}")
 
-    response = athena.start_query_execution(QueryString=sql,
-                                            QueryExecutionContext={"Database": source_database},
-                                            WorkGroup=workgroup)
-    query_id = response['QueryExecutionId']
-    while True:
-        response = athena.get_query_execution(QueryExecutionId=query_id)
-        if response['QueryExecution']['Status']['State'] == 'SUCCEEDED':
-            break
-        time.sleep(5)
-        logger.info(f"Query {query_id} is still running: {response['QueryExecution']['Status']['State']}")
+
+    execute_athena_query(sql)
+
     glue.delete_table(DatabaseName=source_database, Name=tmp_table_name)
     logger.info(f"Time to transfer output data from {tmp_table_location} to {table_location}")
     s3 = boto3.client("s3")
@@ -115,15 +124,6 @@ if __name__ == "__main__":
         continuation_token = objects.get("NextContinuationToken")
 
     logger.info(f"Refreshing partitions")
-    response = athena.start_query_execution(QueryString=f"MSCK REPAIR TABLE {target_database}.{target_table}",
-                                            QueryExecutionContext={"Database": source_database},
-                                            WorkGroup=workgroup)
-    query_id = response['QueryExecutionId']
-    while True:
-        response = athena.get_query_execution(QueryExecutionId=query_id)
-        if response['QueryExecution']['Status']['State'] == 'SUCCEEDED':
-            break
-        time.sleep(5)
-        logger.info(f"Query {query_id} is still running: {response['QueryExecution']['Status']['State']}")
+    execute_athena_query(f"MSCK REPAIR TABLE {target_table}", database=target_database)
 
         
