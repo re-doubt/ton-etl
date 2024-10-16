@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime, timezone
 import avro.schema
 
 """
@@ -13,6 +14,12 @@ class Converter:
         self.numeric_fields = numeric_fields
         self.ignored_fields = ignored_fields
         self.strict = strict
+
+    def timestamp(self, obj) -> int:
+        raise NotImplementedError("timestamp method should be implemented in a subclass")
+    
+    def partition(self, obj) -> str:
+        return datetime.fromtimestamp(self.timestamp(obj), tz=timezone.utc).strftime('%Y%m%d')
 
     def convert(self, obj):
         for field in self.ignored_fields:

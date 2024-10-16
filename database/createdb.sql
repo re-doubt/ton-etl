@@ -1,5 +1,20 @@
 -- initial script
 
+-- core prices
+
+CREATE TABLE prices.core (
+	tx_hash bpchar(44) NOT NULL,
+	lt int8 NULL,
+	asset varchar NOT NULL,
+	price numeric NOT NULL,
+	price_ts int8 NULL,
+	created timestamp NULL,
+	updated timestamp NULL,
+	CONSTRAINT core_pkey PRIMARY KEY (tx_hash)
+);
+CREATE INDEX core_asset_idx ON prices.core USING btree (asset, price_ts DESC);
+
+
 -- Tradoor
 
 CREATE TABLE parsed.tradoor_perp_order (

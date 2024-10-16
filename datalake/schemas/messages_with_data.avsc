@@ -1,10 +1,26 @@
 {
   "namespace": "ton",
   "type": "record",
-  "name": "tradoor_perp_position_change",
+  "name": "messages_with_data",
   "fields": [
     {
       "name": "tx_hash",
+      "type": "string"
+    },
+    {
+      "name": "tx_lt",
+      "type": "long"
+    },
+    {
+      "name": "tx_now",
+      "type": "int"
+    },
+    {
+      "name": "msg_hash",
+      "type": "string"
+    },
+    {
+      "name": "direction",
       "type": "string"
     },
     {
@@ -15,114 +31,121 @@
       ]
     },
     {
-      "name": "event_time",
-      "type": [
-        "int",
-        "null"
-      ]
-    },
-    {
-      "name": "is_increased",
-      "type": [
-        "boolean",
-        "null"
-      ]
-    },
-    {
-      "name": "trx_id",
-      "type": [
-        "double",
-        "null"
-      ]
-    },
-    {
-      "name": "order_id",
-      "type": [
-        "double",
-        "null"
-      ]
-    },
-    {
-      "name": "op_type",
-      "type": [
-        "int",
-        "null"
-      ]
-    },
-    {
-      "name": "position_id",
-      "type": [
-        "double",
-        "null"
-      ]
-    },
-    {
-      "name": "address",
+      "name": "source",
       "type": [
         "string",
         "null"
       ]
     },
     {
-      "name": "token_id",
+      "name": "destination",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "value",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "fwd_fee",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "ihr_fee",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "created_lt",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "created_at",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "opcode",
       "type": [
         "int",
         "null"
       ]
     },
     {
-      "name": "is_long",
+      "name": "ihr_disabled",
       "type": [
         "boolean",
         "null"
       ]
     },
     {
-      "name": "margin_delta",
+      "name": "bounce",
       "type": [
-        "double",
+        "boolean",
         "null"
       ]
     },
     {
-      "name": "margin_after",
+      "name": "bounced",
       "type": [
-        "double",
+        "boolean",
         "null"
       ]
     },
     {
-      "name": "size_delta",
+      "name": "import_fee",
       "type": [
-        "double",
+        "long",
         "null"
       ]
     },
     {
-      "name": "size_after",
+      "name": "body_hash",
       "type": [
-        "double",
+        "string",
         "null"
       ]
     },
     {
-      "name": "trade_price",
+      "name": "body_boc",
       "type": [
-        "double",
+        "bytes",
         "null"
       ]
     },
     {
-      "name": "trigger_price",
+      "name": "comment",
       "type": [
-        "double",
+        "string",
         "null"
       ]
     },
     {
-      "name": "entry_price",
+      "name": "init_state_hash",
       "type": [
-        "double",
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "init_state_boc",
+      "type": [
+        "bytes",
         "null"
       ]
     }

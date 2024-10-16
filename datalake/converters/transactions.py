@@ -10,10 +10,14 @@ from converters.converter import Converter
 class TransactionsConverter(Converter):
     def __init__(self):
         super().__init__("schemas/transactions.avsc")
-        # Use simple connection created on startup. If it fails, we will fail recover after restart
-        self.conn = psycopg2.connect()
 
 
+    def timestamp(self, obj):
+        return obj['now']
+
+
+    """
+    code hash and balance added to transaction on the indexer level
     def convert(self, obj):
         if obj['end_status'] != 'nonexist' and obj['account_state_hash_after']:
             with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
@@ -25,3 +29,4 @@ class TransactionsConverter(Converter):
                     obj['account_state_code_hash_after'] = res['code_hash']
                     obj['account_state_balance_after'] = res['balance']
         return super().convert(obj)
+    """
