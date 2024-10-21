@@ -118,7 +118,8 @@ if __name__ == "__main__":
             logger.info(f"Processing {obj['Key']}")
             suffix = "/".join(obj['Key'].split("/")[-2:])
             logger.info(f"Copying {obj['Key']} to {target_bucket}/{target_key}/{suffix}")
-            s3.copy_object(Bucket=target_bucket, CopySource=f"{bucket}/{obj['Key']}", Key=f"{target_key}/{suffix}")
+            # s3.copy_object(Bucket=target_bucket, CopySource=f"{bucket}/{obj['Key']}", Key=f"{target_key}/{suffix}")
+            s3.copy({'Bucket': bucket, 'Key': obj['Key']}, target_bucket, Key=f"{target_key}/{suffix}")
             # s3.delete_object(Bucket=bucket, Key=obj['Key'])
         if not objects.get("IsTruncated", False):
             break
