@@ -27,7 +27,24 @@ ROUTERS = set(map(Parser.uf2raw, [
     'EQDBYUj5KEPUQrbj7da742UYJIeT9QU5C2dKsi12SdQ3yh9a',
     'EQDTb1w1TCohFqnNcyPrrbbBJQdAwwPn8DbCoaSUd0S5T4fB',
     'EQDi1eWU3HWWst8owY8OMq2Dz9nJJEHUROza8R-_wEGb8yu6',
-    'EQDwyjgjnTXJVPjXji3OPtUilcCjceGVQOLGwr9_sRLjImfG'
+    'EQDwyjgjnTXJVPjXji3OPtUilcCjceGVQOLGwr9_sRLjImfG',
+    # new routers v2.2
+    'EQDAPye7HAPAAl4WXpz5jOCdhf2H9h9QkkzRQ-6K5usiuQeC',
+    'EQByADL5Ra2dldrMSBctgfSm2X2W1P61NVW2RYDb8eJNJGx6',
+    'EQDQ6j53q21HuZtw6oclm7z4LU2cG6S2OKvpSSMH548d7kJT',
+    'EQDx--jUU9PUtHltPYZX7wdzIi0SPY3KZ8nvOs0iZvQJd6Ql',
+    'EQBigMnbY4NU1uwdvzertV5mv_yI7282R-ffW7XZFWPEVRDG',
+    'EQCx0HDJ_DxLxDSQyfsEqHI8Rs65nygvdmeD9Ra7rY15OWN8',
+    'EQAyD7O8CvVdR8AEJcr96fHI1ifFq21S8QMt1czi5IfJPyfA',
+    'EQCS4UEa5UaJLzOyyKieqQOQ2P9M-7kXpkO5HnP3Bv250cN3',
+    'EQCiypoBWNIEPlarBp04UePyEj5zH0ZDHxuRNqJ1WQx3FCY-',
+    'EQAQYbnb1EGK0Wb8mk3vEW4vbHTyv7cOcfJlPWQ87_6_qfzR',
+    'EQDh5oHPvfRwPu2bORBGCoLEO4WQZKL4fk5DD1gydeNG9oEH',
+    'EQCDT9dCT52pdfsLNW0e6qP5T3cgq7M4Ug72zkGYgP17tsWD',
+    'EQAiv3IuxYA6ZGEunOgZSTuMBzbpjwRbWw09-WsE-iqKKMrK',
+    'EQADEFMTMnC-gu5v2U0ZY8AYaGhAOk9TcECg1TOquAW3r-IE',
+    'EQBQ_UBQvR9ryUjKDwijtoiyyga2Wl-yJm6Y8gl0k-HDh_5x',
+    'EQBCtlN7Zy96qx-3yH0Yi4V0SNtQ-8RbhYaNs65MC4Hwfq31'
     ]))
 
 class StonfiSwapV2(Parser):
