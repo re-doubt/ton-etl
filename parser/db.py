@@ -73,6 +73,20 @@ class DB():
             return res['jetton']
         
     """
+    Returns jetton wallet owner
+    """
+    def get_wallet_owner(self, jetton_wallet: Address) -> str:
+        assert self.conn is not None
+        assert type(jetton_wallet) == Address
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("select owner from jetton_wallets jw where address = %s",
+                           (serialize_addr(jetton_wallet), ))
+            res = cursor.fetchone()
+            if not res:
+                return None
+            return res['owner']
+        
+    """
     Returns message body for the parent message
     """
     def get_parent_message_body(self, msg_hash) -> str:
