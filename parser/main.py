@@ -15,6 +15,8 @@ if __name__ == "__main__":
     commit_batch_size = int(os.environ.get("COMMIT_BATCH_SIZE", "100"))
     topics = os.environ.get("KAFKA_TOPICS", "ton.public.latest_account_states,ton.public.messages,ton.public.nft_transfers")
     log_interval = int(os.environ.get("LOG_INTERVAL", '10'))
+    # during initial processing we can be in the situation where we process a lot of messages without any DB updates
+    max_processed_items = int(os.environ.get("MAX_PROCESSED_ITEMS", '1000000'))
     supported_parsers = os.environ.get("SUPPORTED_PARSERS", "*")
     db = DB()
     db.acquire()
@@ -65,7 +67,7 @@ if __name__ == "__main__":
         except Exception as e:
             logger.error(f"Failted to process item {msg}: {e} {traceback.format_exc()}")
             raise
-        if db.updated >= commit_batch_size:
+        if db.updated >= commit_batch_size or (db.updated == 0 and total > max_processed_items):
             logger.info(f"Reached {db.updated} DB updates, making commit")
             db.release() # commit release connection
             consumer.commit() # commit kafka offset
