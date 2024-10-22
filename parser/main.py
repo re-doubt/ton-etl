@@ -7,6 +7,7 @@ import traceback
 from loguru import logger
 from db import DB
 from kafka import KafkaConsumer
+from model.parser import Parser
 from parsers import generate_parsers
 
 
@@ -18,7 +19,7 @@ if __name__ == "__main__":
     # during initial processing we can be in the situation where we process a lot of messages without any DB updates
     max_processed_items = int(os.environ.get("MAX_PROCESSED_ITEMS", '1000000'))
     supported_parsers = os.environ.get("SUPPORTED_PARSERS", "*")
-    db = DB()
+    db = DB(Parser.USE_MESSAGE_CONTENT)
     db.acquire()
 
     consumer = KafkaConsumer(
@@ -60,15 +61,15 @@ if __name__ == "__main__":
             successful += handled
             now = time.time()
             if now - last > log_interval:
-                logger.info(f"{1.0 * total / (now - last):0.2f} Kafka messages per second, {100.0 * successful / total:0.2f}% handled")
+                logger.info(f"{1.0 * total / (now - last):0.2f} Kafka messages per second ({total} processed), {100.0 * successful / total:0.2f}% handled")
                 last = now
                 successful = 0
                 total = 0
         except Exception as e:
-            logger.error(f"Failted to process item {msg}: {e} {traceback.format_exc()}")
+            logger.error(f"Failed to process item {msg}: {e} {traceback.format_exc()}")
             raise
         if db.updated >= commit_batch_size or (db.updated == 0 and total > max_processed_items):
-            logger.info(f"Reached {db.updated} DB updates, making commit")
+            logger.info(f"Reached {db.updated} DB updates, processed {total} items, making commit")
             db.release() # commit release connection
             consumer.commit() # commit kafka offset
             db.acquire() # acquire a new connection
