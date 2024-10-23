@@ -203,18 +203,6 @@
         "int",
         "null"
       ]
-    },
-    {
-      "name": "__lsn",
-      "type": [
-        "long"
-      ]
-    },
-    {
-      "name": "__id",
-      "type": [
-        "string"
-      ]
     }
   ]
 }

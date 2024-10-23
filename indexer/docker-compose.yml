@@ -7,7 +7,6 @@ x-indexer-environment: &index-worker
   POSTGRES_USER:
   POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
   POSTGRES_DBNAME:
-  POSTGRES_DBROOT:
   POSTGRES_PUBLISH_PORT:
   TON_WORKER_FROM:
   TON_WORKER_BINARY: ton-index-postgres-v2
@@ -28,13 +27,12 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
       POSTGRES_DBNAME: ${POSTGRES_DBNAME}
-      POSTGRES_DBROOT: ${POSTGRES_DBROOT}
       POSTGRES_PUBLISH_PORT: ${POSTGRES_PUBLISH_PORT}
       TON_WORKER_FROM: ${TON_WORKER_FROM}
       TON_WORKER_BINARY: ton-index-postgres-v2
     networks:
       internal:
-    command: --from ${TON_WORKER_FROM:-1}
+    command: --from ${TON_WORKER_FROM:-1} --datalake-mode --max-active-tasks ${MAX_ACTIVE_TASKS:-10} --max-insert-actors ${MAX_INSERT_ACTORS:-12} --threads ${THREADS:-7}
     restart: unless-stopped
     ulimits:
       nofile:

@@ -7,7 +7,7 @@ from parsers.swaps.price_discovery import PriceDiscovery
 from parsers.accounts.jetton_wallets_recover import JettonWalletsRecover
 from parsers.accounts.nfts_recover import NFTsRecover
 from parsers.message_contents.decode_comment import CommentsDecoder
-from parsers.accounts.core_prices import CorePricesLSDstTON, CorePricesLSDtsTON, CorePricesStormTrade, CorePricesUSDT
+from parsers.accounts.core_prices import CorePricesHipoTON, CorePricesLSDstTON, CorePricesLSDtsTON, CorePricesStormTrade, CorePricesUSDT
 from parsers.message.dedust_swap import DedustSwap
 from parsers.message.stonfi_swap import StonfiSwap
 from parsers.message.evaa import EvaaSupplyParser, EvaaWithdrawAndLiquidationParser
@@ -40,6 +40,7 @@ _parsers = [
     CorePricesUSDT(),
     CorePricesLSDstTON(),
     CorePricesLSDtsTON(),
+    CorePricesHipoTON(EMULATOR_PATH),
     # TON Vault
     CorePricesStormTrade(EMULATOR_PATH, Parser.uf2raw('EQDpJnZP89Jyxz3euDaXXFUhwCWtaOeRmiUJTi3jGYgF8fnj'),
                           Parser.uf2raw('EQCNY2AQ3ZDYwJAqx_nzl9i9Xhd_Ex7izKJM6JTxXRnO6n1F')),

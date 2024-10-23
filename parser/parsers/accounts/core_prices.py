@@ -68,7 +68,8 @@ class CorePricesUSDT(CorePrices):
         reserve1 = cell.load_coins()
         
         logger.info(f"TON/USDT pool: {reserve0}, {reserve1}")
-        self.update_price(1.0 * reserve0 / reserve1, obj, db)
+        if reserve1 > 0:
+            self.update_price(1.0 * reserve0 / reserve1, obj, db)
 
 """
 stTON (bemo) stores total TON staked and jetton supply in the account state in the first two values.
@@ -87,7 +88,8 @@ class CorePricesLSDstTON(CorePrices):
 
         
         logger.info(f"stTON price: {jetton_total_supply}, {ton_total_supply}")
-        self.update_price(1.0 * ton_total_supply / jetton_total_supply, obj, db)
+        if jetton_total_supply > 0:
+            self.update_price(1.0 * ton_total_supply / jetton_total_supply, obj, db)
 
 
 """
@@ -113,7 +115,25 @@ class CorePricesLSDtsTON(CorePrices):
 
         
         logger.info(f"tsTON price: {total_balance}, {supply}")
-        self.update_price(1.0 * total_balance / supply, obj, db)
+        if supply > 0:
+            self.update_price(1.0 * total_balance / supply, obj, db)
+
+class CorePricesHipoTON(CorePrices, EmulatorParser):
+    def __init__(self, emulator_path, update_interval=3600):
+        EmulatorParser.__init__(self, emulator_path)
+        CorePrices.__init__(self, account=Parser.uf2raw('EQCLyZHP4Xe8fpchQz76O-_RmUhaVc_9BAoGyJrwJrcbz2eZ'), 
+                         asset=Parser.uf2raw('EQDPdq8xjAhytYqfGSX8KcFWIReCufsB9Wdg0pLlYSO_h76w'), 
+                         update_interval=update_interval)
+        
+    def predicate(self, obj) -> bool:
+        return EmulatorParser.predicate(self, obj) and CorePrices.predicate(self, obj)
+
+    def _do_parse(self, obj, db: DB, emulator: TvmEmulator): 
+        response = self._execute_method(emulator, 'get_treasury_state', [], db, obj)
+        total_coins = int(response[0])
+        total_tokens = int(response[1])
+        if total_tokens > 0:
+            self.update_price(1.0 * total_coins / total_tokens, obj, db)
 
 
 class CorePricesStormTrade(CorePrices, EmulatorParser):
@@ -128,4 +148,5 @@ class CorePricesStormTrade(CorePrices, EmulatorParser):
     def _do_parse(self, obj, db: DB, emulator: TvmEmulator): 
         _, _, lp_total_supply, free_balance, _, _, _, _ = self._execute_method(emulator, 'get_vault_data', [], db, obj)
         
-        self.update_price(1.0 * free_balance / lp_total_supply, obj, db)
+        if lp_total_supply > 0:
+            self.update_price(1.0 * free_balance / lp_total_supply, obj, db)

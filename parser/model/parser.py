@@ -1,6 +1,7 @@
 
 #!/usr/bin/env python
 
+import os
 from pytoniq_core import Address, Cell
 from db import DB
 
@@ -24,6 +25,14 @@ class NonCriticalParserError(Exception):
 Base class for parser
 """
 class Parser:
+
+    """
+    Original ton-index-worker writes all bodies into message_contents table.
+    In datalake mode we don't use it and all message bodies are stored in the
+    same table with messages.
+    """
+    USE_MESSAGE_CONTENT = int(os.environ.get("USE_MESSAGE_CONTENT", '0')) == 1
+
     """
     To be invoked before starting parser with the DB instance
     """
@@ -85,4 +94,5 @@ class Parser:
     """
     @classmethod
     def message_body(clz, obj, db: DB) -> Cell:
-        return Cell.one_from_boc(Parser.require(db.get_message_body(obj.get('body_hash'))))
+        body = db.get_message_body(obj.get('body_hash')) if Parser.USE_MESSAGE_CONTENT else obj.get('body_boc')
+        return Cell.one_from_boc(Parser.require(body))

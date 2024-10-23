@@ -7,6 +7,7 @@ import traceback
 from loguru import logger
 from db import DB
 from kafka import KafkaConsumer
+from model.parser import Parser
 from parsers import generate_parsers
 
 
@@ -15,8 +16,10 @@ if __name__ == "__main__":
     commit_batch_size = int(os.environ.get("COMMIT_BATCH_SIZE", "100"))
     topics = os.environ.get("KAFKA_TOPICS", "ton.public.latest_account_states,ton.public.messages,ton.public.nft_transfers")
     log_interval = int(os.environ.get("LOG_INTERVAL", '10'))
+    # during initial processing we can be in the situation where we process a lot of messages without any DB updates
+    max_processed_items = int(os.environ.get("MAX_PROCESSED_ITEMS", '1000000'))
     supported_parsers = os.environ.get("SUPPORTED_PARSERS", "*")
-    db = DB()
+    db = DB(Parser.USE_MESSAGE_CONTENT)
     db.acquire()
 
     consumer = KafkaConsumer(
@@ -32,6 +35,7 @@ if __name__ == "__main__":
 
     last = time.time()
     total = 0
+    kafka_batch = 0
     successful = 0
     PARSERS = generate_parsers(None if supported_parsers == '*' else set(supported_parsers.split(",")))
     for parser_list in PARSERS.values():
@@ -47,6 +51,7 @@ if __name__ == "__main__":
         try:
             
             total += 1
+            kafka_batch += 1
             handled = 0
             obj = json.loads(msg.value.decode("utf-8"))
             __op = obj.get('__op', None)
@@ -58,15 +63,16 @@ if __name__ == "__main__":
             successful += handled
             now = time.time()
             if now - last > log_interval:
-                logger.info(f"{1.0 * total / (now - last):0.2f} Kafka messages per second, {100.0 * successful / total:0.2f}% handled")
+                logger.info(f"{1.0 * total / (now - last):0.2f} Kafka messages per second ({total} processed), {100.0 * successful / total:0.2f}% handled")
                 last = now
                 successful = 0
                 total = 0
         except Exception as e:
-            logger.error(f"Failted to process item {msg}: {e} {traceback.format_exc()}")
+            logger.error(f"Failed to process item {msg}: {e} {traceback.format_exc()}")
             raise
-        if db.updated >= commit_batch_size:
-            logger.info(f"Reached {db.updated} DB updates, making commit")
+        if db.updated >= commit_batch_size or (db.updated == 0 and kafka_batch > max_processed_items):
+            logger.info(f"Reached {db.updated} DB updates, processed {kafka_batch} items, making commit")
             db.release() # commit release connection
             consumer.commit() # commit kafka offset
             db.acquire() # acquire a new connection
+            kafka_batch = 0

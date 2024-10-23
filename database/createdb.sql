@@ -1,5 +1,26 @@
 -- initial script
 
+CREATE TABLE parsed.mc_libraries (
+	boc varchar NULL
+);
+CREATE UNIQUE INDEX mc_libraries_md5_idx ON parsed.mc_libraries USING btree (md5((boc)::text));
+
+
+-- core prices
+
+CREATE TABLE prices.core (
+	tx_hash bpchar(44) NOT NULL,
+	lt int8 NULL,
+	asset varchar NOT NULL,
+	price numeric NOT NULL,
+	price_ts int8 NULL,
+	created timestamp NULL,
+	updated timestamp NULL,
+	CONSTRAINT core_pkey PRIMARY KEY (tx_hash)
+);
+CREATE INDEX core_asset_idx ON prices.core USING btree (asset, price_ts DESC);
+
+
 -- Tradoor
 
 CREATE TABLE parsed.tradoor_perp_order (
@@ -226,3 +247,5 @@ CREATE TABLE parsed.jetton_mint (
     created timestamp NULL,
     updated timestamp NULL
 );
+
+ALTER TABLE parsed.jetton_mint ADD column if not exists "owner" varchar NULL;

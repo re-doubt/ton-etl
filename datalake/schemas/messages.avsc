@@ -12,6 +12,10 @@
       "type": "long"
     },
     {
+      "name": "tx_now",
+      "type": "int"
+    },
+    {
       "name": "msg_hash",
       "type": "string"
     },
@@ -118,13 +122,6 @@
       ]
     },
     {
-      "name": "body_boc",
-      "type": [
-        "bytes",
-        "null"
-      ]
-    },
-    {
       "name": "comment",
       "type": [
         "string",
@@ -136,18 +133,6 @@
       "type": [
         "string",
         "null"
-      ]
-    },
-    {
-      "name": "__lsn",
-      "type": [
-        "long"
-      ]
-    },
-    {
-      "name": "__id",
-      "type": [
-        "string"
       ]
     }
   ]

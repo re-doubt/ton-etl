@@ -37,6 +37,11 @@ message.max.bytes=200000000
 max.partition.fetch.bytes=200000000
 ````
 
+Also for better observability you can add JMX exporter to Kafka:
+1. Download [jmx_exporter](https://github.com/prometheus/jmx_exporter/releases/tag/1.0.1)
+2. Download kafka config for jmx exporter [kafka-2_0_0.yml](https://github.com/prometheus/jmx_exporter/blob/main/example_configs/kafka-2_0_0.yml)
+3. Metrics would be available on localhost:7072/metrics
+
 
 After starting you can create Debeizum connector:
 
@@ -60,6 +65,7 @@ curl --location 'http://localhost:8083/connectors' \
        "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
        "transforms.unwrap.add.fields": "op,table,lsn,source.ts_ms",
        "transforms.unwrap.add.headers": "db",
+       "transforms.unwrap.delete.tombstone.handling.mode": "drop",
        "key.converter": "org.apache.kafka.connect.json.JsonConverter",
        "key.converter.schemas.enable": "false",
        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
@@ -185,8 +191,8 @@ Tables related to DeFi - DEX trades, TVL, LSD prices, etc..
 TON/USDT prices, LSD prices and other prices originated from single smart-contracts.
 
 * TON/USDT price is recovered by [CorePricesUSDT](./parser/parsers/accounts/core_prices.py) parser from ston.fi TON/USDT pool
-* [CorePricesLSDstTON](./parser/parsers/accounts/core_prices.py) and [CorePricesLSDtsTON](./parser/parsers/accounts/core_prices.py) are used
-to extract prices for stTON and tsTON
+* [CorePricesLSDstTON](./parser/parsers/accounts/core_prices.py), [CorePricesHipoTON](./parser/parsers/accounts/core_prices.py) and [CorePricesLSDtsTON](./parser/parsers/accounts/core_prices.py) are used
+to extract prices for stTON, hTON and tsTON
 * [CorePricesStormTrade](./parser/parsers/accounts/core_prices.py) extracts vaults converstion rate between LP token and underlying asset
 
 ###  dex_trade

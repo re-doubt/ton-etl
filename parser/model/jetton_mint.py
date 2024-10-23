@@ -17,6 +17,7 @@ class JettonMint:
     minter: str
     from_address: Address
     wallet: str
+    owner: str
     response_destination: Address
     forward_ton_amount: int
     forward_payload: bytes

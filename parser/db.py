@@ -23,7 +23,8 @@ def serialize_addr(addr: Union[Address, ExternalAddress, None]) -> str:
     return None
     
 class DB():
-    def __init__(self):
+    def __init__(self, use_message_content: bool):
+        self.use_message_content = use_message_content
         self.pool = pool.SimpleConnectionPool(1, 3)
         if not self.pool:
             raise Exception("Unable to init connection")
@@ -50,6 +51,7 @@ class DB():
     Returns message body by body hash
     """
     def get_message_body(self, body_hash) -> str:
+        assert self.use_message_content, "get_message_body is not supported in datalake mode"
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute("select body from message_contents mc  where hash = %s", (body_hash, ))
@@ -73,21 +75,46 @@ class DB():
             return res['jetton']
         
     """
+    Returns jetton wallet owner
+    """
+    def get_wallet_owner(self, jetton_wallet: Address) -> str:
+        assert self.conn is not None
+        assert type(jetton_wallet) == Address
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("select owner from jetton_wallets jw where address = %s",
+                           (serialize_addr(jetton_wallet), ))
+            res = cursor.fetchone()
+            if not res:
+                return None
+            return res['owner']
+        
+    """
     Returns message body for the parent message
     """
     def get_parent_message_body(self, msg_hash) -> str:
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute("""
-                           select mc.body from trace_edges te
+            if self.use_message_content:
+                cursor.execute("""
+                            select mc.body from trace_edges te
                             join messages m on m.tx_hash = te.left_tx and m.direction ='in'
                             join message_contents mc on mc.hash = m.body_hash 
                             where te.msg_hash = %s
-                           """, (msg_hash, ))
-            res = cursor.fetchone()
-            if not res:
-                return None
-            return res['body']
+                            """, (msg_hash, ))
+                res = cursor.fetchone()
+                if not res:
+                    return None
+                return res['body']
+            else:
+                cursor.execute("""
+                            select m.body_boc from trace_edges te
+                            join messages m on m.tx_hash = te.left_tx and m.direction ='in'
+                            where te.msg_hash = %s
+                            """, (msg_hash, ))
+                res = cursor.fetchone()
+                if not res:
+                    return None
+                return res['body_boc']
 
     """
     Returns parent message with message body
@@ -95,17 +122,30 @@ class DB():
     def get_parent_message_with_body(self, msg_hash) -> dict:
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute(
-                """
-                select m.*, mc.body from trace_edges te
-                join messages m on m.tx_hash = te.left_tx and m.direction ='in'
-                join message_contents mc on mc.hash = m.body_hash 
-                where te.msg_hash = %s
-                """, 
-                (msg_hash, ),
-            )
-            res = cursor.fetchone()
-            return res
+            if self.use_message_content:
+                cursor.execute(
+                    """
+                    select m.*, mc.body from trace_edges te
+                    join messages m on m.tx_hash = te.left_tx and m.direction ='in'
+                    join message_contents mc on mc.hash = m.body_hash 
+                    where te.msg_hash = %s
+                    """, 
+                    (msg_hash, ),
+                )
+                return cursor.fetchone()
+            else:
+                cursor.execute(
+                    """
+                    select m.* from trace_edges te
+                    join messages m on m.tx_hash = te.left_tx and m.direction ='in'
+                    where te.msg_hash = %s
+                    """, 
+                    (msg_hash, ),
+                ) 
+                res = cursor.fetchone()
+                if res:
+                    res['body'] = res['body_boc']
+                return res
 
     def get_nft_sale(self, address: str) -> dict:
         assert self.conn is not None
