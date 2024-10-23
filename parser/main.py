@@ -35,6 +35,7 @@ if __name__ == "__main__":
 
     last = time.time()
     total = 0
+    kafka_batch = 0
     successful = 0
     PARSERS = generate_parsers(None if supported_parsers == '*' else set(supported_parsers.split(",")))
     for parser_list in PARSERS.values():
@@ -50,6 +51,7 @@ if __name__ == "__main__":
         try:
             
             total += 1
+            kafka_batch += 1
             handled = 0
             obj = json.loads(msg.value.decode("utf-8"))
             __op = obj.get('__op', None)
@@ -68,8 +70,9 @@ if __name__ == "__main__":
         except Exception as e:
             logger.error(f"Failed to process item {msg}: {e} {traceback.format_exc()}")
             raise
-        if db.updated >= commit_batch_size or (db.updated == 0 and total > max_processed_items):
-            logger.info(f"Reached {db.updated} DB updates, processed {total} items, making commit")
+        if db.updated >= commit_batch_size or (db.updated == 0 and kafka_batch > max_processed_items):
+            logger.info(f"Reached {db.updated} DB updates, processed {kafka_batch} items, making commit")
             db.release() # commit release connection
             consumer.commit() # commit kafka offset
             db.acquire() # acquire a new connection
+            kafka_batch = 0
