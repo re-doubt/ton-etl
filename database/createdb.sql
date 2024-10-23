@@ -1,5 +1,11 @@
 -- initial script
 
+CREATE TABLE parsed.mc_libraries (
+	boc varchar NULL
+);
+CREATE UNIQUE INDEX mc_libraries_md5_idx ON parsed.mc_libraries USING btree (md5((boc)::text));
+
+
 -- core prices
 
 CREATE TABLE prices.core (
@@ -241,3 +247,5 @@ CREATE TABLE parsed.jetton_mint (
     created timestamp NULL,
     updated timestamp NULL
 );
+
+ALTER TABLE parsed.jetton_mint ADD column if not exists "owner" varchar NULL;
