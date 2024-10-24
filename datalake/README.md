@@ -13,7 +13,7 @@ Initially data is partitioned by adding date, but at the end of the day it is re
 
 ## Blocks
 
-[AVRO schema](./schemas/blocks.avsc)
+[AVRO schema](./schemas/blocks_export.avsc)
 
 Partition field: __gen_utime__
 URL: **s3://ton-blockchain-public-datalake/v1/blocks/**
@@ -22,7 +22,7 @@ Contains information about blocks (masterchain and workchains).
 
 ## Transactions
 
-[AVRO schema](./schemas/transactions.avsc).
+[AVRO schema](./schemas/transactions_export.avsc).
 
 Partition field: __now__
 URL: **s3://ton-blockchain-public-datalake/v1/blocks/**
@@ -31,7 +31,7 @@ Additionaly we are adding account_state_code_hash_after and account_state_balanc
 
 ## Messages
 
-[AVRO schema](./schemas/messages.avsc)
+[AVRO schema](./schemas/messages_export.avsc)
 
 Partition field: __tx_now__
 URL: **s3://ton-blockchain-public-datalake/v1/messages/**
@@ -43,7 +43,7 @@ Contains messages from transactions. Internal messages are included twice with d
 
 ## Messages with raw bodies
 
-[AVRO schema](./schemas/messages_with_body.avsc)
+[AVRO schema](./schemas/messages_with_body_export.avsc)
 
 Partition field: __tx_now__
 URL: **s3://ton-blockchain-public-datalake/v1/messages_with_body/**

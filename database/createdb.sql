@@ -249,3 +249,6 @@ CREATE TABLE parsed.jetton_mint (
 );
 
 ALTER TABLE parsed.jetton_mint ADD column if not exists "owner" varchar NULL;
+
+--  required for fast lookup of parent message by msg_hash
+CREATE INDEX trace_edges_msg_hash_idx ON public.trace_edges (msg_hash);

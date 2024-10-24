@@ -1,0 +1,138 @@
+{
+  "type": "record",
+  "name": "baseRecord",
+  "fields": [
+    {
+      "name": "tx_hash",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "tx_lt",
+      "type": ["null", "long"]
+    },
+    {
+      "name": "tx_now",
+      "type": ["null", "int"]
+    },
+    {
+      "name": "msg_hash",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "direction",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "trace_id",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "source",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "destination",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "value",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "fwd_fee",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "ihr_fee",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "created_lt",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "created_at",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "opcode",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "ihr_disabled",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "bounce",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "bounced",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    {
+      "name": "import_fee",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "body_hash",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "comment",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "init_state_hash",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  ]
+}
