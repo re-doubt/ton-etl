@@ -58,6 +58,8 @@ class JettonMintParser(Parser):
             except Exception as e:
                 logger.error(f"Unable to parse forward payload {e}")
 
+            wallet = db.get_jetton_wallet(Address(Parser.require(obj.get("destination"))))
+
             mint = JettonMint(
                 tx_hash=Parser.require(obj.get("tx_hash")),
                 msg_hash=Parser.require(obj.get("msg_hash")),
@@ -68,7 +70,8 @@ class JettonMintParser(Parser):
                 amount=amount,
                 minter=Parser.require(obj.get("source")),
                 wallet=Parser.require(obj.get("destination")),
-                owner=db.get_wallet_owner(Address(Parser.require(obj.get("destination")))),
+                owner=wallet['owner'] if wallet else None,
+                jetton_master_address=wallet['jetton'] if wallet else None,
                 from_address=from_address,
                 response_destination=response_destination,
                 forward_ton_amount=forward_ton_amount,
@@ -111,6 +114,9 @@ class HipoTokensMinted(Parser):
         query_id = cell.load_uint(64)  # query_id:uint64
         amount = cell.load_coins()  # tokens:Coins
 
+        wallet = db.get_jetton_wallet(Address(Parser.require(obj.get("destination"))))
+        assert wallet['jetton'] == HTON_MASTER
+
         mint = JettonMint(
             tx_hash=Parser.require(obj.get("tx_hash")),
             msg_hash=Parser.require(obj.get("msg_hash")),
@@ -121,7 +127,8 @@ class HipoTokensMinted(Parser):
             amount=amount,
             minter=Parser.require(obj.get("source")),
             wallet=Parser.require(obj.get("destination")),
-            owner=db.get_wallet_owner(Address(Parser.require(obj.get("destination")))),
+            owner=wallet['owner'] if wallet else None,
+            jetton_master_address=wallet['jetton'],
             from_address=None,
             response_destination=None,
             forward_ton_amount=None,
