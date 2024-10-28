@@ -25,7 +25,7 @@ Contains information about blocks (masterchain and workchains).
 [AVRO schema](./schemas/transactions_export.avsc).
 
 Partition field: __now__
-URL: **s3://ton-blockchain-public-datalake/v1/blocks/**
+URL: **s3://ton-blockchain-public-datalake/v1/transactions/**
 
 Additionaly we are adding account_state_code_hash_after and account_state_balance_after fields.
 
