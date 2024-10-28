@@ -18,6 +18,7 @@ class JettonMint:
     from_address: Address
     wallet: str
     owner: str
+    jetton_master_address: str
     response_destination: Address
     forward_ton_amount: int
     forward_payload: bytes
