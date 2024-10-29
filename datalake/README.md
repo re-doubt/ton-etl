@@ -43,7 +43,7 @@ Contains messages from transactions. Internal messages are included twice with d
 
 ## Messages with raw bodies
 
-[AVRO schema](./schemas/messages_with_body_export.avsc)
+[AVRO schema](./schemas/messages_with_data_export.avsc)
 
 Partition field: __tx_now__
 URL: **s3://ton-blockchain-public-datalake/v1/messages_with_body/**
