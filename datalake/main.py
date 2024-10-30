@@ -128,8 +128,8 @@ class DatalakeWriter:
         if self.total % FLUSH_INTERVAL == 0:
             self.writer.flush()
         self.file_size = os.path.getsize(AVRO_TMP_BUFFER)
-        if self.file_size > self.max_file_size:
-            logger.info(f"Reached max file size {self.file_size}, flushing file")
+        if self.file_size > self.max_file_size or (time.time() - self.last_commit > self.commit_interval):
+            logger.info(f"Reached max file size {self.file_size}, {time.time() - self.last_commit:0.1f}s since last commit, flushing file")
             self.writer.flush()
             self.writer.close()
             with open(AVRO_TMP_BUFFER, "rb") as f:
