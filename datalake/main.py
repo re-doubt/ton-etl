@@ -23,6 +23,8 @@ from converters.gaspump import GasPumpConverter
 from converters.agg_prices import AggPricesConverter
 from converters.tradoor_position_change import TradoorPositionChangeConverter
 from converters.transactions import TransactionsConverter
+from converters.account_states import AccountStatesConverter
+
 
 
 AVRO_TMP_BUFFER = "tmp_buffer.avro"
@@ -39,7 +41,8 @@ CONVERTERS = {
     "dex_swaps": DexSwapsConverter(),
     "gaspump_trades": GasPumpConverter(),
     "agg_prices": AggPricesConverter(),
-    "tradoor_position_change": TradoorPositionChangeConverter()
+    "tradoor_position_change": TradoorPositionChangeConverter(),
+    "account_states": AccountStatesConverter()
 }
 
 FIELDS_TO_REMOVE = ['__op', '__table', '__source_ts_ms', '__lsn']

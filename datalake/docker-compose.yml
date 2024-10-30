@@ -226,6 +226,25 @@ services:
       options:
         max-size: 10M
 
+  exporter_account_states:
+    build: ./
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 4
+    environment:
+      - KAFKA_GROUP_ID=exporter_account_states
+      - KAFKA_TOPIC=ton.public.latest_account_states
+      - CONVERTER=account_states
+      - MAX_FILE_SIZE=100000000
+      - PARTITION_MODE=adding_date
+    env_file:
+      - exporter.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
 networks:
   default:
     name: database_default
