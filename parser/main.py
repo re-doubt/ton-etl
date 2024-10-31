@@ -19,6 +19,8 @@ if __name__ == "__main__":
     # during initial processing we can be in the situation where we process a lot of messages without any DB updates
     max_processed_items = int(os.environ.get("MAX_PROCESSED_ITEMS", '1000000'))
     supported_parsers = os.environ.get("SUPPORTED_PARSERS", "*")
+    # to avoid race conditions we will process messages with maturity greater than MIN_MATURITY_SECONDS
+    min_maturity = int(os.environ.get("MIN_MATURITY_SECONDS", "0")) * 1000
     db = DB(Parser.USE_MESSAGE_CONTENT)
     db.acquire()
 
@@ -49,6 +51,10 @@ if __name__ == "__main__":
     # for msg in consumer:
     for msg in generator:
         try:
+            if msg.timestamp and min_maturity and msg.timestamp > time.time() * 1000 - min_maturity:
+                wait_interval_ms = msg.timestamp - time.time() * 1000  + min_maturity + 10000
+                logger.info(f"Waiting for {wait_interval_ms / 1000:0.1f} s before processing next message")
+                time.sleep(wait_interval_ms / 1000)
             
             total += 1
             kafka_batch += 1
