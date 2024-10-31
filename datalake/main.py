@@ -165,7 +165,7 @@ class DatalakeWriter:
                 self.total += 1
                 obj = json.loads(msg.value.decode("utf-8"))
                 __op = obj.get('__op', None)
-                if not (__op == 'c' or __op == 'r'): # ignore everything apart from new items (c - new item, r - initial snapshot)
+                if not (__op == 'c' or __op == 'r' or (self.converter.updates_enabled and __op == 'u')): # ignore everything apart from new items (c - new item, r - initial snapshot)
                     continue
 
                 for f in FIELDS_TO_REMOVE:

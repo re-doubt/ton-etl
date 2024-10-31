@@ -233,10 +233,10 @@ services:
       mode: replicated
       replicas: 4
     environment:
-      - KAFKA_GROUP_ID=exporter_account_states
+      - KAFKA_GROUP_ID=exporter_account_states_3
       - KAFKA_TOPIC=ton.public.latest_account_states
       - CONVERTER=account_states
-      - MAX_FILE_SIZE=100000000
+      - MAX_FILE_SIZE=200000000
       - PARTITION_MODE=adding_date
     env_file:
       - exporter.env

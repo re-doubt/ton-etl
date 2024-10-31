@@ -6,7 +6,7 @@ from converters.converter import Converter
 
 class AccountStatesConverter(Converter):
     def __init__(self):
-        super().__init__("schemas/account_states.avsc", ignored_fields=["id", "account_friendly"])
+        super().__init__("schemas/account_states.avsc", ignored_fields=["id", "account_friendly"], updates_enabled=True)
 
     def timestamp(self, obj):
         return obj['timestamp']
