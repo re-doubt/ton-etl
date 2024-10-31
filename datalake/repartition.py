@@ -94,7 +94,10 @@ if __name__ == "__main__":
     select {FIELDS},
     date_format(from_unixtime({repartition_field}), '%Y%m%d') as block_date
     from "{source_database}".{source_table}
-    where adding_date = '{partition_date}'
+    where adding_date >= '{partition_date}' and date_format(from_unixtime({repartition_field}), '%Y%m%d') <= '20241030'
+    except
+    select {FIELDS}, block_date
+    from "{target_database}".{target_table} where block_date >= '20241014'
     """
     logger.info(f"Running SQL code to convert data into single file dataset {sql}")
 
