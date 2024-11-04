@@ -52,6 +52,17 @@ Contains the same data as ``messages`` table with two more fields:
 * body_boc - raw body of the message body
 * init_state_boc - raw init state (if present) from the message
 
+## Account states
+
+[AVRO schema](./schemas/account_states.avsc)
+
+Partition field: __timestamp__
+URL: **s3://ton-blockchain-public-datalake/v1/account_states/**
+
+Contains the same data as ``messages`` table with two more fields:
+* body_boc - raw body of the message body
+* init_state_boc - raw init state (if present) from the message
+
 
 ## Jettons
 

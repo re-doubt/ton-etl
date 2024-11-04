@@ -23,6 +23,8 @@ from converters.gaspump import GasPumpConverter
 from converters.agg_prices import AggPricesConverter
 from converters.tradoor_position_change import TradoorPositionChangeConverter
 from converters.transactions import TransactionsConverter
+from converters.account_states import AccountStatesConverter
+
 
 
 AVRO_TMP_BUFFER = "tmp_buffer.avro"
@@ -39,7 +41,8 @@ CONVERTERS = {
     "dex_swaps": DexSwapsConverter(),
     "gaspump_trades": GasPumpConverter(),
     "agg_prices": AggPricesConverter(),
-    "tradoor_position_change": TradoorPositionChangeConverter()
+    "tradoor_position_change": TradoorPositionChangeConverter(),
+    "account_states": AccountStatesConverter()
 }
 
 FIELDS_TO_REMOVE = ['__op', '__table', '__source_ts_ms', '__lsn']
@@ -128,8 +131,8 @@ class DatalakeWriter:
         if self.total % FLUSH_INTERVAL == 0:
             self.writer.flush()
         self.file_size = os.path.getsize(AVRO_TMP_BUFFER)
-        if self.file_size > self.max_file_size:
-            logger.info(f"Reached max file size {self.file_size}, flushing file")
+        if self.file_size > self.max_file_size or (time.time() - self.last_commit > self.commit_interval):
+            logger.info(f"Reached max file size {self.file_size}, {time.time() - self.last_commit:0.1f}s since last commit, flushing file")
             self.writer.flush()
             self.writer.close()
             with open(AVRO_TMP_BUFFER, "rb") as f:
@@ -162,7 +165,7 @@ class DatalakeWriter:
                 self.total += 1
                 obj = json.loads(msg.value.decode("utf-8"))
                 __op = obj.get('__op', None)
-                if not (__op == 'c' or __op == 'r'): # ignore everything apart from new items (c - new item, r - initial snapshot)
+                if not (__op == 'c' or __op == 'r' or (self.converter.updates_enabled and __op == 'u')): # ignore everything apart from new items (c - new item, r - initial snapshot)
                     continue
 
                 for f in FIELDS_TO_REMOVE:

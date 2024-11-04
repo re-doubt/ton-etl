@@ -14,6 +14,7 @@ from model.dexpool import DexPool
 class FakeRecord:
     value: any
     topic: str
+    timestamp: any = None
 
 def serialize_addr(addr: Union[Address, ExternalAddress, None]) -> str:
     if isinstance(addr, Address):

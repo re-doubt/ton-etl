@@ -1,0 +1,85 @@
+{
+  "namespace": "ton",
+  "type": "record",
+  "name": "latest_account_states",
+  "fields": [
+    {
+      "name": "account",
+      "type": "string"
+    },
+    {
+      "name": "hash",
+      "type": "string"
+    },
+    {
+      "name": "balance",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "account_status",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "timestamp",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "last_trans_hash",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "last_trans_lt",
+      "type": [
+        "long",
+        "null"
+      ]
+    },
+    {
+      "name": "frozen_hash",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "data_hash",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "code_hash",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "data_boc",
+      "type": [
+        "bytes",
+        "null"
+      ]
+    },
+    {
+      "name": "code_boc",
+      "type": [
+        "bytes",
+        "null"
+      ]
+    }
+  ]
+}
