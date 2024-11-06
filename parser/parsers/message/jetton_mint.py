@@ -60,12 +60,15 @@ class JettonMintParser(Parser):
 
             wallet = db.get_jetton_wallet(Address(Parser.require(obj.get("destination"))))
 
+            tx = Parser.require(db.get_transaction(Parser.require(obj.get("tx_hash"))))
+
             mint = JettonMint(
                 tx_hash=Parser.require(obj.get("tx_hash")),
                 msg_hash=Parser.require(obj.get("msg_hash")),
                 trace_id=Parser.require(obj.get("trace_id")),
                 utime=Parser.require(obj.get("created_at")),
-                successful=Parser.require(db.is_tx_successful(Parser.require(obj.get("tx_hash")))),
+                tx_lt=tx['lt'],
+                successful=tx['compute_exit_code'] == 0 and tx['action_result_code'] == 0,
                 query_id=query_id,
                 amount=amount,
                 minter=Parser.require(obj.get("source")),
@@ -117,12 +120,15 @@ class HipoTokensMinted(Parser):
         wallet = db.get_jetton_wallet(Address(Parser.require(obj.get("destination"))))
         assert wallet['jetton'] == HTON_MASTER
 
+        tx = Parser.require(db.get_transaction(Parser.require(obj.get("tx_hash"))))
+
         mint = JettonMint(
             tx_hash=Parser.require(obj.get("tx_hash")),
             msg_hash=Parser.require(obj.get("msg_hash")),
             trace_id=Parser.require(obj.get("trace_id")),
             utime=Parser.require(obj.get("created_at")),
-            successful=Parser.require(db.is_tx_successful(Parser.require(obj.get("tx_hash")))),
+            tx_lt=tx['lt'],
+            successful=tx['compute_exit_code'] == 0 and tx['action_result_code'] == 0,
             query_id=query_id,
             amount=amount,
             minter=Parser.require(obj.get("source")),

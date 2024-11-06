@@ -253,3 +253,6 @@ ALTER TABLE parsed.jetton_mint ADD column if not exists "jetton_master_address" 
 
 --  required for fast lookup of parent message by msg_hash
 CREATE INDEX trace_edges_msg_hash_idx ON public.trace_edges (msg_hash);
+
+-- to be aligned with jetton_transfers and jetton_burn
+ALTER TABLE parsed.jetton_mint ADD tx_lt int8 NULL;
