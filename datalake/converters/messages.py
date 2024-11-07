@@ -31,7 +31,7 @@ class MessageWithDataConverter(Converter):
     def timestamp(self, obj):
         return obj['tx_now']
 
-    def convert(self, obj):
+    def convert(self, obj, table_name=None):
         comment = None
         cell = Cell.one_from_boc(obj['body_boc']).begin_parse()
         obj['body_boc'] = base64.b64decode(obj['body_boc'])
@@ -42,4 +42,4 @@ class MessageWithDataConverter(Converter):
         except Exception as e:
             pass
         obj['comment'] = comment
-        return super().convert(obj)
+        return super().convert(obj, table_name)

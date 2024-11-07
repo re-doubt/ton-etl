@@ -12,7 +12,7 @@ class NftTransfersConverter(Converter):
             "forward_amount"
             ])
 
-    def convert(self, obj):
+    def convert(self, obj, table_name=None):
         forward_payload = obj['forward_payload']
         if forward_payload:
             obj['forward_payload'] = base64.b64decode(forward_payload)
@@ -24,4 +24,4 @@ class NftTransfersConverter(Converter):
         # Convert base64 custom_payload into binary
         if obj['custom_payload']:
             obj['custom_payload'] = base64.b64decode(obj['custom_payload'])
-        return super().convert(obj)
+        return super().convert(obj, table_name)

@@ -1,8 +1,12 @@
 {
   "namespace": "ton",
   "type": "record",
-  "name": "jetton_burns",
+  "name": "jetton_events",
   "fields": [
+    {
+      "name": "type",
+      "type": "string"
+    },
     {
       "name": "tx_hash",
       "type": "string"
@@ -12,8 +16,15 @@
       "type": "long"
     },
     {
-      "name": "tx_now",
+      "name": "utime",
       "type": "int"
+    },
+    {
+      "name": "trace_id",
+      "type": [
+        "string",
+        "null"
+      ]
     },
     {
       "name": "tx_aborted",
@@ -22,27 +33,6 @@
     {
       "name": "query_id",
       "type": [
-        "double",
-        "null"
-      ]
-    },
-    {
-      "name": "owner",
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    {
-      "name": "jetton_wallet_address",
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    {
-      "name": "jetton_master_address",
-      "type": [
         "string",
         "null"
       ]
@@ -50,7 +40,35 @@
     {
       "name": "amount",
       "type": [
-        "double",
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "source",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "destination",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "jetton_wallet",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "jetton_master",
+      "type": [
+        "string",
         "null"
       ]
     },
@@ -69,7 +87,21 @@
       ]
     },
     {
-      "name": "trace_id",
+      "name": "forward_ton_amount",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "forward_payload",
+      "type": [
+        "bytes",
+        "null"
+      ]
+    },
+    {
+      "name": "comment",
       "type": [
         "string",
         "null"
