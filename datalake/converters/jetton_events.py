@@ -13,7 +13,7 @@ class JettonEventsConverter(Converter):
             NumericField(name="query_id", is_integer=True, as_string=True),
             NumericField(name="forward_ton_amount", is_integer=True, as_string=True),
             NumericField(name="amount", is_integer=True, as_string=True),
-            ])
+            ], ignored_fields=['updated', 'created', 'msg_hash', 'from_address'])
         
     def timestamp(self, obj):
         if obj['__table'] == "jetton_mint":
@@ -29,14 +29,23 @@ class JettonEventsConverter(Converter):
             obj['jetton_wallet'] = obj['wallet']
             del obj['wallet']
             del obj['minter']
-        elif table_name == "jetton_burn":
+            obj['custom_payload'] = None
+            obj['source'] = obj['from_address']
+            obj['destination'] = obj['owner']
+            del obj['owner']
+        elif table_name == "jetton_burns":
             obj['type'] = "burn"
             obj['utime'] = obj['tx_now']
             del obj['tx_now']
             obj['source'] = obj['owner']
+            del obj['owner']
             obj['destination'] = None
             obj['jetton_wallet'] = obj['jetton_wallet_address']
             del obj['jetton_wallet_address']
+            obj['destination'] = None
+            obj['forward_ton_amount'] = None
+            obj['forward_payload'] = None
+            obj['comment'] = None
         elif table_name == "jetton_transfers":
             obj['type'] = "transfer"
             obj['utime'] = obj['tx_now']
@@ -47,7 +56,7 @@ class JettonEventsConverter(Converter):
         obj['jetton_master'] = obj['jetton_master_address']
         del obj['jetton_master_address']
 
-        forward_payload = obj['forward_payload']
+        forward_payload = obj.get('forward_payload', None)
         if forward_payload:
             obj['forward_payload'] = base64.b64decode(forward_payload)
             cell = Cell.one_from_boc(base64.b64decode(forward_payload)).begin_parse()
@@ -56,6 +65,6 @@ class JettonEventsConverter(Converter):
             except Exception as e:
                 pass
         # Convert base64 custom_payload into binary
-        if obj['custom_payload']:
+        if obj.get('custom_payload', None):
             obj['custom_payload'] = base64.b64decode(obj['custom_payload'])
         return super().convert(obj, table_name)
