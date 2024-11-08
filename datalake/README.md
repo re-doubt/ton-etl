@@ -59,14 +59,23 @@ Contains the same data as ``messages`` table with two more fields:
 Partition field: __timestamp__
 URL: **s3://ton-blockchain-public-datalake/v1/account_states/**
 
-Contains the same data as ``messages`` table with two more fields:
-* body_boc - raw body of the message body
-* init_state_boc - raw init state (if present) from the message
+Contains raw account states with raw data and code.
 
 
-## Jettons
+## Jetton events
 
-TBD
+[AVRO schema](./schemas/jetton_events.avsc)
+
+Partition field: __utime__
+URL: **s3://ton-blockchain-public-datalake/v1/jetton_events/**
+
+Contains jetton events, event type is defined in ``type`` field:
+* transfer - TEP-74 transfer event
+* burn - TEP-74 burn event
+* mint - TEP-74 jetton standard does not specify mint format but it has recommended form of internal_transfer message. 
+So we are using it as mint event. Also there are some jetton-specific mint implementations, 
+the current implementation supports HIPO hTON mints.
+
 
 ## DEX Swaps
 

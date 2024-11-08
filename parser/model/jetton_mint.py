@@ -11,6 +11,7 @@ class JettonMint:
     msg_hash: str
     trace_id: str
     utime: int
+    tx_lt: int
     successful: bool
     query_id: int
     amount: int

@@ -14,9 +14,8 @@ import avro.schema
 from avro.datafile import DataFileWriter
 from avro.io import DatumWriter
 from converters.messages import MessageConverter, MessageWithDataConverter
-from converters.jetton_transfers import JettonTransfersConverter
+from converters.jetton_events import JettonEventsConverter
 from converters.blocks import BlocksConverter
-from converters.jetton_burns import JettonBurnsConverter
 from converters.nft_transfers import NftTransfersConverter
 from converters.dex_swaps import DexSwapsConverter
 from converters.gaspump import GasPumpConverter
@@ -34,14 +33,8 @@ CONVERTERS = {
     "messages": MessageConverter(),
     "messages_with_data": MessageWithDataConverter(),
     "transactions": TransactionsConverter(),
-    "jetton_transfers": JettonTransfersConverter(),
-    "jetton_burns": JettonBurnsConverter(),
+    "jetton_events": JettonEventsConverter(),
     "blocks": BlocksConverter(),
-    "nft_transfers": NftTransfersConverter(),
-    "dex_swaps": DexSwapsConverter(),
-    "gaspump_trades": GasPumpConverter(),
-    "agg_prices": AggPricesConverter(),
-    "tradoor_position_change": TradoorPositionChangeConverter(),
     "account_states": AccountStatesConverter()
 }
 
@@ -93,7 +86,7 @@ class DatalakeWriter:
         self.writer = DataFileWriter(open(AVRO_TMP_BUFFER, "wb"), DatumWriter(), self.converter.schema)
 
         group_id = os.environ.get("KAFKA_GROUP_ID")
-        topic = os.environ.get("KAFKA_TOPIC", "ton.public.messages")
+        topics = os.environ.get("KAFKA_TOPICS", "ton.public.messages").split(",")
 
         self.max_file_size = int(os.environ.get("MAX_FILE_SIZE", '100000000'))
         self.log_interval = int(os.environ.get("LOG_INTERVAL", '10'))
@@ -114,8 +107,9 @@ class DatalakeWriter:
                 enable_auto_commit=False
                 )
 
-        logger.info(f"Subscribing to {topic}")
-        self.consumer.subscribe(topic)
+        logger.info(f"Subscribing to {topics}")
+        for topic in topics:
+            self.consumer.subscribe(topic)
 
     def append(self, obj, partition):
         if self.partition_mode == PARTITION_MODE_ADDING_DATE:
@@ -168,16 +162,17 @@ class DatalakeWriter:
                 if not (__op == 'c' or __op == 'r' or (self.converter.updates_enabled and __op == 'u')): # ignore everything apart from new items (c - new item, r - initial snapshot)
                     continue
 
+
+                local_partition = self.converter.partition(obj)
+                table = obj['__table']
                 for f in FIELDS_TO_REMOVE:
                     del obj[f]
 
-                local_partition = self.converter.partition(obj)
-
                 if self.converter.strict:
-                    self.append(self.converter.convert(obj), local_partition)
+                    self.append(self.converter.convert(obj, table_name=table), local_partition)
                 else:
                     try:
-                        self.append(self.converter.convert(obj), local_partition)
+                        self.append(self.converter.convert(obj, table_name=table), local_partition)
                     except Exception as e:
                         logger.error(f"Failed to convert item {obj}: {e} {traceback.format_exc()}")
                         continue

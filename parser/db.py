@@ -163,6 +163,17 @@ class DB():
             res = cursor.fetchone()
             return res
         
+    def get_transaction(self, tx_hash: str):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                select * from transactions where hash = %s
+                """, 
+                (tx_hash,),
+            )
+            return cursor.fetchone()
+    
     def is_tx_successful(self, tx_hash: str) -> bool:
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:

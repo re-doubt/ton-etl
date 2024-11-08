@@ -11,10 +11,10 @@ class AccountStatesConverter(Converter):
     def timestamp(self, obj):
         return obj['timestamp']
     
-    def convert(self, obj):
+    def convert(self, obj, table_name=None):
         if obj['data_boc']:
             obj['data_boc'] = base64.b64decode(obj['data_boc'])
         if obj['code_boc']:
             obj['code_boc'] = base64.b64decode(obj['code_boc'])
 
-        return super().convert(obj)            
+        return super().convert(obj, table_name)            
