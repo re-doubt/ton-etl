@@ -8,6 +8,7 @@ import uuid
 from loguru import logger
 import boto3
 import botocore
+from datetime import datetime, timedelta
 
 
 
@@ -17,10 +18,13 @@ if __name__ == "__main__":
     repartition_field = os.environ.get("REPARTITION_FIELD")
     source_table = os.environ.get("SOURCE_TABLE")
     target_table = os.environ.get("TARGET_TABLE")
-    partition_date = os.environ.get("PARTITION_DATE")
     table_location = os.environ.get("TARGET_TABLE_LOCATION")
     tmp_location = os.environ.get("TMP_LOCATION")
     workgroup = os.environ.get("ATHENA_WORKGROUP")
+    yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
+    three_days_before = (datetime.now() - timedelta(days=3)).strftime("%Y%m%d")
+    two_days_before = (datetime.now() - timedelta(days=2)).strftime("%Y%m%d")
+    logger.info(f"Repartitioning up to {yesterday}")
 
     athena = boto3.client("athena", region_name="us-east-1")
 
@@ -40,7 +44,7 @@ if __name__ == "__main__":
     execute_athena_query(f"MSCK REPAIR TABLE {source_table}", database=source_database)
 
     logger.info(f"Repartitioning table {source_database}.{source_table} => {target_database}.{target_table} "
-                f"for date {partition_date} on field {repartition_field}")
+                f"for date >= {two_days_before} on field {repartition_field}")
 
     glue = boto3.client("glue", region_name="us-east-1")
     source_table_meta = glue.get_table(DatabaseName=source_database, Name=source_table)
@@ -77,7 +81,7 @@ if __name__ == "__main__":
         logger.info(response)
         target_table_meta = glue.get_table(DatabaseName=target_database, Name=target_table)
     
-    tmp_table_name = f"{target_table}_increment_{partition_date}_{str(uuid.uuid4()).replace('-', '')}"
+    tmp_table_name = f"{target_table}_increment_{two_days_before}_{str(uuid.uuid4()).replace('-', '')}"
     tmp_table_location = f"{tmp_location}/{tmp_table_name}"
     FIELDS = ", ".join([col['Name'] for col in source_table_meta['Table']['StorageDescriptor']['Columns']])
     sql = f"""
@@ -94,10 +98,10 @@ if __name__ == "__main__":
     select {FIELDS},
     date_format(from_unixtime({repartition_field}), '%Y%m%d') as block_date
     from "{source_database}".{source_table}
-    where adding_date >= '{partition_date}' and date_format(from_unixtime({repartition_field}), '%Y%m%d') <= '20241030'
+    where adding_date >= '{two_days_before}' and date_format(from_unixtime({repartition_field}), '%Y%m%d') <= '{yesterday}'
     except
     select {FIELDS}, block_date
-    from "{target_database}".{target_table} where block_date >= '20241014'
+    from "{target_database}".{target_table} where block_date >= '{three_days_before}'
     """
     logger.info(f"Running SQL code to convert data into single file dataset {sql}")
 
