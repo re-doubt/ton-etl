@@ -108,8 +108,7 @@ class DatalakeWriter:
                 )
 
         logger.info(f"Subscribing to {topics}")
-        for topic in topics:
-            self.consumer.subscribe(topic)
+        self.consumer.subscribe(topics)
 
     def append(self, obj, partition):
         if self.partition_mode == PARTITION_MODE_ADDING_DATE:
