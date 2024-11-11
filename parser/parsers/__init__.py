@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from parsers.jetton_masters.jetton_metadata import JettonMastersMetadataParser
 from parsers.message.stonfi_swap_v2 import StonfiSwapV2
 from parsers.message.gaspump import GasPumpTrade
 from parsers.message.tradoor_trades import TradoorOptionOrder, TradoorPerpOrder, TradoorPerpPositionChange
@@ -57,7 +58,8 @@ _parsers = [
     
     CommentsDecoder(),
 
-    JettonWalletBalancesParser()
+    JettonWalletBalancesParser(),
+    JettonMastersMetadataParser()
 ]
 
 """
