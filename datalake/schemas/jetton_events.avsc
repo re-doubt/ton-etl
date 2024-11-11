@@ -33,14 +33,24 @@
     {
       "name": "query_id",
       "type": [
-        "string",
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 20,
+          "scale": 0
+        },
         "null"
       ]
     },
     {
       "name": "amount",
       "type": [
-        "string",
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 38,
+          "scale": 0
+        },
         "null"
       ]
     },
@@ -89,7 +99,12 @@
     {
       "name": "forward_ton_amount",
       "type": [
-        "string",
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 38,
+          "scale": 0
+        },
         "null"
       ]
     },

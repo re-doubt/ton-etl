@@ -104,7 +104,7 @@ services:
       mode: replicated
       replicas: 1
     environment:
-      - KAFKA_GROUP_ID=exporter_jetton_events_test
+      - KAFKA_GROUP_ID=exporter_jetton_events
       - KAFKA_TOPICS=ton.parsed.jetton_mint,ton.public.jetton_burns,ton.public.jetton_transfers
       - CONVERTER=jetton_events
       - PARTITION_MODE=adding_date

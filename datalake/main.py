@@ -111,6 +111,8 @@ class DatalakeWriter:
         self.consumer.subscribe(topics)
 
     def append(self, obj, partition):
+        if obj is None:
+            return
         if self.partition_mode == PARTITION_MODE_ADDING_DATE:
             self.append_adding_date(obj)
         elif self.partition_mode == PARTITION_MODE_OBJ_IMESTAMP:

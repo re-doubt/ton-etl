@@ -10,9 +10,9 @@ The converter is designed to handle events from jetton_mint, jetton_burn and jet
 class JettonEventsConverter(Converter):
     def __init__(self):
         super().__init__("schemas/jetton_events.avsc", numeric_fields=[
-            NumericField(name="query_id", is_integer=True, as_string=True),
-            NumericField(name="forward_ton_amount", is_integer=True, as_string=True),
-            NumericField(name="amount", is_integer=True, as_string=True),
+            "query_id",
+            "forward_ton_amount",
+            "amount"
             ], ignored_fields=['updated', 'created', 'msg_hash', 'from_address'])
         
     def timestamp(self, obj):
@@ -26,11 +26,14 @@ class JettonEventsConverter(Converter):
             obj['type'] = "mint"
             obj['tx_aborted'] = not obj['successful']
             del obj['successful']
+
             obj['jetton_wallet'] = obj['wallet']
             del obj['wallet']
             del obj['minter']
             obj['custom_payload'] = None
-            obj['source'] = obj['from_address']
+            # We have from_address inside minter address but it is better to use null for source field
+            # to make it possible consider all events in the same way as balance transfers
+            obj['source'] = None # obj['from_address']
             obj['destination'] = obj['owner']
             del obj['owner']
         elif table_name == "jetton_burns":
@@ -55,6 +58,10 @@ class JettonEventsConverter(Converter):
 
         obj['jetton_master'] = obj['jetton_master_address']
         del obj['jetton_master_address']
+
+        if obj['jetton_master'] is None:
+            logger.warning(f"Zero jetton master found in {obj}, ignoring")
+            return None
 
         forward_payload = obj.get('forward_payload', None)
         if forward_payload:
