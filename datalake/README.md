@@ -76,6 +76,14 @@ Contains jetton events, event type is defined in ``type`` field:
 So we are using it as mint event. Also there are some jetton-specific mint implementations, 
 the current implementation supports HIPO hTON mints.
 
+All jetton events include tx_aborted field, pay attention that if it is ``false`` then the event should be discarded.
+Aborted events are stored becase it could be useful for some types of analysis.
+
+``source`` field is set to ``null`` for mint events and ``destination`` is set to ``null`` for burn events.
+
+Note that fields ``query_id``, ``forward_ton_amount``, ``amount`` are stored as  decimal values with scale equals to 0. Since the data mart
+doesn't support off-chain metadata and stores only raw data the amount is stored as raw value without dividing by 10^decimals.
+
 
 ## DEX Swaps
 
