@@ -65,6 +65,13 @@ class JettonMastersMetadataParser(Parser):
         prev_ts_offchain = metadata.update_time_metadata if metadata else 0
         updated = False
         metadata_updated = False
+        def normalize_json(s):
+            if s and type(s) == str:
+                return json.dumps(json.loads(s))
+            if s and type(s) == dict:
+                return json.dumps(s)
+            return None
+
         if metadata:
             logger.info(f"Jetton metadata for {address} already exists")
             if metadata.mintable != obj.get("mintable", None):
@@ -75,7 +82,7 @@ class JettonMastersMetadataParser(Parser):
                 updated = True
                 logger.info(f"Admin address has been changed for {address}: {metadata.admin_address} -> {obj.get('admin_address', None)}")
                 metadata.admin_address = obj.get("admin_address", None)
-            if metadata.jetton_content_onchain != obj.get("jetton_content", None):
+            if normalize_json(metadata.jetton_content_onchain) != normalize_json(obj.get("jetton_content", None)):
                 updated = True
                 metadata_updated = True
                 logger.info(f"Jetton content has been changed for {address}: {metadata.jetton_content_onchain} -> {obj.get('jetton_content', None)}")

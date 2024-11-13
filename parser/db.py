@@ -509,6 +509,9 @@ class DB():
     def upsert_jetton_metadata(self, metadata: JettonMetadata, prev_ts_onchain: int, prev_ts_offchain: int):
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            jetton_content = metadata.jetton_content_onchain
+            if jetton_content and type(jetton_content) == dict:
+                jetton_content = json.dumps(jetton_content)
             cursor.execute("""
             insert into parsed.jetton_metadata(address, update_time_onchain, update_time_metadata, mintable, admin_address, 
                            jetton_content_onchain, jetton_wallet_code_hash, code_hash, metadata_status, symbol, name, description,
@@ -533,7 +536,7 @@ class DB():
                            tonapi_image_url = EXCLUDED.tonapi_image_url
                            -- where jetton_metadata.update_time_onchain = %s and jetton_metadata.update_time_metadata = %s
             """, (metadata.address, metadata.update_time_onchain, metadata.update_time_metadata, metadata.mintable, metadata.admin_address,
-                  metadata.jetton_content_onchain, metadata.jetton_wallet_code_hash, metadata.code_hash, metadata.metadata_status,
+                  jetton_content, metadata.jetton_wallet_code_hash, metadata.code_hash, metadata.metadata_status,
                   metadata.symbol, metadata.name, metadata.description, metadata.image, metadata.image_data, metadata.decimals, metadata.sources,
                   metadata.tonapi_image_url, prev_ts_onchain, prev_ts_offchain))
             self.updated += 1
