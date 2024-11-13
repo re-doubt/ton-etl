@@ -47,7 +47,7 @@ class JettonMastersMetadataParser(Parser):
                 logger.error(f"No schema for URL: {url}")
                 return None
             else:
-                if parsed_url.netloc == 'localhost' or parsed_url.netloc:
+                if parsed_url.netloc == 'localhost':
                     logger.warning(f"Skipping {url}")
                     return None
                 try:
