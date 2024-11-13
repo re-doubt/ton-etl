@@ -20,7 +20,7 @@ services:
     build: ./
     restart: always
     environment:
-      - KAFKA_GROUP_ID=jetton_metadata_test
+      - KAFKA_GROUP_ID=jetton_metadata
       - SUPPORTED_PARSERS=JettonMastersMetadataParser
       - KAFKA_TOPICS=ton.public.jetton_masters
     env_file:
