@@ -153,7 +153,7 @@ class JettonMastersMetadataParser(Parser):
                         image = update_metadata(3, offchain_metadata, "image", image, METADATA_OFFCHAIN)
                         image_data = update_metadata(4, offchain_metadata, "image_data", image_data, METADATA_OFFCHAIN)
                         decimals = update_metadata(5, offchain_metadata, "decimals", decimals, METADATA_OFFCHAIN)
-
+                        metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_OK
                     except Exception as e:
                         logger.error(f"Error updating offchain metadata for {address}: {e}")
                         try:
@@ -169,6 +169,7 @@ class JettonMastersMetadataParser(Parser):
                             description = update_metadata(2, tonapi_metadata, "description", description, METADATA_TONAPI)
                             image = update_metadata(3, tonapi_metadata, "image", image, METADATA_TONAPI)
                             decimals = update_metadata(5, tonapi_metadata, "decimals", decimals, METADATA_TONAPI)
+                            metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_OK
                         except Exception as e2:
                             logger.error(f"Error getting metadata from TonAPI for {address}: {e2}")
                             metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_ERROR
