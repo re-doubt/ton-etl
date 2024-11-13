@@ -19,5 +19,7 @@ class JettonMetadata:
     description: str = None
     image: str = None
     image_data: str = None
+    decimals: int = None
     sources: str = None
-    update_time_offchain: int = None
+    tonapi_image_url: str = None
+    update_time_metadata: int = None

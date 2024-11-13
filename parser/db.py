@@ -486,7 +486,7 @@ class DB():
             return JettonMetadata(
                 address=row['address'],
                 update_time_onchain=row['update_time_onchain'],
-                update_time_offchain=row['update_time_offchain'],
+                update_time_metadata=row['update_time_metadata'],
                 mintable=row['mintable'],
                 admin_address=row['admin_address'],
                 jetton_content_onchain=row['jetton_content_onchain'],
@@ -498,7 +498,9 @@ class DB():
                 description=row['description'],
                 image=row['image'],
                 image_data=row['image_data'],
-                sources=row['sources']
+                decimals=row['decimals'],
+                sources=row['sources'],
+                tonapi_image_url=row['tonapi_image_url']
             )
         
     """
@@ -508,13 +510,13 @@ class DB():
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute("""
-            insert into parsed.jetton_metadata(address, update_time_onchain, update_time_offchain, mintable, admin_address, 
+            insert into parsed.jetton_metadata(address, update_time_onchain, update_time_metadata, mintable, admin_address, 
                            jetton_content_onchain, jetton_wallet_code_hash, code_hash, metadata_status, symbol, name, description,
-                            image, image_data, sources)
-                           values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                            image, image_data, decimals, sources, tonapi_image_url)
+                           values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                            on conflict (address) do update
                            set update_time_onchain = EXCLUDED.update_time_onchain,
-                           update_time_offchain = EXCLUDED.update_time_offchain,
+                           update_time_metadata = EXCLUDED.update_time_metadata,
                            mintable = EXCLUDED.mintable,
                            admin_address = EXCLUDED.admin_address,
                            jetton_content_onchain = EXCLUDED.jetton_content_onchain,
@@ -526,10 +528,12 @@ class DB():
                            description = EXCLUDED.description,
                            image = EXCLUDED.image,
                            image_data = EXCLUDED.image_data,
-                           sources = EXCLUDED.sources
-                           where update_time_onchain = %s and update_time_offchain = %s
-            """, (metadata.address, metadata.update_time_onchain, metadata.update_time_offchain, metadata.mintable, metadata.admin_address,
+                           decimals = EXCLUDED.decimals,
+                           sources = EXCLUDED.sources,
+                           tonapi_image_url = EXCLUDED.tonapi_image_url
+                           -- where jetton_metadata.update_time_onchain = %s and jetton_metadata.update_time_metadata = %s
+            """, (metadata.address, metadata.update_time_onchain, metadata.update_time_metadata, metadata.mintable, metadata.admin_address,
                   metadata.jetton_content_onchain, metadata.jetton_wallet_code_hash, metadata.code_hash, metadata.metadata_status,
-                  metadata.symbol, metadata.name, metadata.description, metadata.image, metadata.image_data, metadata.sources,
-                  prev_ts_onchain, prev_ts_offchain))
+                  metadata.symbol, metadata.name, metadata.description, metadata.image, metadata.image_data, metadata.decimals, metadata.sources,
+                  metadata.tonapi_image_url, prev_ts_onchain, prev_ts_offchain))
             self.updated += 1
