@@ -31,7 +31,7 @@ if __name__ == "__main__":
                     continue
                 # logger.info(f"Discovered column: {row}")
                 data_type = row['data_type']
-                if data_type == 'character varying' or data_type == 'character' or data_type == 'text':
+                if data_type == 'character varying' or data_type == 'character' or data_type == 'text' or data_type == 'jsonb':
                     avro_type = 'string'
                 elif data_type == 'bigint':
                     avro_type = 'long'
