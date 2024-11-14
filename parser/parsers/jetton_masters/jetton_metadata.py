@@ -210,5 +210,6 @@ class JettonMastersMetadataParser(Parser):
                 
             metadata.update_time_metadata = time.time()
         if updated:
+            metadata.update_time_onchain=obj.get("last_tx_now", None)
             logger.info(f"Upserting jetton metadata for {address}")
             db.upsert_jetton_metadata(metadata, prev_ts_onchain, prev_ts_offchain)
