@@ -10,7 +10,7 @@ rather it is recommended to use adding_at partitioning key.
 """
 class JettonMetadataConverter(Converter):
     def __init__(self):
-        super().__init__("schemas/jetton_metadata.avsc")
+        super().__init__("schemas/jetton_metadata.avsc", updates_enabled=True)
         
     def timestamp(self, obj):
         # if case of partitioning by timestamp, we should use max of update_time_metadata and update_time_onchain
