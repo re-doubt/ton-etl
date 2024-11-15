@@ -64,7 +64,7 @@ Contains raw account states with raw data and code.
 
 ## Jetton events
 
-[AVRO schema](./schemas/jetton_events.avsc)
+[AVRO schema](./schemas/jetton_events_export.avsc)
 
 Partition field: __utime__
 URL: **s3://ton-blockchain-public-datalake/v1/jetton_events/**
@@ -128,7 +128,18 @@ Fields description:
 
 ## Jetton metadata snapshots
 
-``jetton_metadata`` table allows to get the full history of jetton metadata changes.
+``jetton_metadata`` table allows to get the full history of jetton metadata changes but for most cases it is more suitable to have
+the latest snapshot of jetton metadata. To simplify usage in this case daily snapshots with the latest metadata are created.
+
+Partition field: __snapshot_date__
+URL: **s3://ton-blockchain-public-datalake/v1/jetton_metadata_snapshots/**
+
+This table contains the same data as ``jetton_metadata`` table but only for the latest snapshot for each jetton.
+
+Note: for performance reasons daily snapshots are splited into 10 files.
+
+It is recommended to use ``jetton_metadata_latest`` view to get the latest snapshot of jetton metadata (see [athena_ddl.sql](./athena_ddl.sql)).
+
 
 ## DEX Swaps
 

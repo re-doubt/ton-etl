@@ -314,3 +314,10 @@ TBLPROPERTIES (
   'sizeKey'='100028463', 
   'transient_lastDdlTime'='1731608503', 
   'typeOfData'='file')
+
+
+-- views
+create or replace view "jetton_metadata_latest"
+as
+select * from "jetton_metadata_snapshots"
+where snapshot_date = (SELECT max(snapshot_date) FROM "jetton_metadata_snapshots")
