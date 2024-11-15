@@ -111,7 +111,6 @@ if __name__ == "__main__":
     glue.delete_table(DatabaseName=source_database, Name=tmp_table_name)
     logger.info(f"Time to transfer output data from {tmp_table_location} to {table_location}")
     s3 = boto3.client("s3")
-    # tmp_table_location = "s3://tf-analytcs-athena-output/tmp_repartition_space/blocks_increment_20241014_29c9c4a3e5aa4b019b1d8a6f9c6fb731"
     bucket, key = tmp_table_location.replace("s3://", "").split("/", 1)
     target_bucket, target_key = table_location.replace("s3://", "").split("/", 1)
     continuation_token = None
