@@ -154,6 +154,15 @@ provided in [athena_ddl.sql](./athena_ddl.sql) file and load partitions using ``
 ## Query examples
 
 Get most active jettons from the last 30 days:
+
 ```sql
-TODO
+with top_jettons as (
+select jetton_master, approx_distinct(trace_id) operations from jetton_events
+where block_date >= date_format(date_add('day', -30, current_date), '%Y%m%d')
+group by 1
+order by operations desc limit 10
+)
+select symbol, jetton_master, operations from top_jettons 
+join jetton_metadata_latest on jetton_master = address
+order by operations desc
 ```
