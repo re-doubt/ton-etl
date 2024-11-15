@@ -1,0 +1,125 @@
+{
+  "type": "record",
+  "name": "baseRecord",
+  "fields": [
+    {
+      "name": "type",
+      "type": ["string", "null"]
+    },
+    {
+      "name": "tx_hash",
+      "type": ["string", "null"]
+    },
+    {
+      "name": "tx_lt",
+      "type": ["long", "null"]
+    },
+    {
+      "name": "utime",
+      "type": ["int", "null"]
+    },
+    {
+      "name": "trace_id",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "tx_aborted",
+      "type": ["boolean", "null"]
+    },
+    {
+      "name": "query_id",
+      "type": [
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 20,
+          "scale": 0
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "amount",
+      "type": [
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 38,
+          "scale": 0
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "source",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "destination",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "jetton_wallet",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "jetton_master",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "response_destination",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "custom_payload",
+      "type": [
+        "bytes",
+        "null"
+      ]
+    },
+    {
+      "name": "forward_ton_amount",
+      "type": [
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 38,
+          "scale": 0
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "forward_payload",
+      "type": [
+        "bytes",
+        "null"
+      ]
+    },
+    {
+      "name": "comment",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  ]
+}

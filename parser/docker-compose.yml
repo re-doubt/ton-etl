@@ -16,6 +16,20 @@ services:
       options:
         max-size: 10M
 
+  parser_jetton_metadata:
+    build: ./
+    restart: always
+    environment:
+      - KAFKA_GROUP_ID=jetton_metadata
+      - SUPPORTED_PARSERS=JettonMastersMetadataParser
+      - KAFKA_TOPICS=ton.public.jetton_masters
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
   parser_core_prices:
     build: ./
     restart: always
@@ -40,20 +54,6 @@ services:
       - SUPPORTED_PARSERS=StonfiSwap,StonfiSwapV2,DedustSwap,TradoorPerpOrder,TradoorOptionOrder,GasPumpTrade,TradoorPerpPositionChange,EvaaSupplyParser,EvaaWithdrawAndLiquidationParser,JettonMintParser,HipoTokensMinted
       - KAFKA_TOPICS=ton.public.messages
       - MIN_MATURITY_SECONDS=300
-    env_file:
-      - parser.env
-    logging:
-      driver: local
-      options:
-        max-size: 10M
-
-  parser_messages_comments:
-    build: ./
-    restart: always
-    environment:
-      - KAFKA_GROUP_ID=messages_contents
-      - SUPPORTED_PARSERS=CommentsDecoder
-      - KAFKA_TOPICS=ton.public.message_contents
     env_file:
       - parser.env
     logging:

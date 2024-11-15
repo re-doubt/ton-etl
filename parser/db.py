@@ -9,6 +9,7 @@ from dataclasses import dataclass
 
 from model.dexswap import DexSwapParsed
 from model.dexpool import DexPool
+from model.jetton_metadata import JettonMetadata
 
 @dataclass
 class FakeRecord:
@@ -470,4 +471,72 @@ class DB():
                         on conflict do nothing
                             """, (pool.pool, pool.last_updated, pool.reserves_left, pool.reserves_right, 
                                   pool.total_supply, pool.tvl_usd, pool.tvl_ton))
+            self.updated += 1
+
+    """
+    Returns jetton metadata
+    """
+    def get_jetton_metadata(self, address: str) -> JettonMetadata:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("select * from parsed.jetton_metadata where address = %s", (address,))
+            row = cursor.fetchone()
+            if not row:
+                return None
+            return JettonMetadata(
+                address=row['address'],
+                update_time_onchain=row['update_time_onchain'],
+                update_time_metadata=row['update_time_metadata'],
+                mintable=row['mintable'],
+                admin_address=row['admin_address'],
+                jetton_content_onchain=row['jetton_content_onchain'],
+                jetton_wallet_code_hash=row['jetton_wallet_code_hash'],
+                code_hash=row['code_hash'],
+                metadata_status=row['metadata_status'],
+                symbol=row['symbol'],
+                name=row['name'],
+                description=row['description'],
+                image=row['image'],
+                image_data=row['image_data'],
+                decimals=row['decimals'],
+                sources=row['sources'],
+                tonapi_image_url=row['tonapi_image_url']
+            )
+        
+    """
+    Upsert jetton metadata
+    """
+    def upsert_jetton_metadata(self, metadata: JettonMetadata, prev_ts_onchain: int, prev_ts_offchain: int):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            jetton_content = metadata.jetton_content_onchain
+            if jetton_content and type(jetton_content) == dict:
+                jetton_content = json.dumps(jetton_content)
+            cursor.execute("""
+            insert into parsed.jetton_metadata(address, update_time_onchain, update_time_metadata, mintable, admin_address, 
+                           jetton_content_onchain, jetton_wallet_code_hash, code_hash, metadata_status, symbol, name, description,
+                            image, image_data, decimals, sources, tonapi_image_url)
+                           values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                           on conflict (address) do update
+                           set update_time_onchain = EXCLUDED.update_time_onchain,
+                           update_time_metadata = EXCLUDED.update_time_metadata,
+                           mintable = EXCLUDED.mintable,
+                           admin_address = EXCLUDED.admin_address,
+                           jetton_content_onchain = EXCLUDED.jetton_content_onchain,
+                           jetton_wallet_code_hash = EXCLUDED.jetton_wallet_code_hash,
+                           code_hash = EXCLUDED.code_hash,
+                           metadata_status = EXCLUDED.metadata_status,
+                           symbol = EXCLUDED.symbol,
+                           name = EXCLUDED.name,
+                           description = EXCLUDED.description,
+                           image = EXCLUDED.image,
+                           image_data = EXCLUDED.image_data,
+                           decimals = EXCLUDED.decimals,
+                           sources = EXCLUDED.sources,
+                           tonapi_image_url = EXCLUDED.tonapi_image_url
+                           -- where jetton_metadata.update_time_onchain = %s and jetton_metadata.update_time_metadata = %s
+            """, (metadata.address, metadata.update_time_onchain, metadata.update_time_metadata, metadata.mintable, metadata.admin_address,
+                  jetton_content, metadata.jetton_wallet_code_hash, metadata.code_hash, metadata.metadata_status,
+                  metadata.symbol, metadata.name, metadata.description, metadata.image, metadata.image_data, metadata.decimals, metadata.sources,
+                  metadata.tonapi_image_url, prev_ts_onchain, prev_ts_offchain))
             self.updated += 1

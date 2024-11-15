@@ -23,6 +23,7 @@ from converters.agg_prices import AggPricesConverter
 from converters.tradoor_position_change import TradoorPositionChangeConverter
 from converters.transactions import TransactionsConverter
 from converters.account_states import AccountStatesConverter
+from converters.jetton_metadata import JettonMetadataConverter
 
 
 
@@ -35,7 +36,8 @@ CONVERTERS = {
     "transactions": TransactionsConverter(),
     "jetton_events": JettonEventsConverter(),
     "blocks": BlocksConverter(),
-    "account_states": AccountStatesConverter()
+    "account_states": AccountStatesConverter(),
+    "jetton_metadata": JettonMetadataConverter()
 }
 
 FIELDS_TO_REMOVE = ['__op', '__table', '__source_ts_ms', '__lsn']

@@ -15,16 +15,12 @@ from datetime import datetime, timedelta
 if __name__ == "__main__":
     source_database = os.environ.get("SOURCE_DATABASE")
     target_database = os.environ.get("TARGET_DATABASE")
-    repartition_field = os.environ.get("REPARTITION_FIELD")
     source_table = os.environ.get("SOURCE_TABLE")
     target_table = os.environ.get("TARGET_TABLE")
     table_location = os.environ.get("TARGET_TABLE_LOCATION")
     tmp_location = os.environ.get("TMP_LOCATION")
     workgroup = os.environ.get("ATHENA_WORKGROUP")
-    yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
-    three_days_before = (datetime.now() - timedelta(days=3)).strftime("%Y%m%d")
-    two_days_before = (datetime.now() - timedelta(days=2)).strftime("%Y%m%d")
-    logger.info(f"Repartitioning up to {yesterday}")
+    buckets_count = int(os.environ.get("BUCKETS_COUNT", 10))
 
     athena = boto3.client("athena", region_name="us-east-1")
 
@@ -43,8 +39,7 @@ if __name__ == "__main__":
     logger.info(f"Preparing source table {source_database}.{source_table}")
     execute_athena_query(f"MSCK REPAIR TABLE {source_table}", database=source_database)
 
-    logger.info(f"Repartitioning table {source_database}.{source_table} => {target_database}.{target_table} "
-                f"for date >= {two_days_before} on field {repartition_field}")
+    logger.info(f"Repartitioning table {source_database}.{source_table} => {target_database}.{target_table} ")
 
     glue = boto3.client("glue", region_name="us-east-1")
     source_table_meta = glue.get_table(DatabaseName=source_database, Name=source_table)
@@ -63,7 +58,7 @@ if __name__ == "__main__":
                 "Name": target_table,
                 "TableType": "EXTERNAL_TABLE",
                 "StorageDescriptor": {
-                    'Columns': source_table_meta['Table']['StorageDescriptor']['Columns'],
+                    'Columns': [c for c in source_table_meta['Table']['StorageDescriptor']['Columns'] if c['Name'] != 'adding_date'],  
                     'Location': table_location,
                     'InputFormat': 'org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat',
                     'OutputFormat': 'org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat',
@@ -71,7 +66,7 @@ if __name__ == "__main__":
                 },
                 "PartitionKeys": [
                     {
-                        "Name": "block_date",
+                        "Name": "snapshot_date",
                         "Type": "string",
                     }
                 ],
@@ -81,7 +76,7 @@ if __name__ == "__main__":
         logger.info(response)
         target_table_meta = glue.get_table(DatabaseName=target_database, Name=target_table)
     
-    tmp_table_name = f"{target_table}_increment_{two_days_before}_{str(uuid.uuid4()).replace('-', '')}"
+    tmp_table_name = f"{target_table}_increment_{str(uuid.uuid4()).replace('-', '')}"
     tmp_table_location = f"{tmp_location}/{tmp_table_name}"
     FIELDS = ", ".join([col['Name'] for col in source_table_meta['Table']['StorageDescriptor']['Columns']])
     sql = f"""
@@ -90,18 +85,23 @@ if __name__ == "__main__":
         format = 'AVRO', 
         write_compression = 'SNAPPY',
         external_location = '{tmp_table_location}',
-        bucketed_by = ARRAY['{source_table_meta['Table']['StorageDescriptor']['Columns'][0]['Name']}'],
-        bucket_count = 1,
-        partitioned_by = ARRAY['block_date']
+        bucketed_by = ARRAY['address'],
+        bucket_count = {buckets_count},
+        partitioned_by = ARRAY['snapshot_date']
     )
     as
-    select {FIELDS},
-    date_format(from_unixtime({repartition_field}), '%Y%m%d') as block_date
-    from "{source_database}".{source_table}
-    where adding_date >= '{two_days_before}' and date_format(from_unixtime({repartition_field}), '%Y%m%d') <= '{yesterday}'
-    except
-    select {FIELDS}, block_date
-    from "{target_database}".{target_table} where block_date >= '{three_days_before}'
+    with ranks as (
+    SELECT address, update_time_onchain,
+    update_time_metadata, mintable, admin_address, jetton_content_onchain,
+    jetton_wallet_code_hash, code_hash, metadata_status, symbol,
+    name, description, image, image_data, decimals, sources, tonapi_image_url,
+    row_number() over (partition by address order by update_time_metadata desc, update_time_onchain desc) as rank FROM "{source_database}".{source_table}
+    )
+    select address, update_time_onchain, update_time_metadata, mintable, admin_address, 
+    jetton_content_onchain, jetton_wallet_code_hash, code_hash, metadata_status, symbol, 
+    name, description, image, image_data, decimals, sources, tonapi_image_url, 
+    date_format(current_date, '%Y%m%d') as snapshot_date from ranks
+    where rank = 1
     """
     logger.info(f"Running SQL code to convert data into single file dataset {sql}")
 

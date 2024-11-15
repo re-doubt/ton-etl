@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from parsers.jetton_masters.jetton_metadata import JettonMastersMetadataParser
 from parsers.message.stonfi_swap_v2 import StonfiSwapV2
 from parsers.message.gaspump import GasPumpTrade
 from parsers.message.tradoor_trades import TradoorOptionOrder, TradoorPerpOrder, TradoorPerpPositionChange
@@ -20,6 +21,8 @@ import os
 
 EMULATOR_PATH = os.environ.get("EMULATOR_LIBRARY")
 MIN_SWAP_VOLUME_FOR_PRICE = int(os.environ.get("MIN_SWAP_VOLUME_FOR_PRICE", "1"))
+METADATA_FETCH_TIMEOUT = int(os.environ.get("METADATA_FETCH_TIMEOUT", "10"))
+METADATA_FETCH_MAX_ATTEMPTS = int(os.environ.get("METADATA_FETCH_MAX_ATTEMPTS", "3"))
 
 _parsers = [
     DedustSwap(),
@@ -57,7 +60,8 @@ _parsers = [
     
     CommentsDecoder(),
 
-    JettonWalletBalancesParser()
+    JettonWalletBalancesParser(),
+    JettonMastersMetadataParser(METADATA_FETCH_TIMEOUT, METADATA_FETCH_MAX_ATTEMPTS)
 ]
 
 """
