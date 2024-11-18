@@ -1,4 +1,6 @@
 import base64
+from typing import List
+from topics import TOPIC_JETTON_BURN, TOPIC_JETTON_MINT, TOPIC_JETTON_TRANSFERS
 from loguru import logger
 from pytoniq_core import Cell
 from converters.converter import Converter, NumericField
@@ -20,6 +22,9 @@ class JettonEventsConverter(Converter):
             return obj['utime']
         else:
             return obj['tx_now']
+        
+    def topics(self) -> List[str]:
+        return [TOPIC_JETTON_MINT, TOPIC_JETTON_BURN, TOPIC_JETTON_TRANSFERS]
 
     def convert(self, obj, table_name=None):
         if table_name == "jetton_mint":

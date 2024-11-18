@@ -31,6 +31,9 @@ class Converter:
     
     def partition(self, obj) -> str:
         return datetime.fromtimestamp(self.timestamp(obj), tz=timezone.utc).strftime('%Y%m%d')
+    
+    def topics(self) -> List[str]:
+        raise NotImplementedError("topics method should be implemented in a subclass")
 
     def convert(self, obj, table_name=None):
         for field in self.ignored_fields:

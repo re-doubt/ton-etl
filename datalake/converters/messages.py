@@ -1,6 +1,8 @@
 import base64
+from typing import List
 import psycopg2
 from functools import lru_cache
+from topics import TOPIC_MESSAGES
 from loguru import logger
 from pytoniq_core import Cell
 from psycopg2.extras import RealDictCursor
@@ -13,14 +15,18 @@ class MessageConverter(Converter):
 
     def timestamp(self, obj):
         return obj['tx_now']
+    
+    def topics(self) -> List[str]:
+        return [TOPIC_MESSAGES]
 
-    def convert(self, obj):
+    def convert(self, obj, table_name=None):
         comment = None
-        cell = Cell.one_from_boc(obj['body_boc']).begin_parse()
-        try:
-            comment = cell.load_snake_string().replace('\x00', '')
-        except Exception as e:
-            pass
+        if 'body_boc' in obj:
+            cell = Cell.one_from_boc(obj['body_boc']).begin_parse()
+            try:
+                comment = cell.load_snake_string().replace('\x00', '')
+            except Exception as e:
+                pass
         obj['comment'] = comment
         return super().convert(obj)
     
@@ -30,6 +36,9 @@ class MessageWithDataConverter(Converter):
 
     def timestamp(self, obj):
         return obj['tx_now']
+    
+    def topics(self) -> List[str]:
+        return [TOPIC_MESSAGES]
 
     def convert(self, obj, table_name=None):
         comment = None
