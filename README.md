@@ -181,6 +181,10 @@ with [EvaaWithdrawAndLiquidationParser](./parser/parsers/message/evaa.py).
 Contains decoded EVAA liquidation events. Produced from messages table stream
 with [EvaaWithdrawAndLiquidationParser](./parser/parsers/message/evaa.py). 
 
+### swap_coffee_stake
+Contains decoded swap.coffee staking events. Produced from messages table stream
+with [SwapCoffeeStakeParser](./parser/parsers/message/swap_coffee.py).
+
 ## prices
 
 Tables related to DeFi - DEX trades, TVL, LSD prices, etc..

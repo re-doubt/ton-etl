@@ -1,0 +1,61 @@
+{
+  "namespace": "ton",
+  "type": "record",
+  "name": "swap_coffee_stake",
+  "fields": [
+    {
+      "name": "tx_hash",
+      "type": "string"
+    },
+    {
+      "name": "msg_hash",
+      "type": "string"
+    },
+    {
+      "name": "trace_id",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "utime",
+      "type": "int"
+    },
+    {
+      "name": "vault",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "user",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "token",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "amount",
+      "type": [
+        "double",
+        "null"
+      ]
+    },
+    {
+      "name": "period_id",
+      "type": [
+        "int",
+        "null"
+      ]
+    }
+  ]
+}

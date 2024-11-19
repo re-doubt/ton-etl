@@ -276,3 +276,17 @@ CREATE TABLE parsed.jetton_metadata (
 	sources varchar null, -- [on|off] 6 times for symbol, name, description, image, image_data, decimals
 	tonapi_image_url varchar null -- tonapi image url
 );
+
+CREATE TABLE parsed.swap_coffee_stake (
+    tx_hash bpchar(44) NULL primary key,
+    msg_hash bpchar(44) NULL,
+    trace_id bpchar(44) NULL,
+	utime int8 NULL,
+    vault varchar NULL,
+    user varchar NULL,
+    token varchar NULL,
+    amount numeric NULL,
+    period_id int8 NULL,
+    created timestamp NULL,
+    updated timestamp NULL
+);
