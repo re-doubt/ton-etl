@@ -1,0 +1,17 @@
+{
+  "type": "record",
+  "name": "TonFunBclTrade",
+  "namespace": "tonfun",
+  "fields": [
+    {"name": "tx_hash", "type": "string"},
+    {"name": "trace_id", "type": "string"},
+    {"name": "event_time", "type": "long"},
+    {"name": "bcl_master", "type": "string"},
+    {"name": "event_type", "type": "string"},
+    {"name": "trader_address", "type": ["null", "string"]},
+    {"name": "ton_amount", "type": ["null", "double"]},
+    {"name": "bcl_amount", "type": ["null", "double"]},
+    {"name": "min_receive", "type": ["null", "double"]},
+    {"name": "referral", "type": ["null", "string"]}
+  ]
+}
