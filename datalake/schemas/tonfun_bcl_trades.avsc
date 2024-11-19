@@ -12,6 +12,8 @@
     {"name": "ton_amount", "type": ["null", "double"]},
     {"name": "bcl_amount", "type": ["null", "double"]},
     {"name": "min_receive", "type": ["null", "double"]},
-    {"name": "referral", "type": ["null", "string"]}
+    {"name": "referral", "type": ["null", "string"]},
+    {"name": "partner_address", "type": ["null", "string"]},
+    {"name": "platform_tag", "type": ["null", "string"]}
   ]
 }
