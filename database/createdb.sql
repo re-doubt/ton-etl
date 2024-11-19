@@ -256,3 +256,23 @@ CREATE INDEX trace_edges_msg_hash_idx ON public.trace_edges (msg_hash);
 
 -- to be aligned with jetton_transfers and jetton_burn
 ALTER TABLE parsed.jetton_mint ADD tx_lt int8 NULL;
+
+CREATE TABLE parsed.jetton_metadata (
+    address public."tonaddr" not NULL primary key,
+    update_time_onchain int4 null, -- onchain
+    update_time_metadata int4 null, -- metadata update time
+    mintable bool NULL, -- from onchain
+  	admin_address public."tonaddr" NULL, -- from onchain
+    jetton_content_onchain jsonb NULL, -- onchain
+  	jetton_wallet_code_hash public."tonhash" NULL, -- onchain
+	code_hash public."tonhash" null, -- onchain
+	metadata_status int, -- 1 - ok, -1 error, 0 on chain only
+	symbol varchar null, -- on/offchain
+	name varchar null, -- on/offchain
+	description varchar null, -- on/offchain
+	image varchar null, -- on/offchain
+	image_data varchar null, -- on/offchain
+	decimals smallint null, -- on/offchain
+	sources varchar null, -- [on|off] 6 times for symbol, name, description, image, image_data, decimals
+	tonapi_image_url varchar null -- tonapi image url
+);
