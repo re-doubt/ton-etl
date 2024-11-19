@@ -281,7 +281,7 @@ CREATE TABLE parsed.swap_coffee_stake (
     tx_hash bpchar(44) NULL primary key,
     msg_hash bpchar(44) NULL,
     trace_id bpchar(44) NULL,
-	utime int8 NULL,
+    utime int8 NULL,
     vault varchar NULL,
     user varchar NULL,
     token varchar NULL,
