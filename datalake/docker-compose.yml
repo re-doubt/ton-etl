@@ -133,6 +133,22 @@ services:
       options:
         max-size: 10M
 
+  streaming:
+    build:
+      context: ./
+      dockerfile: Dockerfile.streaming
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      - KAFKA_GROUP_ID=streaming
+      - KAFKA_BROKER=cdc-using-debezium-kafka:29092
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
 networks:
   default:
     name: database_default

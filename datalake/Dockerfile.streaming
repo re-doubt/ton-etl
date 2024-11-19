@@ -6,7 +6,7 @@ RUN pip3 install -r /opt/app/requirements.txt
 COPY converters /opt/app/converters
 COPY schemas /opt/app/schemas
 COPY topics.py /opt/app/
-COPY main.py /opt/app/
+COPY streaming.py /opt/app/
 
 WORKDIR /opt/app/
-CMD ["python3", "main.py"]
+CMD ["python3", "streaming.py"]

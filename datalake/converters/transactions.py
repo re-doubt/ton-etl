@@ -1,6 +1,8 @@
 import base64
+from typing import List
 import psycopg2
 from functools import lru_cache
+from topics import TOPIC_TRANSACTIONS
 from loguru import logger
 from pytoniq_core import Cell
 from psycopg2.extras import RealDictCursor
@@ -14,6 +16,9 @@ class TransactionsConverter(Converter):
 
     def timestamp(self, obj):
         return obj['now']
+    
+    def topics(self) -> List[str]:
+        return [TOPIC_TRANSACTIONS]
 
 
     """

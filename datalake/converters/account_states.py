@@ -1,4 +1,6 @@
 import base64
+from typing import List
+from topics import TOPIC_ACCOUNT_STATES
 from loguru import logger
 from pytoniq_core import Cell
 from converters.converter import Converter
@@ -10,6 +12,9 @@ class AccountStatesConverter(Converter):
 
     def timestamp(self, obj):
         return obj['timestamp']
+    
+    def topics(self) -> List[str]:
+        return [TOPIC_ACCOUNT_STATES]
     
     def convert(self, obj, table_name=None):
         if obj['data_boc']:
