@@ -23,6 +23,7 @@ def parse_referral(cs: Slice) -> dict:
         logger.warning(f"Unknown referral opcode: {opcode}")
         return {}
     return {
+        "referral": None,
         "partner_address": cs.load_address(),
         "platform_tag": cs.load_address() if cs.remaining_bits else None,
         "extra_tag": cs.load_address() if cs.remaining_bits else None,

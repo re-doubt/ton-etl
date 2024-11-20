@@ -282,3 +282,23 @@ ALTER TYPE public.dex_name ADD VALUE 'megaton' AFTER 'ston.fi_v2';
 
 -- required for megaton parser
 CREATE INDEX jetton_transfers_trace_id_idx ON public.jetton_transfers (trace_id);
+
+-- TonFun
+CREATE TABLE parsed.tonfun_bcl_trade (
+    tx_hash bpchar(44) NULL primary key,
+    trace_id bpchar(44) NULL,
+    event_time int4 NULL,
+    bcl_master varchar NULL,
+    event_type varchar NULL,
+    trader_address varchar null,
+    ton_amount numeric NULL,
+    bcl_amount numeric NULL,
+    min_receive numeric NULL,
+    referral varchar NULL,
+    partner_address varchar NULL,
+    platform_tag varchar NULL,
+    extra_tag varchar NULL,
+    created timestamp NULL,
+    updated timestamp NULL
+);
+
