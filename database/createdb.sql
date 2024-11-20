@@ -121,7 +121,7 @@ CREATE TABLE parsed.dex_swap_parsed (
 	tx_hash bpchar(44) NULL,
 	msg_hash bpchar(44) NOT NULL,
 	trace_id bpchar(44) NULL,
-	public."dex_name" varchar NULL,
+	platform public."dex_name" NULL,
 	swap_utime int8 NULL,
 	swap_user varchar NULL,
 	swap_pool varchar NULL,

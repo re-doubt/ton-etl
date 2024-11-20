@@ -141,9 +141,15 @@ with [JettonMintParser](./parser/parsers/message/jetton_mint.py).
 
 ### dex_swap_parsed
 
-Contains decoded DEX swaps events for DeDust and Ston.fi. Produced from messages table stream
-with [DedustSwap](./parser/parsers/message/dedust_swap.py), [StonfiSwap](./parser/parsers/message/stonfi_swap.py) and [StonfiSwapV2](./parser/parsers/message/stonfi_swap_v2.py) parsers. 
-Each parser estimates deal volume in TON and USD using core prices (see below).
+Supported DEXs:
+* DeDust: [DedustSwap](./parser/parsers/message/dedust_swap.py)
+* Ston.fi: [StonfiSwap](./parser/parsers/message/stonfi_swap.py)
+* Ston.fi v2: [StonfiSwapV2](./parser/parsers/message/stonfi_swap_v2.py)
+* Megaton: [MegatonSwap](./parser/parsers/jetton_transfer/megaton.py)
+
+Each parser estimates deal volume in TON and USD using core prices (see below). So for swaps with core assets like
+TON, stablecoins or LSDs volume will be estimated based on the core asset price at the moment of the swap. Otherwise
+(like swaps between jettons) volume will be null.
 
 
 ### tradoor_perp_order

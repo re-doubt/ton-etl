@@ -53,10 +53,6 @@ class MegatonDexSwap(Parser):
         user_router = transfers[-4]
 
         # last transfer has to be our message
-        logger.info(f"router_user: {router_user}")
-        logger.info(f"lp_router: {lp_router}")
-        logger.info(f"router_lp: {router_lp}")
-        logger.info(f"user_router: {user_router}")
         assert router_user.get("tx_hash") == obj.get("tx_hash")
         if lp_router.get("destination") != current_router:
             logger.warning(f"LP router {lp_router.get('destination')} is not the current router {current_router}")
