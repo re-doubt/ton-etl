@@ -121,7 +121,7 @@ CREATE TABLE parsed.dex_swap_parsed (
 	tx_hash bpchar(44) NULL,
 	msg_hash bpchar(44) NOT NULL,
 	trace_id bpchar(44) NULL,
-	platform public."dex_name" NULL,
+	public."dex_name" varchar NULL,
 	swap_utime int8 NULL,
 	swap_user varchar NULL,
 	swap_pool varchar NULL,
@@ -276,3 +276,9 @@ CREATE TABLE parsed.jetton_metadata (
 	sources varchar null, -- [on|off] 6 times for symbol, name, description, image, image_data, decimals
 	tonapi_image_url varchar null -- tonapi image url
 );
+
+-- megaton dex support
+ALTER TYPE public.dex_name ADD VALUE 'megaton' AFTER 'ston.fi_v2';
+
+-- required for megaton parser
+CREATE INDEX jetton_transfers_trace_id_idx ON public.jetton_transfers (trace_id);

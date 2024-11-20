@@ -11,14 +11,17 @@ from model.dexpool import DexPool
 
 USDT = Parser.uf2raw('EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs')
 jUSDT = Parser.uf2raw('EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA')
-pTON = Parser.uf2raw('EQCM3B12QK1e4yZSf8GtBRT0aLMNyEsBc_DhVfRRtOEffLez')
-pTONv2 = Parser.uf2raw('EQBnGWMCf3-FZZq1W4IWcWiGAc3PHuZ0_H-7sad2oY00o83S')
+jUSDC = Parser.uf2raw('EQB-MPwrd1G6WKNkLz_VnV6WqBDd142KMQv-g1O-8QUA3728')
+pTON = Parser.uf2raw('EQCM3B12QK1e4yZSf8GtBRT0aLMNyEsBc_DhVfRRtOEffLez') # ston.fi v1
+pTONv2 = Parser.uf2raw('EQBnGWMCf3-FZZq1W4IWcWiGAc3PHuZ0_H-7sad2oY00o83S') # ston.fi v2
+WTON_Megaton = Parser.uf2raw('EQCajaUU1XXSAjTD-xOV7pE49fGtg4q8kF3ELCOJtGvQFQ2C')
+WTON_Stonfi = Parser.uf2raw('EQDQoc5M3Bh8eWFephi9bClhevelbZZvWhkqdo80XuY_0qXv') # deprecated
 TON = Parser.uf2raw('EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c')
 stTON = Parser.uf2raw('EQDNhy-nxYFgUqzfUzImBEP67JqsyMIcyk2S5_RwNNEYku0k')
 tsTON = Parser.uf2raw('EQC98_qAmNEptUtPc7W6xdHh_ZHrBUFpw5Ft_IzNU20QAJav')
 
-STABLES = [USDT, jUSDT]
-TONS = [pTON, TON, pTONv2]
+STABLES = [USDT, jUSDT, jUSDC]
+TONS = [pTON, TON, pTONv2, WTON_Megaton, WTON_Stonfi]
 LSDS = [stTON, tsTON]
 
 QUOTE_ASSET_TYPE_TON = "TON"
