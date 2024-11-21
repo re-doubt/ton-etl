@@ -14,7 +14,6 @@ class TonFunTradeEvent:
     ton_amount: Decimal
     bcl_amount: Decimal
     min_receive: Decimal
-    referral: Optional[str]  # Referral data
     # TL-B: ref_v1$_ partner:MaybeAddress platformTag:MaybeAddress extraTag:MaybeAddress = ReferralConfig;
     partner_address: Optional[str]  # partner field of referral slice
     platform_tag: Optional[str]     # platformTag field of referral slice
