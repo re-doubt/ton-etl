@@ -36,6 +36,7 @@ def parse_referral(cs: Slice) -> dict:
     }
 
 def parse_event(opcode: int, cs: Cell) -> Optional[dict]:
+    cs.load_uint(32) # opcode
     return {
         "buy_log": lambda: {"type": "Buy", **parse_trade_data(cs)},
         "sell_log": lambda: {"type": "Sell", **parse_trade_data(cs)},
