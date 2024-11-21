@@ -293,6 +293,7 @@ CREATE TABLE parsed.tonfun_bcl_trade (
     trader_address varchar null,
     ton_amount numeric NULL,
     bcl_amount numeric NULL,
+    referral_ver int8 NULL,
     partner_address varchar NULL,
     platform_tag varchar NULL,
     extra_tag varchar NULL,

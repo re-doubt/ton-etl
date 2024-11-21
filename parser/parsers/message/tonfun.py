@@ -22,8 +22,14 @@ def parse_referral(cs: Slice) -> dict:
     opcode = cs.load_uint(32) # crc32(ref_v1)
     if opcode != 0xf7ecea4c:
         logger.warning(f"Unknown referral opcode: {opcode}")
-        return {}
+        return {
+            "referral_ver": opcode,
+            "partner_address": None,
+            "platform_tag": None,
+            "extra_tag": None
+        }
     return {
+        "referral_ver": opcode,
         "partner_address": cs.load_address(),
         "platform_tag": cs.load_address() if cs.remaining_bits else None,
         "extra_tag": cs.load_address() if cs.remaining_bits else None,
@@ -59,10 +65,11 @@ def parse_trade_data(cs: Cell) -> dict:
         "current_supply": cs.load_coins(),
         "ton_liq_collected": cs.load_coins(),
         **(parse_referral(cs.load_ref().begin_parse()) if cs.load_bit() else
-           {"partner_address": None, "platform_tag": None, "extra_tag": None})
+           {"referral_ver": None, "partner_address": None, "platform_tag": None, "extra_tag": None})
     }
 
 def make_event(obj: dict, trade_data: dict) -> TonFunTradeEvent:
+    logger.info(f"Parsed trade data: {trade_data}")
     return TonFunTradeEvent(
         tx_hash=obj["tx_hash"],
         trace_id=obj["trace_id"],
@@ -72,6 +79,7 @@ def make_event(obj: dict, trade_data: dict) -> TonFunTradeEvent:
         trader_address=trade_data["trader"],
         ton_amount=int(trade_data["ton_amount"]),
         bcl_amount=int(trade_data["bcl_amount"]),
+        referral_ver=trade_data["referral_ver"],
         partner_address=trade_data["partner_address"],
         platform_tag=trade_data["platform_tag"],
         extra_tag=trade_data["extra_tag"]
