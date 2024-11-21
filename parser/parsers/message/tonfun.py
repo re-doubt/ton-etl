@@ -72,7 +72,6 @@ def make_event(obj: dict, trade_data: dict) -> TonFunTradeEvent:
         trader_address=trade_data["trader"],
         ton_amount=int(trade_data["ton_amount"]),
         bcl_amount=int(trade_data["bcl_amount"]),
-        min_receive=None,
         partner_address=trade_data["partner_address"],
         platform_tag=trade_data["platform_tag"],
         extra_tag=trade_data["extra_tag"]
