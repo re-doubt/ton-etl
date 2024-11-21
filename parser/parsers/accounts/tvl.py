@@ -6,7 +6,7 @@ from loguru import logger
 from db import DB
 from pytoniq_core import Cell, Address, begin_cell
 from model.dexpool import DexPool
-from model.dexswap import DEX_DEDUST, DEX_STON, DEX_STON_V2
+from model.dexswap import DEX_DEDUST, DEX_MEGATON, DEX_STON, DEX_STON_V2
 from model.dedust import read_dedust_asset
 from parsers.message.swap_volume import estimate_tvl
 from pytvm.tvm_emulator.tvm_emulator import TvmEmulator
@@ -86,6 +86,10 @@ class TVLPoolStateParser(EmulatorParser):
                 wallet0_address, wallet1_address = self._execute_method(emulator, 'get_assets', [], db, obj)
                 current_jetton_left = read_dedust_asset(wallet0_address)
                 current_jetton_right = read_dedust_asset(wallet1_address)
+        elif pool.platform == DEX_MEGATON:
+            _, _, _, jetton_a_address, _, pool.reserves_left, _, jetton_b_address, _, pool.reserves_right, _ = self._execute_method(emulator, 'get_lp_swap_data', [], db, obj)
+            current_jetton_left = jetton_a_address.load_address()
+            current_jetton_right = jetton_b_address.load_address()
         else:
             raise Exception(f"DEX is not supported: {pool.platform}")
         

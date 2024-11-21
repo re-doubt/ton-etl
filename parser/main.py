@@ -48,6 +48,10 @@ if __name__ == "__main__":
         generator = db.get_messages_for_processing(os.environ.get("PROCESS_ONE_HASH"))
     elif os.environ.get("PROCESS_ONE_HASH_STATE"):
         generator = db.get_account_state_for_processing(os.environ.get("PROCESS_ONE_HASH_STATE").upper())
+    elif os.environ.get("PROCESS_JETTONS_ONE_TRACE_ID"):
+        generator = db.get_jetton_transfers_for_processing(os.environ.get("PROCESS_JETTONS_ONE_TRACE_ID"))
+
+        
     # for msg in consumer:
     for msg in generator:
         try:

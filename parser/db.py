@@ -1,4 +1,6 @@
-from typing import Dict, Set, Union
+import base64
+import decimal
+from typing import Dict, List, Set, Union
 from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
 from pytoniq_core import Address, ExternalAddress
@@ -351,6 +353,27 @@ class DB():
             )
             return list(map(lambda x: FakeRecord(value=json.dumps(dict(x)).encode('utf-8'), topic="ton.public.messages"),
                             cursor.fetchall()))
+
+    def get_jetton_transfers_for_processing(self, trace_id):
+
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                select * from jetton_transfers where trace_id = %s
+                """, 
+                (trace_id,),
+            )
+            class DecimalEncoder(json.JSONEncoder):
+                def default(self, o):
+                    if isinstance(o, decimal.Decimal):
+                        return {
+                            'value': base64.b64encode(int(o).to_bytes(length=128, byteorder='big')).decode('utf-8'),
+                            'scale': 0
+                        }
+                    return super().default(o)
+            return list(map(lambda x: FakeRecord(value=json.dumps(dict(x),  cls=DecimalEncoder).encode('utf-8'), topic="ton.public.jetton_transfers"),
+                            cursor.fetchall()))
         
     # for debugging purposese
     def get_account_state_for_processing(self, address):
@@ -540,3 +563,9 @@ class DB():
                   metadata.symbol, metadata.name, metadata.description, metadata.image, metadata.image_data, metadata.decimals, metadata.sources,
                   metadata.tonapi_image_url, prev_ts_onchain, prev_ts_offchain))
             self.updated += 1
+
+    def get_jetton_transfers_by_trace_id(self, trace_id: str) -> List[dict]:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("select * from public.jetton_transfers where trace_id = %s", (trace_id,))
+            return cursor.fetchall()

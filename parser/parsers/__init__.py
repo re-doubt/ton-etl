@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from parsers.jetton_transfer.megaton import MegatonDexSwap
 from parsers.jetton_masters.jetton_metadata import JettonMastersMetadataParser
 from parsers.message.stonfi_swap_v2 import StonfiSwapV2
 from parsers.message.gaspump import GasPumpTrade
@@ -29,6 +30,7 @@ _parsers = [
     NftHistoryParser(),
     StonfiSwap(),
     StonfiSwapV2(),
+    MegatonDexSwap(),
     TradoorPerpOrder(),
     TradoorOptionOrder(),
     TradoorPerpPositionChange(),

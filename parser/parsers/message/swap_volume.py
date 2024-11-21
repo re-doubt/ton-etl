@@ -11,15 +11,25 @@ from model.dexpool import DexPool
 
 USDT = Parser.uf2raw('EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs')
 jUSDT = Parser.uf2raw('EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA')
-pTON = Parser.uf2raw('EQCM3B12QK1e4yZSf8GtBRT0aLMNyEsBc_DhVfRRtOEffLez')
-pTONv2 = Parser.uf2raw('EQBnGWMCf3-FZZq1W4IWcWiGAc3PHuZ0_H-7sad2oY00o83S')
+jUSDC = Parser.uf2raw('EQB-MPwrd1G6WKNkLz_VnV6WqBDd142KMQv-g1O-8QUA3728')
+pTON = Parser.uf2raw('EQCM3B12QK1e4yZSf8GtBRT0aLMNyEsBc_DhVfRRtOEffLez') # ston.fi v1
+pTONv2 = Parser.uf2raw('EQBnGWMCf3-FZZq1W4IWcWiGAc3PHuZ0_H-7sad2oY00o83S') # ston.fi v2
+WTON_Megaton = Parser.uf2raw('EQCajaUU1XXSAjTD-xOV7pE49fGtg4q8kF3ELCOJtGvQFQ2C')
+WTON_Stonfi = Parser.uf2raw('EQDQoc5M3Bh8eWFephi9bClhevelbZZvWhkqdo80XuY_0qXv') # deprecated
 TON = Parser.uf2raw('EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c')
 stTON = Parser.uf2raw('EQDNhy-nxYFgUqzfUzImBEP67JqsyMIcyk2S5_RwNNEYku0k')
 tsTON = Parser.uf2raw('EQC98_qAmNEptUtPc7W6xdHh_ZHrBUFpw5Ft_IzNU20QAJav')
+oUSDT = Parser.uf2raw('EQC_1YoM8RBixN95lz7odcF3Vrkc_N8Ne7gQi7Abtlet_Efi')
+oUSDC = Parser.uf2raw('EQC61IQRl0_la95t27xhIpjxZt32vl1QQVF2UgTNuvD18W-4')
 
-STABLES = [USDT, jUSDT]
-TONS = [pTON, TON, pTONv2]
+STABLES = [USDT, jUSDT, jUSDC]
+TONS = [pTON, TON, pTONv2, WTON_Megaton, WTON_Stonfi]
 LSDS = [stTON, tsTON]
+ORBIT_STABLES = [oUSDT, oUSDC]
+STABLES_INCLUDING_ORBIT = STABLES + ORBIT_STABLES
+# Orbit bridge was hacked on 2024-01-01 (see https://blockworks.co/news/80-million-lost-orbit-bridge)
+# that resulted in de-peg of oUSDT and oUSDC so we will not consider them as stablecoins after the hack date
+ORBIT_HACK_TIMESTAMP = 1703980800
 
 QUOTE_ASSET_TYPE_TON = "TON"
 QUOTE_ASSET_TYPE_STABLE = "STABLE"
@@ -30,11 +40,11 @@ QUOTE_ASSET_TYPE_OTHER = "OTHER"
 Deterministically returns base and quote tokens and quote asset type
 """
 def base_quote(left: str, right: str) -> (str, str, str):
-    if left in STABLES and right in STABLES:
+    if left in STABLES_INCLUDING_ORBIT and right in STABLES_INCLUDING_ORBIT:
         return (min(left, right), max(left, right), QUOTE_ASSET_TYPE_STABLE)
-    if left in STABLES:
+    if left in STABLES_INCLUDING_ORBIT:
         return (right, left, QUOTE_ASSET_TYPE_STABLE)
-    if right in STABLES:
+    if right in STABLES_INCLUDING_ORBIT:
         return (left, right, QUOTE_ASSET_TYPE_STABLE)
     if left in TONS and right in TONS: # meaningless..
         return (min(left, right), min(left, right), QUOTE_ASSET_TYPE_TON)
@@ -66,10 +76,10 @@ def estimate_volume(swap: DexSwapParsed, db: DB):
             return a
     swap_src_token = normalize_addr(swap.swap_src_token)
     swap_dst_token = normalize_addr(swap.swap_dst_token)
-    if swap_src_token in STABLES:
+    if swap_src_token in STABLES or (swap_src_token in ORBIT_STABLES and swap.swap_utime < ORBIT_HACK_TIMESTAMP):
         volume_usd = swap.swap_src_amount / 1e6
         volume_ton = volume_usd / ton_price
-    elif swap_dst_token in STABLES:
+    elif swap_dst_token in STABLES or (swap_dst_token in ORBIT_STABLES and swap.swap_utime < ORBIT_HACK_TIMESTAMP):
         volume_usd = swap.swap_dst_amount / 1e6
         volume_ton = volume_usd / ton_price
 
@@ -120,10 +130,10 @@ def estimate_tvl(pool: DexPool, db: DB):
             return a
     jetton_left = normalize_addr(pool.jetton_left)
     jetton_right = normalize_addr(pool.jetton_right)
-    if jetton_left in STABLES:
+    if jetton_left in STABLES or (jetton_left in ORBIT_STABLES and pool.last_updated < ORBIT_HACK_TIMESTAMP):
         tvl_usd = pool.reserves_left / 1e6 * 2
         tvl_ton = tvl_usd / ton_price
-    elif jetton_right in STABLES:
+    elif jetton_right in STABLES or (jetton_right in ORBIT_STABLES and pool.last_updated < ORBIT_HACK_TIMESTAMP):
         tvl_usd = pool.reserves_right / 1e6 * 2
         tvl_ton = tvl_usd / ton_price
 
