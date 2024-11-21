@@ -52,6 +52,7 @@ def parse_send_liq_data(cs: Cell) -> dict:
         "bcl_amount": 0,
         "current_supply": jetton_liq,
         "ton_liq_collected": ton_liq,
+        "referral_ver": None,
         "partner_address": None,
         "platform_tag": None,
         "extra_tag": None
