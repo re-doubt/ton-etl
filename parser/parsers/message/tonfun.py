@@ -35,13 +35,12 @@ def parse_referral(cs: Slice) -> dict:
         "extra_tag": cs.load_address() if cs.remaining_bits else None,
     }
 
-def parse_event(cs: Cell) -> Optional[dict]:
-    event_id = cs.load_uint(32)
+def parse_event(opcode: int, cs: Cell) -> Optional[dict]:
     return {
         "buy_log": lambda: {"type": "Buy", **parse_trade_data(cs)},
         "sell_log": lambda: {"type": "Sell", **parse_trade_data(cs)},
         "send_liq_log": lambda: {"type": "SendLiq", **parse_send_liq_data(cs)}
-    }.get(EVENT_TYPES.get(event_id, "unknown"), lambda: None)()
+    }.get(EVENT_TYPES.get(opcode, "unknown"), lambda: None)()
 
 def parse_send_liq_data(cs: Cell) -> dict:
     ton_liq = cs.load_coins()
@@ -97,7 +96,7 @@ class TonFunTrade(Parser):
     )
 
     def handle_internal(self, obj: dict, db: DB) -> None:
-        maybe_trade_data = parse_event(Parser.message_body(obj, db).begin_parse())
+        maybe_trade_data = parse_event(obj.get("opcode"), Parser.message_body(obj, db).begin_parse())
         if maybe_trade_data:
             event = make_event(obj, maybe_trade_data)
             logger.info(f"Parsed tonfun event: {event}")
