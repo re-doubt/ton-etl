@@ -89,7 +89,6 @@ class TonFunTrade(Parser):
     )
 
     def handle_internal(self, obj: dict, db: DB) -> None:
-        # check 
         maybe_trade_data = parse_event(Parser.message_body(obj, db).begin_parse())
         if maybe_trade_data:
             event = make_event(obj, maybe_trade_data)

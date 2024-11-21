@@ -172,6 +172,11 @@ with [TradoorOptionOrder](./parser/parsers/message/tradoor_trades.py) parser.
 Contains decoded GasPump trade events. Produced from messages table stream
 with [GasPumpTrade](./parser/parsers/message/gaspump.py) parser. 
 
+### tonfun_bcl_trade
+
+Contains decoded [TonFun](https://github.com/ton-fun-tech) trade events. Produced from messages table stream
+with [TonFunTrade](./parser/parsers/message/tonfun.py) parser. 
+
 ### evaa_supply
 
 Contains decoded EVAA supply events. Produced from messages table stream
