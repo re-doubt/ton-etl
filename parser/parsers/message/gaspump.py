@@ -36,7 +36,8 @@ GASPUMP_CODE_HASH_WHITELIST = set([
     'zHJFV4ogLC+2/uN1jCQZBs9IA3xEaUEF5kqRdWjDOlw=',
     'epVAPFfHhSCA8fFWbj5rWnMUNwUah+hGTl0yl3+VaVg=',
     's8xEFRVKnzs0e0+nHdDo1N9iOmaGHMnQexA8lf1elkU=',
-    'r5eJZ7VurJARfQResj0zCr6kG6QH7tauAs0F2SGuG6U='
+    'r5eJZ7VurJARfQResj0zCr6kG6QH7tauAs0F2SGuG6U=',
+    'xw8j8tT8ut2DfkUFvG62n14weRqpu/SwiITp5nBt4U4='
 ])
 
 DEPLOY_AND_BUY_EVENT = Parser.opcode_signed(0x67617301)
