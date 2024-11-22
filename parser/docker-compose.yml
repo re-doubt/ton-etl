@@ -51,7 +51,7 @@ services:
     restart: always
     environment:
       - KAFKA_GROUP_ID=messages_parsers
-      - SUPPORTED_PARSERS=StonfiSwap,StonfiSwapV2,DedustSwap,TradoorPerpOrder,TradoorOptionOrder,GasPumpTrade,TradoorPerpPositionChange,EvaaSupplyParser,EvaaWithdrawAndLiquidationParser,JettonMintParser,HipoTokensMinted,MegatonDexSwap
+      - SUPPORTED_PARSERS=StonfiSwap,StonfiSwapV2,DedustSwap,TradoorPerpOrder,TradoorOptionOrder,GasPumpTrade,TradoorPerpPositionChange,EvaaSupplyParser,EvaaWithdrawAndLiquidationParser,JettonMintParser,HipoTokensMinted,MegatonDexSwap,DeleaDepositParser,DeleaWithdrawAndLiquidationParser
       - KAFKA_TOPICS=ton.public.messages
       - MIN_MATURITY_SECONDS=300
     env_file:
