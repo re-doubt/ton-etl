@@ -118,7 +118,7 @@ Contains raw data from ton-index-worker:
 ## parsed
 
 Contains parsed data produced by [parsers](./parser/).
-All tables produces from messages includes tx_hash, trace_id and event_time (transaction time).
+All tables produced from messages include tx_hash, trace_id and event_time (transaction time).
 
 ### mc_libraries
 
