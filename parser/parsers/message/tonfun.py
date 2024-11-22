@@ -19,6 +19,14 @@ EVENT_TYPES = {
 }
 
 def parse_referral(cs: Slice) -> dict:
+    if cs.remaining_bits < 32:
+        logger.warning(f"Referral slice is too short: {cs.remaining_bits} bits")
+        return {
+            "referral_ver": None,
+            "partner_address": None,
+            "platform_tag": None,
+            "extra_tag": None
+        }
     opcode = cs.load_uint(32) # crc32(ref_v1)
     if opcode != 0xf7ecea4c:
         logger.warning(f"Unknown referral opcode: {opcode}")
