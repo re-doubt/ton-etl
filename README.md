@@ -118,6 +118,7 @@ Contains raw data from ton-index-worker:
 ## parsed
 
 Contains parsed data produced by [parsers](./parser/).
+All tables produces from messages includes tx_hash, trace_id and event_time (transaction time).
 
 ### mc_libraries
 
@@ -176,6 +177,15 @@ with [GasPumpTrade](./parser/parsers/message/gaspump.py) parser.
 
 Contains decoded [TonFun](https://github.com/ton-fun-tech) trade events. Produced from messages table stream
 with [TonFunTrade](./parser/parsers/message/tonfun.py) parser. 
+Includes following fields:
+* bcl_master - jetton master address. According to TONFun architecture the same jetton master is used after the token leaves the bonding curve.
+* event_type - ``Buy``, ``Sell`` or ``SendLiq``. ``SendLiq`` is used for the event when liquidity is collected from the bonding curve and sent to DEX (Ston.fi)
+* trader_address - address of the trader. None for the ``SendLiq`` event (but actually in most cases ``SendLiq`` occurs after the ``Buy`` event and has the same ``trace_id``)
+* ton_amount - amount of TON sold/bought (zero for ``SendLiq``)
+* bcl_amount - amount of jetton bought/sold (zero for ``SendLiq``)
+* referral_ver - referral version. TONFun protocol allows to set arbitrary referral cell and the cell starts with 32-bit version (opcode). The only supported
+opcode is crc32(ref_v1).
+* partner_address, platform_tag, extra_tag - referral addresses provided by the trader
 
 ### evaa_supply
 
