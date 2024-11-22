@@ -1,10 +1,11 @@
+import traceback
 from typing import Optional
 from functools import partial
 from operator import eq
 from decimal import Decimal
 from loguru import logger
 from pytoniq_core import Cell, Slice
-from model.parser import Parser, TOPIC_MESSAGES
+from model.parser import NonCriticalParserError, Parser, TOPIC_MESSAGES
 from model.tonfun import TonFunTradeEvent
 from db import DB
 
@@ -105,8 +106,12 @@ class TonFunTrade(Parser):
     )
 
     def handle_internal(self, obj: dict, db: DB) -> None:
-        maybe_trade_data = parse_event(obj.get("opcode"), Parser.message_body(obj, db).begin_parse())
-        if maybe_trade_data:
-            event = make_event(obj, maybe_trade_data)
-            logger.info(f"Parsed tonfun event: {event}")
-            db.serialize(event)
+        try:
+            maybe_trade_data = parse_event(obj.get("opcode"), Parser.message_body(obj, db).begin_parse())
+            if maybe_trade_data:
+                event = make_event(obj, maybe_trade_data)
+                logger.info(f"Parsed tonfun event: {event}")
+                db.serialize(event)
+        except Exception as e:
+            logger.error(f"Failed to parse tonfun event: {e} {traceback.format_exc()}")
+            raise NonCriticalParserError(f"Failed to parse tonfun event: {e} {traceback.format_exc()}") from e
