@@ -192,6 +192,11 @@ opcode is crc32(ref_v1).
 Contains decoded EVAA supply events. Produced from messages table stream
 with [EvaaSupplyParser](./parser/parsers/message/evaa.py). 
 
+EVAA pools:
+* EQC8rUZqR_pWV1BylWUlPNBzyiTYVoBEmQkMIQDZXICfnuRr - EVAA main pool
+* EQBIlZX2URWkXCSg3QF2MJZU-wC5XkBoLww-hdWk2G37Jc6N - EVAA LP pool
+* EQBozwKVDya9IL3Kw4mR5AQph4yo15EuMdyX8nLljeaUxrpM - Coffin pool (EVAA fork)
+
 ### evaa_withdraw
 
 Contains decoded EVAA withdraw events. Produced from messages table stream
