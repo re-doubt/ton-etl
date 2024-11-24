@@ -20,6 +20,30 @@ CREATE TABLE prices.core (
 );
 CREATE INDEX core_asset_idx ON prices.core USING btree (asset, price_ts DESC);
 
+-- TON Hedge
+
+CREATE TYPE public."ton_hedge_option_type" AS ENUM (
+	'call',
+	'put');
+
+CREATE TABLE parsed.tonhedge_option (
+    tx_hash bpchar(44) NULL primary key,
+    trace_id bpchar(44) NULL,
+    event_time int4 NULL,
+    id numeric NULL
+    option_type public."ton_hedge_option_type" NULL
+    option_price numeric NULL
+    opened_asset_price numeric NULL
+    strike_price numeric NULL
+    period numeric NULL
+    amount numeric NULL
+    purchased_at timestamp NULL
+    initial_holder varchar NULL
+    service_fee numeric NULL
+    permium numeric NULL
+    notional_volume numeric NULL
+    volume numeric NULL
+);
 
 -- Tradoor
 

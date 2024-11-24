@@ -1,5 +1,6 @@
 from typing import Dict, List, Set
 from parsers.jetton_transfer.megaton import MegatonDexSwap
+from parsers.message.tonhedge import TonHedgeOptionPurchased
 from parsers.message.tonfun import TonFunTrade
 from parsers.jetton_masters.jetton_metadata import JettonMastersMetadataParser
 from parsers.message.stonfi_swap_v2 import StonfiSwapV2
@@ -27,6 +28,7 @@ METADATA_FETCH_TIMEOUT = int(os.environ.get("METADATA_FETCH_TIMEOUT", "10"))
 METADATA_FETCH_MAX_ATTEMPTS = int(os.environ.get("METADATA_FETCH_MAX_ATTEMPTS", "3"))
 
 _parsers = [
+    TonHedgeOptionPurchased(),
     DedustSwap(),
     NftHistoryParser(),
     StonfiSwap(),
