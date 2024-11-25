@@ -326,3 +326,21 @@ CREATE TABLE parsed.delea_liquidation (
     created timestamp NULL,
     updated timestamp NULL
 );
+
+-- TonFun
+CREATE TABLE parsed.tonfun_bcl_trade (
+    tx_hash bpchar(44) NULL primary key,
+    trace_id bpchar(44) NULL,
+    event_time int4 NULL,
+    bcl_master varchar NULL,
+    event_type varchar NULL,
+    trader_address varchar null,
+    ton_amount numeric NULL,
+    bcl_amount numeric NULL,
+    referral_ver int8 NULL,
+    partner_address varchar NULL,
+    platform_tag varchar NULL,
+    extra_tag varchar NULL,
+    created timestamp NULL,
+    updated timestamp NULL
+);
