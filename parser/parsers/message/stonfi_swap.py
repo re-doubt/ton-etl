@@ -1,3 +1,4 @@
+import traceback
 from model.parser import Parser, TOPIC_MESSAGES
 from loguru import logger
 from db import DB
@@ -23,7 +24,13 @@ class StonfiSwap(Parser):
         cell = Parser.message_body(obj, db).begin_parse()
         cell.load_uint(32) # 0xf93bb43f
         query_id = cell.load_uint(64)
-        owner = cell.load_address()
+        # fix for rare case of wrong owner address
+        try:
+            owner = cell.load_address()
+        except Exception as e:
+            logger.error(f"Failed to load owner address: {e} {traceback.format_exc()}")
+            return
+
         exit_code = cell.load_uint(32)
         params = cell.load_ref().begin_parse()
         token0_amount = params.load_coins()
