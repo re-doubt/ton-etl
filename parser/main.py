@@ -28,7 +28,8 @@ if __name__ == "__main__":
             group_id=group_id,
             bootstrap_servers=os.environ.get("KAFKA_BROKER"),
             auto_offset_reset=os.environ.get("KAFKA_OFFSET_RESET", 'earliest'),
-            enable_auto_commit=False
+            enable_auto_commit=False,
+            max_poll_records=int(os.environ.get("KAFKA_MAX_POLL_RECORDS", '50')),
             )
     for topic in topics.split(","):
         logger.info(f"Subscribing to {topic}")
@@ -56,8 +57,8 @@ if __name__ == "__main__":
     for msg in generator:
         try:
             if msg.timestamp and min_maturity and msg.timestamp > time.time() * 1000 - min_maturity:
-                wait_interval_ms = msg.timestamp - time.time() * 1000  + min_maturity + 10000
-                logger.info(f"Waiting for {wait_interval_ms / 1000:0.1f} s before processing next message")
+                wait_interval_ms = msg.timestamp - time.time() * 1000  + min_maturity + 100#00
+                logger.info(f"Waiting for {wait_interval_ms / 1000:0.1f} s before processing next message, timestamp {msg.timestamp}, partition {msg.partition}")
                 time.sleep(wait_interval_ms / 1000)
             
             total += 1
