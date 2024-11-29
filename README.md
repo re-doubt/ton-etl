@@ -1,10 +1,11 @@
 # TON-ETL indexing in decoding pipeline
 
 The repository contains the code for the indexing and decoding pipeline for the TON blockchain.
-IT is based on [ton-indexer-worker](https://github.com/toncenter/ton-index-worker) by [Toncenter](https://toncenter.com/).
+It is based on [ton-indexer-worker](https://github.com/toncenter/ton-index-worker) by [Toncenter](https://toncenter.com/).
 [ton-indexer-worker](https://github.com/toncenter/ton-index-worker) ingests raw data into Postgres DB
 and perform basic parsing for jettons and NFTs, then the data flows via [Debeizum](https://debezium.io/) to 
-Kafka topics and being processed by [parsers](./parser/).
+Kafka topics and being processed by [parsers](./parser/). The main goal of the project is to export data
+to external destination - [AWS S3 Data Lake and Kafka topics](./datalake/README.md).
 
 Overall architecture is shown on the diagram below:
 
@@ -93,7 +94,7 @@ you can scale number of parser instances to handle more events per second.
 
 ## Datalake exporter
 
-Datalake exporter listens to Kafka topics with specific tables and exports data to S3. AVRO file format
+[Datalake exporters](./datalake/README.md) listen to Kafka topics with specific tables and exports data to S3. AVRO file format
 is used to export data. After the launch exporter discovers schema from PostgresDB and use this schema for
 AVRO serialization.
 
