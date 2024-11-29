@@ -18,3 +18,4 @@ class TonFunTradeEvent:
     partner_address: Optional[str]  # partner field of referral slice
     platform_tag: Optional[str]     # platformTag field of referral slice
     extra_tag: Optional[str]        # extraTag field of referral slice
+    volume_usd: Decimal

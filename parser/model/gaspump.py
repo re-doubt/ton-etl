@@ -16,3 +16,4 @@ class GaspumpEvent:
     fee_ton_amount: decimal.Decimal
     input_ton_amount: decimal.Decimal
     bonding_curve_overflow: bool
+    volume_usd: decimal.Decimal
