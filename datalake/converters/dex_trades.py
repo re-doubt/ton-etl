@@ -4,7 +4,6 @@ import decimal
 from typing import List
 from topics import TOPIC_DEX_SWAPS, TOPIC_GASPUMP_EVENTS, TOPIC_TONFUN
 from loguru import logger
-from pytoniq_core import Cell
 from converters.converter import Converter
 
 """
@@ -26,7 +25,8 @@ DEX_MAPPING = {
 }
 
 DEX_VERSION_MAPPING = {
-    "ston.fi_v2": 2
+    "ston.fi_v2": 2,
+    "dedust": 2 # only Protocol 2.0
 }
 
 TON_NATIVE_ADDRESS = "0:0000000000000000000000000000000000000000000000000000000000000000"
