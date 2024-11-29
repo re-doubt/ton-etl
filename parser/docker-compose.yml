@@ -51,8 +51,23 @@ services:
     restart: always
     environment:
       - KAFKA_GROUP_ID=messages_parsers
-      - SUPPORTED_PARSERS=StonfiSwap,StonfiSwapV2,DedustSwap,TradoorPerpOrder,TradoorOptionOrder,GasPumpTrade,TradoorPerpPositionChange,EvaaSupplyParser,EvaaWithdrawAndLiquidationParser,JettonMintParser,HipoTokensMinted,MegatonDexSwap,TonFunTrade
+      - SUPPORTED_PARSERS=StonfiSwap,StonfiSwapV2,DedustSwap,TradoorPerpOrder,TradoorOptionOrder,GasPumpTrade,TradoorPerpPositionChange,EvaaSupplyParser,EvaaWithdrawAndLiquidationParser,JettonMintParser,HipoTokensMinted,TonFunTrade
       - KAFKA_TOPICS=ton.public.messages
+      - MIN_MATURITY_SECONDS=300
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
+  parser_megaton:
+    build: ./
+    restart: always
+    environment:
+      - KAFKA_GROUP_ID=jettons_megaton
+      - SUPPORTED_PARSERS=MegatonDexSwap
+      - KAFKA_TOPICS=ton.public.jetton_transfers
       - MIN_MATURITY_SECONDS=300
     env_file:
       - parser.env

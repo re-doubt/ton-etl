@@ -34,6 +34,15 @@ class Converter:
     
     def topics(self) -> List[str]:
         raise NotImplementedError("topics method should be implemented in a subclass")
+    
+    def decode_numeric(self, numeric) -> decimal.Decimal:
+        if numeric is not None:
+            assert type(numeric) == dict and 'value' in numeric and 'scale' in numeric, f"Wrong format for numeric value: {numeric}"
+            decoded = int.from_bytes(base64.b64decode(numeric['value']), 'big') / pow(10, numeric['scale'])
+            return decimal.Decimal(decoded)
+        else:
+            return None
+
 
     def convert(self, obj, table_name=None):
         for field in self.ignored_fields:
@@ -43,10 +52,7 @@ class Converter:
             if field not in obj:
                 continue
             numeric = obj[field]
-            if numeric is not None:
-                assert type(numeric) == dict and 'value' in numeric and 'scale' in numeric, f"Wrong format for numeric value: {numeric}"
-                decoded = int.from_bytes(base64.b64decode(numeric['value']), 'big') / pow(10, numeric['scale'])
-                obj[field] = decimal.Decimal(decoded)
+            obj[field] = self.decode_numeric(numeric)
         return obj
     
     """

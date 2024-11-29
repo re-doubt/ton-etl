@@ -16,6 +16,7 @@ from converters.blocks import BlocksConverter
 from converters.transactions import TransactionsConverter
 from converters.account_states import AccountStatesConverter
 from converters.jetton_metadata import JettonMetadataConverter
+from converters.dex_trades import DexTradesConverter
 
 
 CONVERTERS = {
@@ -24,7 +25,8 @@ CONVERTERS = {
     "jetton_events": JettonEventsConverter(),
     "blocks": BlocksConverter(),
     "account_states": AccountStatesConverter(),
-    "jetton_metadata": JettonMetadataConverter()
+    "jetton_metadata": JettonMetadataConverter(),
+    "dex_trades": DexTradesConverter()
 }
 
 FIELDS_TO_REMOVE = ['__op', '__table', '__source_ts_ms', '__lsn']
@@ -84,8 +86,11 @@ class StreamWriter:
                         output = converter.convert(obj, table_name=table)
                         if not output:
                             continue
+                        if type(output) != list:
+                            output = [output]
                         output_topic = f"{PREFIX}{name}"
-                        self.producer.send(output_topic, json.dumps(prepare_output(output)).encode("utf-8"), timestamp_ms=msg.timestamp)
+                        for item in output:
+                            self.producer.send(output_topic, json.dumps(prepare_output(item)).encode("utf-8"), timestamp_ms=msg.timestamp)
                         total += 1
                 # Will commit each time the new masterchain block is received
                 if topic == TOPIC_BLOCKS:
