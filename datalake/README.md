@@ -4,7 +4,7 @@ TON-ETL consist of multiple data processing layers and the final one is exporter
 prepare data for external usage (normalize it, fit into the same model and send to the final destination).
 Currently two main destinations are supported:
 * AWS S3 Data Lake 
-* Realtime data streaming via public Kafka topics
+* Near real-time data streaming via public Kafka topics
 
 
 ## AWS S3 Data Lake
@@ -16,9 +16,9 @@ All data tables are stored in separate folders and named by data type. Data is p
 is extracted from specific field for each data type and converted into string in __YYYYMMDD__ format.
 Initially data is partitioned by adding date, but at the end of the day it is re-partitioned using [this script](./repartition.py).
 
-## Realtime data streaming via pulic Kafka topics
+## Near real-time  data streaming via pulic Kafka topics
 
-AWS S3 Data Lake is suitable for batch processing but it doesn't support realtime data processing.
+AWS S3 Data Lake is suitable for batch processing but it doesn't support real-time  data processing.
 Pulic Kafka topics are introduced to address this limitation. Data updates from TON-ETL are converted using the
 same schema converters as S3 Data Lake and sent to the public Kafka topics. 
 Kafka topics endpoints:
@@ -42,6 +42,13 @@ List of topics supported:
 
 Public Kafka topics are available for free, but to provide better observability and performance we would like to ask you to
 contact us for connection credentials linked to your organisation using [the following form](https://docs.google.com/forms/d/e/1FAIpQLSc4OhA1pe6OzyaG_gb8plAG8XlJpOkcAw7vo8fSeDeBBGFmCA/viewform?usp=sf_link).
+
+Note that the data stream is near real-time with with estimated delay in range 10-30 seconds after the block is processed. 
+This delay originates from the multiple reasons:
+* Blocks propagation 
+* RocksDB indexing
+* Decoding layer
+* External Kafka broker replication latency
 
 
 # Data types
