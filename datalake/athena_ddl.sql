@@ -316,6 +316,41 @@ TBLPROPERTIES (
   'typeOfData'='file')
 
 
+CREATE EXTERNAL TABLE `dex_trades`(
+  `tx_hash` string COMMENT 'from deserializer', 
+  `trace_id` string COMMENT 'from deserializer', 
+  `project_type` string COMMENT 'from deserializer', 
+  `project` string COMMENT 'from deserializer', 
+  `version` int COMMENT 'from deserializer', 
+  `event_time` int COMMENT 'from deserializer', 
+  `event_type` string COMMENT 'from deserializer', 
+  `trader_address` string COMMENT 'from deserializer', 
+  `pool_address` string COMMENT 'from deserializer', 
+  `router_address` string COMMENT 'from deserializer', 
+  `token_sold_address` string COMMENT 'from deserializer', 
+  `token_bought_address` string COMMENT 'from deserializer', 
+  `amount_sold_raw` decimal(38,0) COMMENT 'from deserializer', 
+  `amount_bought_raw` decimal(38,0) COMMENT 'from deserializer', 
+  `referral_address` string COMMENT 'from deserializer', 
+  `platform_tag` string COMMENT 'from deserializer', 
+  `query_id` decimal(20,0) COMMENT 'from deserializer', 
+  `volume_usd` decimal(20,6) COMMENT 'from deserializer', 
+  `volume_ton` decimal(20,9) COMMENT 'from deserializer')
+PARTITIONED BY ( 
+  `block_date` string)
+ROW FORMAT SERDE 
+  'org.apache.hadoop.hive.serde2.avro.AvroSerDe' 
+WITH SERDEPROPERTIES ( 
+  'avro.schema.literal'='{\"type\":\"record\",\"name\":\"dex_swaps\",\"namespace\":\"ton\",\"fields\":[{\"name\":\"tx_hash\",\"type\":\"string\"},{\"name\":\"trace_id\",\"type\":[\"string\",\"null\"]},{\"name\":\"project_type\",\"type\":\"string\"},{\"name\":\"project\",\"type\":\"string\"},{\"name\":\"version\",\"type\":[\"int\",\"null\"]},{\"name\":\"event_time\",\"type\":\"int\"},{\"name\":\"event_type\",\"type\":\"string\"},{\"name\":\"trader_address\",\"type\":[\"string\",\"null\"]},{\"name\":\"pool_address\",\"type\":[\"string\",\"null\"]},{\"name\":\"router_address\",\"type\":[\"string\",\"null\"]},{\"name\":\"token_sold_address\",\"type\":[\"string\",\"null\"]},{\"name\":\"token_bought_address\",\"type\":[\"string\",\"null\"]},{\"name\":\"amount_sold_raw\",\"type\":[{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":38,\"scale\":0},\"null\"]},{\"name\":\"amount_bought_raw\",\"type\":[{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":38,\"scale\":0},\"null\"]},{\"name\":\"referral_address\",\"type\":[\"string\",\"null\"]},{\"name\":\"platform_tag\",\"type\":[\"string\",\"null\"]},{\"name\":\"query_id\",\"type\":[{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":20,\"scale\":0},\"null\"]},{\"name\":\"volume_usd\",\"type\":[{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":20,\"scale\":6},\"null\"]},{\"name\":\"volume_ton\",\"type\":[{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":20,\"scale\":9},\"null\"]}]}') 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat'
+LOCATION
+  's3://ton-blockchain-public-datalake/v1/dex_trades'
+TBLPROPERTIES (
+)
+
 -- views
 create or replace view "jetton_metadata_latest"
 as

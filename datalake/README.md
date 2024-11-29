@@ -209,9 +209,3 @@ select symbol, jetton_master, operations from top_jettons
 join jetton_metadata_latest on jetton_master = address
 order by operations desc
 ```
-
-Get the tokens with the most trades in the last 30 days:
-
-```sql
-TODO
-```
