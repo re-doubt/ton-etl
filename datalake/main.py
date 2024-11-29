@@ -16,10 +16,7 @@ from avro.io import DatumWriter
 from converters.messages import MessageConverter, MessageWithDataConverter
 from converters.jetton_events import JettonEventsConverter
 from converters.blocks import BlocksConverter
-from converters.nft_transfers import NftTransfersConverter
-from converters.dex_swaps import DexSwapsConverter
-from converters.gaspump import GasPumpConverter
-from converters.agg_prices import AggPricesConverter
+from converters.dex_trades import DexTradesConverter
 from converters.tradoor_position_change import TradoorPositionChangeConverter
 from converters.transactions import TransactionsConverter
 from converters.account_states import AccountStatesConverter
@@ -37,7 +34,8 @@ CONVERTERS = {
     "jetton_events": JettonEventsConverter(),
     "blocks": BlocksConverter(),
     "account_states": AccountStatesConverter(),
-    "jetton_metadata": JettonMetadataConverter()
+    "jetton_metadata": JettonMetadataConverter(),
+    "dex_trades": DexTradesConverter()
 }
 
 FIELDS_TO_REMOVE = ['__op', '__table', '__source_ts_ms', '__lsn']
@@ -115,6 +113,11 @@ class DatalakeWriter:
     def append(self, obj, partition):
         if obj is None:
             return
+        if type(obj) == list:
+            for item in obj:
+                self.append(item, partition)
+            return
+
         if self.partition_mode == PARTITION_MODE_ADDING_DATE:
             self.append_adding_date(obj)
         elif self.partition_mode == PARTITION_MODE_OBJ_IMESTAMP:
