@@ -141,10 +141,53 @@ Note: for performance reasons daily snapshots are splited into 10 files.
 It is recommended to use ``jetton_metadata_latest`` view to get the latest snapshot of jetton metadata (see [athena_ddl.sql](./athena_ddl.sql)).
 
 
-## DEX Swaps
+## DEX Trades
 
-TBD
+[AVRO schema](./schemas/dex_trades.avsc)
 
+Partition field: __event_time__
+URL: **s3://ton-blockchain-public-datalake/v1/dex_trades/**
+
+Contains dex and launchpad trades data. 
+
+Fields description:
+* tx_hash, trace_id - transaction hash and trace id
+* project_type - project type, possible values: ``dex`` for classical AMM DEXs and ``launchpad`` for bonding curve launcpads
+* project - project name, see the list below
+* version - project version
+* event_time - timestamp of the event
+* event_type - ``trade`` or ``launch``. ``launch`` is used for the event when liquidity is collected from the bonding curve and sent to DEX.
+* trader_address - address of the trader
+* pool_address - address of the pool, ``null`` if the pool is not known
+* router_address - address of the router, ``null`` if the router is not used by the project (see table below)
+* token_sold_address, token_bought_address - address of the token sold/bought. See below the list of special wrapped TON aliases.
+* amount_sold_raw, amount_bought_raw - amount of the token sold/bought as raw value without dividing by 10^decimals. To get decimals use ``jetton_metadata`` table.
+* referral_address - referral address, ``null`` if the referral is not specified or not supported by the project (see table below)
+* platform_tag - platform address, ``null`` if the platform is not specified or not supported by the project (see table below)
+* query_id - query id, ``null`` if the query id is not supported by the project (see table below)
+* volume_ton - volume in TON
+* volume_usd - volume in USD
+
+Volume estimation is based on the amount of tokens sold/bought in the current trade and it is calculated only if the trade involves one of the following assets:
+* TON (or wrapped TON)
+* USDT (or wrapped USDT or USDC)
+* LSD (stTON, tsTON, hTON)
+
+Supported projects:
+| Project Type | Project Name | Description | Features |
+|--------------|--------------|-------------|----------|
+| dex | [ston.fi](https://app.ston.fi/swap) | Decentralized exchange with AMM pools. Supported [version 1](https://docs.ston.fi/docs/developer-section/api-reference-v1) and [version 2](https://docs.ston.fi/docs/developer-section/api-reference-v2). | referral_address, router_address (v2 only), query_id |
+| dex | [dedust.io](https://app.dedust.io/) | Only [Protocol 2.0](https://docs.dedust.io/docs/introduction) is supported | referral_address |
+| dex | [megaton.fi](https://megaton.fi/) | Decentralized exchange with AMM pools | router_address |
+| launchpad | [ton.fun](https://tonfun-1.gitbook.io/tonfun) | Launchpad SDK adopted by multiple projects ([Blum](https://blum.io/), [BigPump](https://docs.pocketfi.org/features/big.pump), etc) | referral_address, platform_tag |
+| launchpad | [gaspump](https://gaspump.tg/) | Bonding curve launchpad for memecoins ([docs](https://github.com/gas111-bot/gaspump-sdk)) | - |
+
+TON Aliases and wrapped TONs used by the projects:
+* 0:0000000000000000000000000000000000000000000000000000000000000000 - native TON (dedust, ton.fun, gaspump)
+* 0:8CDC1D7640AD5EE326527FC1AD0514F468B30DC84B0173F0E155F451B4E11F7C - pTON (ston.fi)
+* 0:671963027F7F85659AB55B821671688601CDCF1EE674FC7FBBB1A776A18D34A3 - pTONv2 (ston.fi)
+* 0:D0A1CE4CDC187C79615EA618BD6C29617AF7A56D966F5A192A768F345EE63FD2 - WTON (ston.fi)
+* 0:9A8DA514D575D20234C3FB1395EE9138F5F1AD838ABC905DC42C2389B46BD015 - WTON (megaton.fi)
 
 # Integration with Athena
 
@@ -165,4 +208,10 @@ order by operations desc limit 10
 select symbol, jetton_master, operations from top_jettons 
 join jetton_metadata_latest on jetton_master = address
 order by operations desc
+```
+
+Get the tokens with the most trades in the last 30 days:
+
+```sql
+TODO
 ```
