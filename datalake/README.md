@@ -1,15 +1,60 @@
 # Datalake exporters
 
-Datalake exporters are responsible for exporting data from Kafka to cloud storage. It converts messages to Avro format, apply additional transformations and uploads them to S3.
+TON-ETL consist of multiple data processing layers and the final one is exporters. The main goal for exporters is to
+prepare data for external usage (normalize it, fit into the same model and send to the final destination).
+Currently two main destinations are supported:
+* AWS S3 Data Lake 
+* Near real-time data streaming via public Kafka topics
 
-Datalake locations:
-* Production environment: s3://ton-blockchain-public-datalake/v1/
 
-All data types are stored in separate folders and named by type. Data is partitioned by block date. Block date
+## AWS S3 Data Lake
+
+Datalake endpoints:
+* Mainnet: s3://ton-blockchain-public-datalake/v1/ (eu-central-1 region)
+
+All data tables are stored in separate folders and named by data type. Data is partitioned by block date. Block date
 is extracted from specific field for each data type and converted into string in __YYYYMMDD__ format.
 Initially data is partitioned by adding date, but at the end of the day it is re-partitioned using [this script](./repartition.py).
 
+## Near real-time  data streaming via pulic Kafka topics
+
+AWS S3 Data Lake is suitable for batch processing but it doesn't support real-time  data processing.
+Pulic Kafka topics are introduced to address this limitation. Data updates from TON-ETL are converted using the
+same schema converters as S3 Data Lake and sent to the public Kafka topics. 
+Kafka topics endpoints:
+* Mainnet: kafka.redoubt.online:9094
+
+Connection params:
+* Protocol: SASL_PLAINTEXT, SCRAM-SHA-512
+* Data format: JSON
+* Data retention: 7 days
+* GroupId: mandatory
+* Username and password: provided by TON-ETL team
+
+List of topics supported:
+* indexer.streaming_account_states
+* indexer.streaming_blocks
+* indexer.streaming_dex_trades
+* indexer.streaming_jetton_events
+* indexer.streaming_jetton_metadata
+* indexer.streaming_messages (with raw bodies)
+* indexer.streaming_transactions
+
+Public Kafka topics are available for free, but to provide better observability and performance we would like to ask you to
+contact us for connection credentials linked to your organisation using [the following form](https://docs.google.com/forms/d/e/1FAIpQLSc4OhA1pe6OzyaG_gb8plAG8XlJpOkcAw7vo8fSeDeBBGFmCA/viewform?usp=sf_link).
+
+Note that the data stream is near real-time with with estimated delay in range 10-30 seconds after the block is processed. 
+This delay originates from the multiple reasons:
+* Blocks propagation 
+* RocksDB indexing
+* Decoding layer
+* External Kafka broker replication latency
+
+
 # Data types
+
+All target destinations share the same data model (but underlying data format may be different). This section describes
+the data model for supported data types.
 
 ## Blocks
 
