@@ -16,6 +16,8 @@ All data tables are stored in separate folders and named by data type. Data is p
 is extracted from specific field for each data type and converted into string in __YYYYMMDD__ format.
 Initially data is partitioned by adding date, but at the end of the day it is re-partitioned using [this script](./repartition.py).
 
+SNS notifications are enabled for the bucket, SNS ARN is ``arn:aws:sns:eu-central-1:180088995794:TONPublicDataLakeNotifications``.
+
 ## Near real-time  data streaming via pulic Kafka topics
 
 AWS S3 Data Lake is suitable for batch processing but it doesn't support real-time  data processing.
