@@ -1,0 +1,147 @@
+{
+  "namespace": "ton",
+  "type": "record",
+  "name": "dex_swaps",
+  "fields": [
+    {
+      "name": "tx_hash",
+      "type": "string"
+    },
+    {
+      "name": "trace_id",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "project_type",
+      "type": "string"
+    },
+    {
+      "name": "project",
+      "type": "string"
+    },
+    {
+      "name": "version",
+      "type": ["int", "null"]
+    },
+    {
+      "name": "event_time",
+      "type": "int"
+    },
+    {
+      "name": "event_type",
+      "type": "string"
+    },
+    {
+      "name": "trader_address",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "pool_address",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "router_address",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "token_sold_address",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "token_bought_address",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+{
+      "name": "amount_sold_raw",
+      "type": [
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 38,
+          "scale": 0
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "amount_bought_raw",
+      "type": [
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 38,
+          "scale": 0
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "referral_address",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "platform_tag",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    {
+      "name": "query_id",
+      "type": [
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 20,
+          "scale": 0
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "volume_usd",
+      "type": [
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 20,
+          "scale": 6
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "volume_ton",
+      "type": [
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 20,
+          "scale": 9
+        },
+        "null"
+      ]
+    }
+  ]
+}

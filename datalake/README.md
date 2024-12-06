@@ -1,15 +1,62 @@
 # Datalake exporters
 
-Datalake exporters are responsible for exporting data from Kafka to cloud storage. It converts messages to Avro format, apply additional transformations and uploads them to S3.
+TON-ETL consist of multiple data processing layers and the final one is exporters. The main goal for exporters is to
+prepare data for external usage (normalize it, fit into the same model and send to the final destination).
+Currently two main destinations are supported:
+* AWS S3 Data Lake 
+* Near real-time data streaming via public Kafka topics
 
-Datalake locations:
-* Production environment: s3://ton-blockchain-public-datalake/v1/
 
-All data types are stored in separate folders and named by type. Data is partitioned by block date. Block date
+## AWS S3 Data Lake
+
+Datalake endpoints:
+* Mainnet: s3://ton-blockchain-public-datalake/v1/ (eu-central-1 region)
+
+All data tables are stored in separate folders and named by data type. Data is partitioned by block date. Block date
 is extracted from specific field for each data type and converted into string in __YYYYMMDD__ format.
 Initially data is partitioned by adding date, but at the end of the day it is re-partitioned using [this script](./repartition.py).
 
+SNS notifications are enabled for the bucket, SNS ARN is ``arn:aws:sns:eu-central-1:180088995794:TONPublicDataLakeNotifications``.
+
+## Near real-time  data streaming via pulic Kafka topics
+
+AWS S3 Data Lake is suitable for batch processing but it doesn't support real-time  data processing.
+Pulic Kafka topics are introduced to address this limitation. Data updates from TON-ETL are converted using the
+same schema converters as S3 Data Lake and sent to the public Kafka topics. 
+Kafka topics endpoints:
+* Mainnet: kafka.redoubt.online:9094
+
+Connection params:
+* Protocol: SASL_PLAINTEXT, SCRAM-SHA-512
+* Data format: JSON
+* Data retention: 7 days
+* GroupId: mandatory
+* Username and password: provided by TON-ETL team
+
+List of topics supported:
+* indexer.streaming_account_states
+* indexer.streaming_blocks
+* indexer.streaming_dex_trades
+* indexer.streaming_jetton_events
+* indexer.streaming_jetton_metadata
+* indexer.streaming_messages (with raw bodies)
+* indexer.streaming_transactions
+
+Public Kafka topics are available for free, but to provide better observability and performance we would like to ask you to
+contact us for connection credentials linked to your organisation using [the following form](https://docs.google.com/forms/d/e/1FAIpQLSc4OhA1pe6OzyaG_gb8plAG8XlJpOkcAw7vo8fSeDeBBGFmCA/viewform?usp=sf_link).
+
+Note that the data stream is near real-time with with estimated delay in range 10-30 seconds after the block is processed. 
+This delay originates from the multiple reasons:
+* Blocks propagation 
+* RocksDB indexing
+* Decoding layer
+* External Kafka broker replication latency
+
+
 # Data types
+
+All target destinations share the same data model (but underlying data format may be different). This section describes
+the data model for supported data types.
 
 ## Blocks
 
@@ -141,10 +188,53 @@ Note: for performance reasons daily snapshots are splited into 10 files.
 It is recommended to use ``jetton_metadata_latest`` view to get the latest snapshot of jetton metadata (see [athena_ddl.sql](./athena_ddl.sql)).
 
 
-## DEX Swaps
+## DEX Trades
 
-TBD
+[AVRO schema](./schemas/dex_trades.avsc)
 
+Partition field: __event_time__
+URL: **s3://ton-blockchain-public-datalake/v1/dex_trades/**
+
+Contains dex and launchpad trades data. 
+
+Fields description:
+* tx_hash, trace_id - transaction hash and trace id
+* project_type - project type, possible values: ``dex`` for classical AMM DEXs and ``launchpad`` for bonding curve launcpads
+* project - project name, see the list below
+* version - project version
+* event_time - timestamp of the event
+* event_type - ``trade`` or ``launch``. ``launch`` is used for the event when liquidity is collected from the bonding curve and sent to DEX.
+* trader_address - address of the trader
+* pool_address - address of the pool, ``null`` if the pool is not known
+* router_address - address of the router, ``null`` if the router is not used by the project (see table below)
+* token_sold_address, token_bought_address - address of the token sold/bought. See below the list of special wrapped TON aliases.
+* amount_sold_raw, amount_bought_raw - amount of the token sold/bought as raw value without dividing by 10^decimals. To get decimals use ``jetton_metadata`` table.
+* referral_address - referral address, ``null`` if the referral is not specified or not supported by the project (see table below)
+* platform_tag - platform address, ``null`` if the platform is not specified or not supported by the project (see table below)
+* query_id - query id, ``null`` if the query id is not supported by the project (see table below)
+* volume_ton - volume in TON
+* volume_usd - volume in USD
+
+Volume estimation is based on the amount of tokens sold/bought in the current trade and it is calculated only if the trade involves one of the following assets:
+* TON (or wrapped TON)
+* USDT (or wrapped USDT or USDC)
+* LSD (stTON, tsTON, hTON)
+
+Supported projects:
+| Project Type | Project Name | Description | Features |
+|--------------|--------------|-------------|----------|
+| dex | [ston.fi](https://app.ston.fi/swap) | Decentralized exchange with AMM pools. Supported [version 1](https://docs.ston.fi/docs/developer-section/api-reference-v1) and [version 2](https://docs.ston.fi/docs/developer-section/api-reference-v2). | referral_address, router_address (v2 only), query_id |
+| dex | [dedust.io](https://app.dedust.io/) | Only [Protocol 2.0](https://docs.dedust.io/docs/introduction) is supported | referral_address |
+| dex | [megaton.fi](https://megaton.fi/) | Decentralized exchange with AMM pools | router_address |
+| launchpad | [ton.fun](https://tonfun-1.gitbook.io/tonfun) | Launchpad SDK adopted by multiple projects ([Blum](https://blum.io/), [BigPump](https://docs.pocketfi.org/features/big.pump), etc) | referral_address, platform_tag |
+| launchpad | [gaspump](https://gaspump.tg/) | Bonding curve launchpad for memecoins ([docs](https://github.com/gas111-bot/gaspump-sdk)) | - |
+
+TON Aliases and wrapped TONs used by the projects:
+* 0:0000000000000000000000000000000000000000000000000000000000000000 - native TON (dedust, ton.fun, gaspump)
+* 0:8CDC1D7640AD5EE326527FC1AD0514F468B30DC84B0173F0E155F451B4E11F7C - pTON (ston.fi)
+* 0:671963027F7F85659AB55B821671688601CDCF1EE674FC7FBBB1A776A18D34A3 - pTONv2 (ston.fi)
+* 0:D0A1CE4CDC187C79615EA618BD6C29617AF7A56D966F5A192A768F345EE63FD2 - WTON (ston.fi)
+* 0:9A8DA514D575D20234C3FB1395EE9138F5F1AD838ABC905DC42C2389B46BD015 - WTON (megaton.fi)
 
 # Integration with Athena
 

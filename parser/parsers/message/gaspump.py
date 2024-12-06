@@ -4,7 +4,7 @@ from db import DB
 from pytoniq_core import Cell, Address
 from model.tradoor import TradoorOptionOrderEvent, TradoorPerpOrderEvent
 from model.gaspump import GaspumpEvent
-from parsers.message.swap_volume import estimate_volume
+from parsers.message.swap_volume import USDT, estimate_volume
 
 
 """
@@ -83,6 +83,11 @@ class GasPumpTrade(Parser):
             raise Exception(f"Unsupported opcode: {opcode}")
         
         
+        ton_price = db.get_core_price(USDT, Parser.require(obj.get('created_at', None)))
+        if ton_price is None:
+            logger.warning(f"No TON price found for {Parser.require(obj.get('created_at', None))}")
+            ton_price = 0
+        
         event = GaspumpEvent(
             tx_hash=Parser.require(obj.get('tx_hash', None)),
             trace_id=Parser.require(obj.get('trace_id', None)),
@@ -95,6 +100,7 @@ class GasPumpTrade(Parser):
             jetton_amount=jetton_amount,
             fee_ton_amount=fee_ton_amount,
             bonding_curve_overflow=bonding_curve_overflow,
+            volume_usd=ton_amount * ton_price / 1e6
         )
 
         db.serialize(event)

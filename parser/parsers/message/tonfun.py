@@ -4,6 +4,7 @@ from functools import partial
 from operator import eq
 from decimal import Decimal
 from loguru import logger
+from parsers.message.swap_volume import USDT
 from pytoniq_core import Cell, Slice
 from model.parser import NonCriticalParserError, Parser, TOPIC_MESSAGES
 from model.tonfun import TonFunTradeEvent
@@ -78,7 +79,7 @@ def parse_trade_data(cs: Cell) -> dict:
            {"referral_ver": None, "partner_address": None, "platform_tag": None, "extra_tag": None})
     }
 
-def make_event(obj: dict, trade_data: dict) -> TonFunTradeEvent:
+def make_event(obj: dict, trade_data: dict, ton_price: float) -> TonFunTradeEvent:
     logger.info(f"Parsed trade data: {trade_data}")
     return TonFunTradeEvent(
         tx_hash=obj["tx_hash"],
@@ -92,7 +93,8 @@ def make_event(obj: dict, trade_data: dict) -> TonFunTradeEvent:
         referral_ver=trade_data["referral_ver"],
         partner_address=trade_data["partner_address"],
         platform_tag=trade_data["platform_tag"],
-        extra_tag=trade_data["extra_tag"]
+        extra_tag=trade_data["extra_tag"],
+        volume_usd=int(trade_data["ton_amount"]) * ton_price / 1e6
     )
 
 class TonFunTrade(Parser):
@@ -109,7 +111,11 @@ class TonFunTrade(Parser):
         try:
             maybe_trade_data = parse_event(obj.get("opcode"), Parser.message_body(obj, db).begin_parse())
             if maybe_trade_data:
-                event = make_event(obj, maybe_trade_data)
+                ton_price = db.get_core_price(USDT, Parser.require(obj.get('created_at', None)))
+                if ton_price is None:
+                    logger.warning(f"No TON price found for {Parser.require(obj.get('created_at', None))}")
+                    ton_price = 0
+                event = make_event(obj, maybe_trade_data, ton_price)
                 logger.info(f"Parsed tonfun event: {event}")
                 db.serialize(event)
         except Exception as e:
