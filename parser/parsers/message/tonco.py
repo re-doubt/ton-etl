@@ -2,7 +2,7 @@ from model.parser import Parser, TOPIC_MESSAGES
 from loguru import logger
 from db import DB
 from pytoniq_core import Cell, Address
-from model.dexswap import DEX_STON, DEX_STON_V2, DexSwapParsed
+from model.dexswap import DEX_STON, DEX_STON_V2, DEX_TONCO, DexSwapParsed
 from parsers.message.swap_volume import estimate_volume
 
 """
@@ -18,13 +18,17 @@ class TONCOSwap(Parser):
         return [TOPIC_MESSAGES]
 
     def predicate(self, obj) -> bool:
-        # only internal messages sent by the router
+        # only internal messages sent to the router
         return obj.get("opcode", None) == Parser.opcode_signed(0xa1daa96d) and \
             obj.get("direction", None) == "in" and \
             obj.get("destination", None) == ROUTER
     
 
     def handle_internal(self, obj, db: DB):
+        tx = Parser.require(db.is_tx_successful(Parser.require(obj.get('tx_hash', None))))
+        if not tx:
+            logger.info(f"Skipping failed tx for {obj.get('tx_hash', None)}")
+            return
         # raise
         cell = Parser.message_body(obj, db).begin_parse()
         cell.load_uint(32) # 0xa1daa96d
@@ -32,6 +36,8 @@ class TONCOSwap(Parser):
         owner0 = cell.load_address()
         owner1 = cell.load_address() # should be the same as owner0
         exit_code = cell.load_uint(32)
+        if exit_code != 200:
+            logger.warning("Ignoring tonco message with exit code: {exit_code}")
         seqno = cell.load_uint(64)
         coinsinfo_cell = cell.load_maybe_ref()
         logger.info(f"query_id: {query_id}, owner0: {owner0}, owner1: {owner1}, exit_code: {exit_code}, seqno: {seqno}")
@@ -46,99 +52,61 @@ class TONCOSwap(Parser):
             logger.info(f"No coinsinfo_cell for {obj.get('tx_hash')}")
             return
         
-        # excesses_address = cell.load_address()
-        # excesses_address_2 = cell.load_address()
-        # exit_code = cell.load_uint(32)
-
-        # if exit_code != 0xc64370e5: # swap_ok
-        #     logger.debug(f"Message is not a payment to user, exit code {exit_code}")
-        #     return
-
-        # custom_payload = cell.load_maybe_ref()
-    
-        # additional_info = cell.load_ref().begin_parse()
-        # fwd_ton_amount = additional_info.load_coins()
-        # amount0_out = additional_info.load_coins()
-        # token0_address = additional_info.load_address()
-        # amount1_out = additional_info.load_coins()
-        # token1_address = additional_info.load_address()
-        # logger.info(f"{owner} {exit_code} {fwd_ton_amount} {amount0_out} {token0_address} {amount1_out} {token1_address}")
-
-
-        # tx = Parser.require(db.is_tx_successful(Parser.require(obj.get('tx_hash', None))))
-        # if not tx:
-        #     logger.info(f"Skipping failed tx for {obj.get('tx_hash', None)}")
-        #     return
-
-        # parent_body = db.get_parent_message_body(obj.get('msg_hash'))
-        # if not parent_body:
-        #     logger.warning(f"Unable to find parent message for {obj.get('msg_hash')}")
-        #     return
-        # cell = Cell.one_from_boc(parent_body).begin_parse()
+        jetton0_master = db.get_wallet_master(jetton0_address)
+        jetton1_master = db.get_wallet_master(jetton1_address)
+        if not jetton0_master:
+            logger.warning(f"Wallet not found for {jetton0_address}")
+            return
+        if not jetton1_master:
+            logger.warning(f"Wallet not found for {jetton1_address}")
+            return
         
-        # op_id = cell.load_uint(32) # 0x6664de2a
-        # assert op_id == 0x6664de2a, f"Parent message for ston.fi swap is {op_id}"
-        # parent_query_id = cell.load_uint(64)
-
-        # from_user = cell.load_address()
-        # left_amount = cell.load_coins()
-        # right_amount = cell.load_coins()
-
-        # dex_payload = cell.load_ref().begin_parse()
-        # transferred_op = dex_payload.load_uint(32)
-        # token_wallet1 = dex_payload.load_address()
-        # swap_body = dex_payload.load_ref().begin_parse()
-        # min_out = swap_body.load_coins()
-        # receiver = swap_body.load_address()
-        # fwd_gas = swap_body.load_coins()
-        # custom_payload = swap_body.load_maybe_ref()
-        # refund_fwd_gas = swap_body.load_coins()
-        # refund_payload = swap_body.load_maybe_ref()
-        # ref_fee = swap_body.load_uint(16)
-        # ref_address = swap_body.load_address()
-
-        # logger.info(f"token_wallet1: {token_wallet1}, left_amount: {left_amount}, right_amount: {right_amount}, ref_address: {ref_address}")
+        pool_swap = Cell.one_from_boc(db.get_parent_message_body(obj.get('msg_hash'))).begin_parse()
+        swap_op = pool_swap.load_uint(32)
+        if swap_op != 0xa7fb58f8:
+            logger.warning(f"Parent message for tonco swap is {swap_op}, expected 0xa7fb58f8")
+            return
+        swap_query_id = pool_swap.load_uint(64)
+        swap_owner_address = pool_swap.load_address()
+        swap_source_wallet = pool_swap.load_address()
+        swap_ref1 = pool_swap.load_ref().begin_parse()
+        swap_input_amount = swap_ref1.load_coins()
+        swap_ref1.load_uint(160) # sqrtPriceLimitX96
+        min_out = swap_ref1.load_coins()
         
-        # if token_wallet1 == token1_address:
-        #     src_wallet_address = token0_address
-        #     src_amount = left_amount - amount0_out
-        #     dst_wallet_address = token1_address
-        #     dst_amount = amount1_out
-        # elif token_wallet1 == token0_address:
-        #     src_wallet_address = token1_address
-        #     src_amount = right_amount - amount1_out
-        #     dst_wallet_address = token0_address
-        #     dst_amount = amount0_out
-        # else:
-        #     logger.warning(f"Wallet addresses in swap message id={obj.get('msg_hash')} and payment message  don't match")
+        logger.info(f"swap_query_id: {swap_query_id}, swap_owner_address: {swap_owner_address}, swap_source_wallet: {swap_source_wallet}, swap_input_amount: {swap_input_amount}")
+        if swap_query_id != query_id:
+            logger.warning(f"Query id mismatch: {query_id} {swap_query_id}")
+            return
         
-        # src_master = db.get_wallet_master(src_wallet_address)
-        # dst_master = db.get_wallet_master(dst_wallet_address)
-        # if not src_master:
-        #     logger.warning(f"Wallet not found for {src_wallet_address}")
-        #     return
-        # if not dst_master:
-        #     logger.warning(f"Wallet not found for {dst_wallet_address}")
-        #     return
+        src_amount = swap_input_amount
+        if swap_source_wallet == jetton0_address:
+            src_master = jetton0_master
+            dst_master = jetton1_master
+            dst_amount = amount1
+        elif swap_source_wallet == jetton1_address:
+            src_master = jetton1_master
+            dst_master = jetton0_master
+            dst_amount = amount0
 
-        # swap = DexSwapParsed(
-        #     tx_hash=Parser.require(obj.get('tx_hash', None)),
-        #     msg_hash=Parser.require(obj.get('msg_hash', None)),
-        #     trace_id=Parser.require(obj.get('trace_id', None)),
-        #     platform=DEX_STON_V2,
-        #     swap_utime=Parser.require(obj.get('created_at', None)),
-        #     swap_user=from_user,
-        #     swap_pool=Parser.require(obj.get('source', None)),
-        #     swap_src_token=src_master,
-        #     swap_dst_token=dst_master,
-        #     swap_src_amount=src_amount,
-        #     swap_dst_amount=dst_amount,
-        #     referral_address=ref_address,
-        #     query_id=query_id,
-        #     min_out=min_out,
-        #     router=Parser.require(obj.get("destination", None))
-        # )
-        # estimate_volume(swap, db)
-        # logger.info(swap)
-        # db.serialize(swap)
-        # db.discover_dex_pool(swap)
+        swap = DexSwapParsed(
+            tx_hash=Parser.require(obj.get('tx_hash', None)),
+            msg_hash=Parser.require(obj.get('msg_hash', None)),
+            trace_id=Parser.require(obj.get('trace_id', None)),
+            platform=DEX_TONCO,
+            swap_utime=Parser.require(obj.get('created_at', None)),
+            swap_user=owner0,
+            swap_pool=Parser.require(obj.get('source', None)),
+            swap_src_token=src_master,
+            swap_dst_token=dst_master,
+            swap_src_amount=src_amount,
+            swap_dst_amount=dst_amount,
+            referral_address=None,
+            query_id=query_id,
+            min_out=min_out,
+            router=Parser.require(obj.get("destination", None))
+        )
+        estimate_volume(swap, db)
+        logger.info(swap)
+        db.serialize(swap)
+        db.discover_dex_pool(swap)
