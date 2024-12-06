@@ -36,7 +36,7 @@ class TVLPoolStateParser(EmulatorParser):
         return False
     
     def _do_parse(self, obj, db: DB, emulator: TvmEmulator):
-        # TODO refresh pool data every update_interva
+        # TODO refresh pool data every update_interval
         pool = self.pools[obj['account']]
         pool.last_updated = obj['timestamp']
 
