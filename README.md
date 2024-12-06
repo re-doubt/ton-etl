@@ -209,6 +209,21 @@ with [EvaaWithdrawAndLiquidationParser](./parser/parsers/message/evaa.py).
 Contains decoded EVAA liquidation events. Produced from messages table stream
 with [EvaaWithdrawAndLiquidationParser](./parser/parsers/message/evaa.py). 
 
+### delea_deposit
+
+Contains decoded Delea deposit events. Produced from messages table stream
+with [DeleaDepositParser](./parser/parsers/message/delea.py). 
+
+### delea_withdraw
+
+Contains decoded Delea withdraw events. Produced from messages table stream
+with [DeleaWithdrawAndLiquidationParser](./parser/parsers/message/delea.py). 
+
+### delea_liquidation
+
+Contains decoded Delea liquidation events. Produced from messages table stream
+with [DeleaWithdrawAndLiquidationParser](./parser/parsers/message/delea.py). 
+
 ## prices
 
 Tables related to DeFi - DEX trades, TVL, LSD prices, etc..
