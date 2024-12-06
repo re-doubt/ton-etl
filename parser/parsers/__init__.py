@@ -31,7 +31,7 @@ _parsers = [
     NftHistoryParser(),
 
     # DEX trades
-    DedustSwap(), 
+    DedustSwap(EMULATOR_PATH), 
     StonfiSwap(),
     StonfiSwapV2(),
     MegatonDexSwap(),
