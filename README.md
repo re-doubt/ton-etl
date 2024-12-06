@@ -148,6 +148,7 @@ Supported DEXs:
 * Ston.fi: [StonfiSwap](./parser/parsers/message/stonfi_swap.py)
 * Ston.fi v2: [StonfiSwapV2](./parser/parsers/message/stonfi_swap_v2.py)
 * Megaton: [MegatonSwap](./parser/parsers/jetton_transfer/megaton.py)
+* TONCO: [TONCO](./parser/parsers/message/tonco.py)
 
 Each parser estimates deal volume in TON and USD using core prices (see below). So for swaps with core assets like
 TON, stablecoins or LSDs volume will be estimated based on the core asset price at the moment of the swap. Otherwise
