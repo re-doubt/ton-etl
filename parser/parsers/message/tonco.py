@@ -25,9 +25,10 @@ class TONCOSwap(Parser):
     
 
     def handle_internal(self, obj, db: DB):
-        tx = Parser.require(db.is_tx_successful(Parser.require(obj.get('tx_hash', None))))
+        tx_hash = Parser.require(obj.get('tx_hash', None))
+        tx = Parser.require(db.is_tx_successful(tx_hash))
         if not tx:
-            logger.info(f"Skipping failed tx for {obj.get('tx_hash', None)}")
+            logger.info(f"Skipping failed tx for {tx_hash}")
             return
         # raise
         cell = Parser.message_body(obj, db).begin_parse()
@@ -37,7 +38,8 @@ class TONCOSwap(Parser):
         owner1 = cell.load_address() # should be the same as owner0
         exit_code = cell.load_uint(32)
         if exit_code != 200:
-            logger.warning("Ignoring tonco message with exit code: {exit_code}")
+            logger.warning(f"Ignoring tonco message with exit code: {exit_code} {tx_hash}")
+            return
         seqno = cell.load_uint(64)
         coinsinfo_cell = cell.load_maybe_ref()
         logger.info(f"query_id: {query_id}, owner0: {owner0}, owner1: {owner1}, exit_code: {exit_code}, seqno: {seqno}")
@@ -49,22 +51,25 @@ class TONCOSwap(Parser):
             jetton1_address = coinsinfo_cell.load_address()
             logger.info(f"amount0: {amount0}, jetton0_address: {jetton0_address}, amount1: {amount1}, jetton1_address: {jetton1_address}")
         else:
-            logger.info(f"No coinsinfo_cell for {obj.get('tx_hash')}")
+            logger.info(f"No coinsinfo_cell for {tx_hash}")
+            return
+        if amount0 != 0 and amount1 != 0:
+            logger.info(f"Ignoring swap with non-zero amounts {amount0} {amount1} {tx_hash}")
             return
         
         jetton0_master = db.get_wallet_master(jetton0_address)
         jetton1_master = db.get_wallet_master(jetton1_address)
         if not jetton0_master:
-            logger.warning(f"Wallet not found for {jetton0_address}")
+            logger.warning(f"Wallet not found for {jetton0_address} {tx_hash}")
             return
         if not jetton1_master:
-            logger.warning(f"Wallet not found for {jetton1_address}")
+            logger.warning(f"Wallet not found for {jetton1_address} {tx_hash}")
             return
         
         pool_swap = Cell.one_from_boc(db.get_parent_message_body(obj.get('msg_hash'))).begin_parse()
         swap_op = pool_swap.load_uint(32)
         if swap_op != 0xa7fb58f8:
-            logger.warning(f"Parent message for tonco swap is {swap_op}, expected 0xa7fb58f8")
+            logger.warning(f"Parent message for tonco swap is {swap_op}, expected 0xa7fb58f8 {tx_hash}")
             return
         swap_query_id = pool_swap.load_uint(64)
         swap_owner_address = pool_swap.load_address()
@@ -76,7 +81,7 @@ class TONCOSwap(Parser):
         
         logger.info(f"swap_query_id: {swap_query_id}, swap_owner_address: {swap_owner_address}, swap_source_wallet: {swap_source_wallet}, swap_input_amount: {swap_input_amount}")
         if swap_query_id != query_id:
-            logger.warning(f"Query id mismatch: {query_id} {swap_query_id}")
+            logger.warning(f"Query id mismatch: {query_id} {swap_query_id} {tx_hash}")
             return
         
         src_amount = swap_input_amount

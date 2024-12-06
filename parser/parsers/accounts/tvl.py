@@ -6,7 +6,7 @@ from loguru import logger
 from db import DB
 from pytoniq_core import Cell, Address, begin_cell
 from model.dexpool import DexPool
-from model.dexswap import DEX_DEDUST, DEX_MEGATON, DEX_STON, DEX_STON_V2
+from model.dexswap import DEX_DEDUST, DEX_MEGATON, DEX_STON, DEX_STON_V2, DEX_TONCO
 from model.dedust import read_dedust_asset
 from parsers.message.swap_volume import estimate_tvl
 from pytvm.tvm_emulator.tvm_emulator import TvmEmulator
@@ -40,24 +40,25 @@ class TVLPoolStateParser(EmulatorParser):
         pool = self.pools[obj['account']]
         pool.last_updated = obj['timestamp']
 
-        # total supply is required for all cases
-        try:
-            pool.total_supply, _, _, _, _= self._execute_method(emulator, 'get_jetton_data', [], db, obj)
-        except EmulatorException as e:
-            """
-            Ston.fi has a bug with get_jetton_data method failures when address is starting with 
-            a leading zero. (details are here https://github.com/ston-fi/dex-core/pull/2/files)
-            To avoid loosing data, we will retry the method call with an address without leading zero.
-            """
-            if pool.platform == DEX_STON and 'terminating vm with exit code 9' in e.args[0]:
-                # it is better to make a copy to avoid any issues with the original object
-                obj_fixed = copy.deepcopy(obj)
-                obj_fixed['account'] = obj['account'].replace("0:0", "0:1")
-                logger.warning(f"Retrying get_jetton_data with fixed address: {obj_fixed['account']}")
-                emulator_fixed = self._prepare_emulator(obj_fixed)
-                pool.total_supply, _, _, _, _= self._execute_method(emulator_fixed, 'get_jetton_data', [], db, obj_fixed)
-            else:
-                raise e
+        # total supply is required for all cases except TONCO
+        if pool.platform != DEX_TONCO:
+            try:
+                pool.total_supply, _, _, _, _= self._execute_method(emulator, 'get_jetton_data', [], db, obj)
+            except EmulatorException as e:
+                """
+                Ston.fi has a bug with get_jetton_data method failures when address is starting with 
+                a leading zero. (details are here https://github.com/ston-fi/dex-core/pull/2/files)
+                To avoid loosing data, we will retry the method call with an address without leading zero.
+                """
+                if pool.platform == DEX_STON and 'terminating vm with exit code 9' in e.args[0]:
+                    # it is better to make a copy to avoid any issues with the original object
+                    obj_fixed = copy.deepcopy(obj)
+                    obj_fixed['account'] = obj['account'].replace("0:0", "0:1")
+                    logger.warning(f"Retrying get_jetton_data with fixed address: {obj_fixed['account']}")
+                    emulator_fixed = self._prepare_emulator(obj_fixed)
+                    pool.total_supply, _, _, _, _= self._execute_method(emulator_fixed, 'get_jetton_data', [], db, obj_fixed)
+                else:
+                    raise e
 
         if pool.platform == DEX_STON or pool.platform == DEX_STON_V2:
             if pool.platform == DEX_STON:
@@ -90,6 +91,13 @@ class TVLPoolStateParser(EmulatorParser):
             _, _, _, jetton_a_address, _, pool.reserves_left, _, jetton_b_address, _, pool.reserves_right, _ = self._execute_method(emulator, 'get_lp_swap_data', [], db, obj)
             current_jetton_left = jetton_a_address.load_address()
             current_jetton_right = jetton_b_address.load_address()
+        elif pool.platform == DEX_TONCO:
+            _router, _admin, _admin2, j0_wallet, j1_wallet, j0_master, j1_master, _, _, fee_base, fee_protocol, fee_user, _, \
+                price, liq, _, _, _, _, _, pool.reserves_left, pool.reserves_right, nftv3items_active, _, _ = self._execute_method(emulator, 'getPoolStateAndConfiguration', [], db, obj)
+            # total supply is not applicable for TONCO, because LP is not a jetton. But we can use number of active NFT positions as a proxy
+            pool.total_supply = nftv3items_active
+            current_jetton_left = j0_master.load_address()
+            current_jetton_right = j1_master.load_address()
         else:
             raise Exception(f"DEX is not supported: {pool.platform}")
         
