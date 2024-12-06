@@ -30,6 +30,7 @@ DEX_DEDUST = "dedust"
 DEX_STON = "ston.fi"
 DEX_STON_V2 = "ston.fi_v2"
 DEX_MEGATON = "megaton"
+DEX_TONCO = "tonco"
 
 @dataclass
 class DexSwapParsed:

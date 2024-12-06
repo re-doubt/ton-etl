@@ -349,3 +349,5 @@ CREATE TABLE parsed.tonfun_bcl_trade (
 ALTER TABLE parsed.gaspump_trade ADD volume_usd numeric NULL;
 ALTER TABLE parsed.tonfun_bcl_trade ADD volume_usd numeric NULL;
 
+-- tonco DEC support
+ALTER TYPE public.dex_name ADD VALUE 'tonco' AFTER 'megaton';

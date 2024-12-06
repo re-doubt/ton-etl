@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from parsers.message.tonco import TONCOSwap
 from parsers.jetton_transfer.megaton import MegatonDexSwap
 from parsers.message.tonfun import TonFunTrade
 from parsers.jetton_masters.jetton_metadata import JettonMastersMetadataParser
@@ -28,16 +29,20 @@ METADATA_FETCH_TIMEOUT = int(os.environ.get("METADATA_FETCH_TIMEOUT", "10"))
 METADATA_FETCH_MAX_ATTEMPTS = int(os.environ.get("METADATA_FETCH_MAX_ATTEMPTS", "3"))
 
 _parsers = [
-    DedustSwap(),
     NftHistoryParser(),
+
+    # DEX trades
+    DedustSwap(), 
     StonfiSwap(),
     StonfiSwapV2(),
     MegatonDexSwap(),
     TonFunTrade(),
+    GasPumpTrade(),
+    TONCOSwap(),
+    
     TradoorPerpOrder(),
     TradoorOptionOrder(),
     TradoorPerpPositionChange(),
-    GasPumpTrade(),
     EvaaSupplyParser(),
     EvaaWithdrawAndLiquidationParser(),
     JettonMintParser(),
