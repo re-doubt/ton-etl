@@ -11,6 +11,8 @@ DELEA_CONTRACTS = [
     Parser.uf2raw("EQB6rkS8xt3Ey4XugdVqQDe1vt4KJDh813_k2ceoONTCBnyD"),
     Parser.uf2raw("EQCwIIRKpuV9fQpQxdTMhLAO30MNHa6GOYd00TsySOOYtA9n"),
     Parser.uf2raw("EQA2OzCuP8-d_lN2MYxLv5WCNfpLH1NUuugppOZBZgNYn-aa"),
+    Parser.uf2raw("EQA6Xba1d30QeSTVW7-cIAq-WHD9ZBFg90dQ7CB8mQ2Cxx25"),
+    Parser.uf2raw("EQADnjMkZBCS7-zKAPGHwFXGdd8b85m3bRDm52AX__ORLey-"),
 ]
 
 DEPOSIT_TON_EVENT = Parser.opcode_signed(0x00bbdf19)
@@ -25,7 +27,7 @@ class DeleaDepositParser(Parser):
 
     def predicate(self, obj) -> bool:
         return (
-            obj.get("opcode", None) in [DEPOSIT_JETTON_EVENT, DEPOSIT_TON_EVENT] 
+            obj.get("opcode", None) in [DEPOSIT_JETTON_EVENT, DEPOSIT_TON_EVENT]
             and obj.get("direction", None) == "in"
             and obj.get("destination", None) in DELEA_CONTRACTS
         )
@@ -38,7 +40,7 @@ class DeleaDepositParser(Parser):
         query_id = 0
         owner_address = Parser.require(obj.get("source", None))
         try:
-            if deposit_type == DEPOSIT_TON_EVENT:     
+            if deposit_type == DEPOSIT_TON_EVENT:
                 query_id = cell.load_uint(64)
                 amount = cell.load_coins()
             elif deposit_type == DEPOSIT_JETTON_EVENT:
@@ -72,8 +74,8 @@ class DeleaWithdrawAndLiquidationParser(Parser):
 
     def predicate(self, obj) -> bool:
         return  (
-            obj.get("opcode", None) in [WITHDRAW_EVENT, LIQUIDATION_EVENT]  
-            and obj.get("direction", None) == "in" 
+            obj.get("opcode", None) in [WITHDRAW_EVENT, LIQUIDATION_EVENT]
+            and obj.get("direction", None) == "in"
             and obj.get("destination", None) in DELEA_CONTRACTS
         )
 
@@ -81,7 +83,7 @@ class DeleaWithdrawAndLiquidationParser(Parser):
         cell = Parser.message_body(obj, db).begin_parse()
         op = cell.load_uint(32)
         event = None
-        if op == WITHDRAW_EVENT: 
+        if op == WITHDRAW_EVENT:
             query_id = cell.load_uint(64)
             amount = cell.load_coins()
             cell.load_coins()
@@ -105,8 +107,8 @@ class DeleaWithdrawAndLiquidationParser(Parser):
             logger.info(f"Adding Delea withdraw {event}")
         elif op == LIQUIDATION_EVENT:
             query_id = cell.load_uint(64)
-            failed = cell.load_bool() 
-            if failed: 
+            failed = cell.load_bool()
+            if failed:
                 logger.info(f"Delea liquidation is not successfull {Parser.require(obj.get('msg_hash', None))}")
                 return
             amount = cell.load_coins()
@@ -129,7 +131,7 @@ class DeleaWithdrawAndLiquidationParser(Parser):
                 liquidator_address=liquidator_address,
             )
             logger.info(f"Adding Delea liquidation {event}")
-        if event is None :   
+        if event is None :
             logger.error(f"Unable to serialize event {Parser.require(obj.get('msg_hash', None))}: {traceback.format_exc()}")
             raise Exception(f"Unable to serialize event {Parser.require(obj.get('msg_hash', None))}: {traceback.format_exc()}")
         db.serialize(event)
