@@ -62,10 +62,15 @@ class TVLPoolStateParser(EmulatorParser):
 
         if pool.platform == DEX_STON or pool.platform == DEX_STON_V2:
             if pool.platform == DEX_STON:
-                pool.reserves_left, pool.reserves_right, wallet0_address, wallet1_address, _, _, _, _, _, _ = self._execute_method(emulator, 'get_pool_data', [], db, obj)
+                pool.reserves_left, pool.reserves_right, wallet0_address, wallet1_address, lp_fee, protocol_fee, ref_fee, _, _, _ = self._execute_method(emulator, 'get_pool_data', [], db, obj)
             else:
                 # V2
-                _, _, _, pool.reserves_left, pool.reserves_right, wallet0_address, wallet1_address, _, _, _, _, _ = self._execute_method(emulator, 'get_pool_data', [], db, obj)
+                _, _, _, pool.reserves_left, pool.reserves_right, wallet0_address, wallet1_address, lp_fee, protocol_fee, _, _, _ = self._execute_method(emulator, 'get_pool_data', [], db, obj)
+                ref_fee = None # TODO
+            pool.lp_fee = lp_fee / 1e4 if lp_fee is not None else None
+            pool.protocol_fee = protocol_fee / 1e4 if protocol_fee is not None else None
+            pool.referral_fee = ref_fee / 1e4 if ref_fee is not None else None
+
             # logger.info(f"STON pool data: {pool.reserves_left}, {pool.reserves_right}")
             wallet0_address = wallet0_address.load_address() # jetton wallet address
             wallet1_address = wallet1_address.load_address()
@@ -83,14 +88,25 @@ class TVLPoolStateParser(EmulatorParser):
         elif pool.platform == DEX_DEDUST:
             pool.reserves_left, pool.reserves_right = self._execute_method(emulator, 'get_reserves', [], db, obj)
             # logger.info(f"DeDust pool data: {pool.reserves_left}, {pool.reserves_right}")
+
+            trade_fee_numerator, trade_fee_denominator = self._execute_method(emulator, 'get_trade_fee', [], db, obj)
+            if trade_fee_denominator > 0 and trade_fee_numerator is not None:
+                total_fee = trade_fee_numerator / trade_fee_denominator
+                # https://help.dedust.io/dedust/welcome-to-dedust.io/using-dedust.io/fees
+                # 80% of fee goes to LP, 20% to the protocol
+                pool.lp_fee = total_fee * 0.8
+                pool.protocol_fee = total_fee * 0.2
+
             if not pool.is_inited():
                 wallet0_address, wallet1_address = self._execute_method(emulator, 'get_assets', [], db, obj)
+                # TODO  - stable pools flag?
                 current_jetton_left = read_dedust_asset(wallet0_address)
                 current_jetton_right = read_dedust_asset(wallet1_address)
         elif pool.platform == DEX_MEGATON:
-            _, _, _, jetton_a_address, _, pool.reserves_left, _, jetton_b_address, _, pool.reserves_right, _ = self._execute_method(emulator, 'get_lp_swap_data', [], db, obj)
+            swap_fee, _, _, jetton_a_address, _, pool.reserves_left, _, jetton_b_address, _, pool.reserves_right, _ = self._execute_method(emulator, 'get_lp_swap_data', [], db, obj)
             current_jetton_left = jetton_a_address.load_address()
             current_jetton_right = jetton_b_address.load_address()
+            pool.lp_fee = swap_fee / 1e4 if swap_fee is not None else None
         elif pool.platform == DEX_TONCO:
             _router, _admin, _admin2, j0_wallet, j1_wallet, j0_master, j1_master, _, _, fee_base, fee_protocol, fee_user, _, \
                 price, liq, _, _, _, _, _, pool.reserves_left, pool.reserves_right, nftv3items_active, _, _ = self._execute_method(emulator, 'getPoolStateAndConfiguration', [], db, obj)
@@ -98,6 +114,11 @@ class TVLPoolStateParser(EmulatorParser):
             pool.total_supply = nftv3items_active
             current_jetton_left = j0_master.load_address()
             current_jetton_right = j1_master.load_address()
+            if fee_user is not None:
+                base_fee = fee_user / 1e4
+                protocol_share = fee_protocol / 1e4
+                pool.lp_fee = base_fee * (1 - protocol_share)
+                pool.protocol_fee = base_fee * protocol_share
         else:
             raise Exception(f"DEX is not supported: {pool.platform}")
         
