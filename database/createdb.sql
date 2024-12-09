@@ -328,3 +328,9 @@ CREATE TABLE prices.dex_pool (
 ALTER TABLE prices.dex_pool ADD lp_fee numeric NULL;
 ALTER TABLE prices.dex_pool ADD protocol_fee numeric NULL;
 ALTER TABLE prices.dex_pool ADD referral_fee numeric NULL;
+
+CREATE TABLE prices.dex_pool_link (
+    id serial primary key,
+    jetton varchar null,
+    pool varchar null references prices.dex_pool(pool)
+);
