@@ -64,9 +64,10 @@ class TVLPoolStateParser(EmulatorParser):
             if pool.platform == DEX_STON:
                 pool.reserves_left, pool.reserves_right, wallet0_address, wallet1_address, lp_fee, protocol_fee, ref_fee, _, _, _ = self._execute_method(emulator, 'get_pool_data', [], db, obj)
             else:
-                # V2
-                _, _, _, pool.reserves_left, pool.reserves_right, wallet0_address, wallet1_address, lp_fee, protocol_fee, _, _, _ = self._execute_method(emulator, 'get_pool_data', [], db, obj)
-                ref_fee = None # TODO
+                # ston.fi V2, some pools have 13 results, some have 12
+                _, _, _, pool.reserves_left, pool.reserves_right, wallet0_address, wallet1_address, lp_fee, protocol_fee, _, _, _ = \
+                    self._execute_method(emulator, 'get_pool_data', [], db, obj)[0:12]
+                ref_fee = None # ref fee is not a part of pool contract, it could be specified on each trade
             pool.lp_fee = lp_fee / 1e4 if lp_fee is not None else None
             pool.protocol_fee = protocol_fee / 1e4 if protocol_fee is not None else None
             pool.referral_fee = ref_fee / 1e4 if ref_fee is not None else None
