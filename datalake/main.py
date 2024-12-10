@@ -21,7 +21,7 @@ from converters.tradoor_position_change import TradoorPositionChangeConverter
 from converters.transactions import TransactionsConverter
 from converters.account_states import AccountStatesConverter
 from converters.jetton_metadata import JettonMetadataConverter
-
+from converters.dex_pools import DexPoolsConverter
 
 
 AVRO_TMP_BUFFER = "tmp_buffer.avro"
@@ -35,7 +35,8 @@ CONVERTERS = {
     "blocks": BlocksConverter(),
     "account_states": AccountStatesConverter(),
     "jetton_metadata": JettonMetadataConverter(),
-    "dex_trades": DexTradesConverter()
+    "dex_trades": DexTradesConverter(),
+    "dex_pools": DexPoolsConverter()
 }
 
 FIELDS_TO_REMOVE = ['__op', '__table', '__source_ts_ms', '__lsn']
