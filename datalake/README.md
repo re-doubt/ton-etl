@@ -237,6 +237,31 @@ TON Aliases and wrapped TONs used by the projects:
 * 0:D0A1CE4CDC187C79615EA618BD6C29617AF7A56D966F5A192A768F345EE63FD2 - WTON (ston.fi)
 * 0:9A8DA514D575D20234C3FB1395EE9138F5F1AD838ABC905DC42C2389B46BD015 - WTON (megaton.fi)
 
+## DEX Pools (TVL)
+
+[AVRO schema](./schemas/dex_pools.avsc)
+
+Partition field: __last_updated__
+URL: **s3://ton-blockchain-public-datalake/v1/dex_pools/**
+
+Contains history of DEX pools states. Each state includes static information (jettons in the pools), slowly changing fields (fees), reserves and TVL estimated in USD and TON.
+
+Fields:
+* pool - pool address
+* project - project name (the same as in ``dex_trades`` table)
+* version  - project version (the same as in ``dex_trades`` table)
+* discovered_at - timestamp of the pool discovery, i.e. first swap in the pool
+* jetton_left, jetton_right - addresses of the jettons in the pool (fixed for each pool address, could not be changed)
+* reserves_left, reserves_right - raw amount of the jettons in the pool
+* total_supply - total supply of the pool LP-jetton. In case of TONCO - number of active NFT positions.
+* is_liquid - flag if the pool is liquid. Pool is considered liquid if it has at TON, LSD or stable coin. Full list of supported assets see in [swap_volume.py](../parser/parsers/message/swap_volume.py). 
+* tvl_usd, tvl_ton - TVL of the pool in USD and TON. null for pools with is_liquid=false.
+* last_updated - timestamp of the pool update (swap or pool LP-jetton mint/burn)
+* lp_fee, protocol_fee, referral_fee - fees for the pool. Total fee is equal to lp_fee + protocol_fee + referral_fee (only if referral address is present during a swap). 
+
+Note that for ston.fi v2 referral_fee is always null, it is specified in each swap but it is not
+parsed just right now.
+
 # Integration with Athena
 
 As far the data is stored in S3 in Avro format Athena can directly read it. To start working with the data you need to create table with the DDL
