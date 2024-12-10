@@ -307,3 +307,30 @@ ALTER TABLE parsed.tonfun_bcl_trade ADD volume_usd numeric NULL;
 
 -- tonco DEC support
 ALTER TYPE public.dex_name ADD VALUE 'tonco' AFTER 'megaton';
+
+-- Add fees info for dex swaps
+
+CREATE TABLE prices.dex_pool (
+	pool varchar NOT null primary KEY,
+	platform public.dex_name NULL,
+	discovered_at int4 null,
+	jetton_left varchar null,
+	jetton_right varchar null,
+	reserves_left numeric null,
+	reserves_right numeric null,
+    total_supply numeric null,
+    tvl_usd numeric NULL,
+    tvl_ton numeric NULL,
+    last_updated int4 null,
+    is_liquid boolean null
+);
+
+ALTER TABLE prices.dex_pool ADD lp_fee numeric NULL;
+ALTER TABLE prices.dex_pool ADD protocol_fee numeric NULL;
+ALTER TABLE prices.dex_pool ADD referral_fee numeric NULL;
+
+CREATE TABLE prices.dex_pool_link (
+    id serial primary key,
+    jetton varchar null,
+    pool varchar null references prices.dex_pool(pool)
+);

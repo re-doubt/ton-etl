@@ -21,7 +21,8 @@ if __name__ == "__main__":
     supported_parsers = os.environ.get("SUPPORTED_PARSERS", "*")
     # to avoid race conditions we will process messages with maturity greater than MIN_MATURITY_SECONDS
     min_maturity = int(os.environ.get("MIN_MATURITY_SECONDS", "0")) * 1000
-    db = DB(Parser.USE_MESSAGE_CONTENT)
+    save_dex_pool_history = int(os.environ.get("DEX_POOL_HISTORY", "0"))
+    db = DB(Parser.USE_MESSAGE_CONTENT, dex_pool_history=save_dex_pool_history)
     db.acquire()
 
     consumer = KafkaConsumer(
