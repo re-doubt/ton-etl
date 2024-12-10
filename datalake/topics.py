@@ -11,3 +11,5 @@ TOPIC_DEX_SWAPS = "ton.parsed.dex_swap_parsed"
 TOPIC_GASPUMP_EVENTS = "ton.parsed.gaspump_trade"
 TOPIC_TONFUN = "ton.parsed.tonfun_bcl_trade"
 
+TOPIC_DEX_POOLS = "ton.prices.dex_pool"
+

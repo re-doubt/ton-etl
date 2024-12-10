@@ -1,6 +1,7 @@
 """
 Utility method to estimate swap volume in TON and USDT
 """
+import os
 from model.dexswap import DexSwapParsed
 from db import DB
 from loguru import logger
@@ -36,6 +37,8 @@ QUOTE_ASSET_TYPE_TON = "TON"
 QUOTE_ASSET_TYPE_STABLE = "STABLE"
 QUOTE_ASSET_TYPE_LSD = "LSD"
 QUOTE_ASSET_TYPE_OTHER = "OTHER"
+
+NON_LIQUID_POOLS_TVL = int(os.environ.get("NON_LIQUID_POOLS_TVL", "0"))
 
 """
 Deterministically returns base and quote tokens and quote asset type
@@ -160,16 +163,17 @@ def estimate_tvl(pool: DexPool, db: DB):
         tvl_ton = pool.reserves_right / 1e9 * lsd_price * 2
         tvl_usd = tvl_ton * ton_price
     else:
-        left_price = db.get_agg_price(jetton_left, pool.last_updated)
-        right_price = db.get_agg_price(jetton_right, pool.last_updated)
-        if not left_price :
-            logger.warning(f"No price for {jetton_left} for {pool.last_updated}")
-            return
-        if not right_price :
-            logger.warning(f"No price for {right_price} for {pool.last_updated}")
-            return
-        tvl_ton = (pool.reserves_left * left_price + pool.reserves_right * right_price) / 1e9
-        tvl_usd = tvl_ton * ton_price
+        if NON_LIQUID_POOLS_TVL:
+            left_price = db.get_agg_price(jetton_left, pool.last_updated)
+            right_price = db.get_agg_price(jetton_right, pool.last_updated)
+            if not left_price :
+                logger.warning(f"No price for {jetton_left} for {pool.last_updated}")
+                return
+            if not right_price :
+                logger.warning(f"No price for {right_price} for {pool.last_updated}")
+                return
+            tvl_ton = (pool.reserves_left * left_price + pool.reserves_right * right_price) / 1e9
+            tvl_usd = tvl_ton * ton_price
         pool.is_liquid = False
     
     if tvl_ton is not None:

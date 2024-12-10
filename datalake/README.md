@@ -226,6 +226,7 @@ Supported projects:
 | dex | [ston.fi](https://app.ston.fi/swap) | Decentralized exchange with AMM pools. Supported [version 1](https://docs.ston.fi/docs/developer-section/api-reference-v1) and [version 2](https://docs.ston.fi/docs/developer-section/api-reference-v2). | referral_address, router_address (v2 only), query_id |
 | dex | [dedust.io](https://app.dedust.io/) | Only [Protocol 2.0](https://docs.dedust.io/docs/introduction) is supported | referral_address |
 | dex | [megaton.fi](https://megaton.fi/) | Decentralized exchange with AMM pools | router_address |
+| dex | [tonco](https://app.tonco.io/) | Decentralized exchange with CLMM AMM pools | router_address, query_id |
 | launchpad | [ton.fun](https://tonfun-1.gitbook.io/tonfun) | Launchpad SDK adopted by multiple projects ([Blum](https://blum.io/), [BigPump](https://docs.pocketfi.org/features/big.pump), etc) | referral_address, platform_tag |
 | launchpad | [gaspump](https://gaspump.tg/) | Bonding curve launchpad for memecoins ([docs](https://github.com/gas111-bot/gaspump-sdk)) | - |
 
@@ -235,6 +236,31 @@ TON Aliases and wrapped TONs used by the projects:
 * 0:671963027F7F85659AB55B821671688601CDCF1EE674FC7FBBB1A776A18D34A3 - pTONv2 (ston.fi)
 * 0:D0A1CE4CDC187C79615EA618BD6C29617AF7A56D966F5A192A768F345EE63FD2 - WTON (ston.fi)
 * 0:9A8DA514D575D20234C3FB1395EE9138F5F1AD838ABC905DC42C2389B46BD015 - WTON (megaton.fi)
+
+## DEX Pools (TVL)
+
+[AVRO schema](./schemas/dex_pools.avsc)
+
+Partition field: __last_updated__
+URL: **s3://ton-blockchain-public-datalake/v1/dex_pools/**
+
+Contains history of DEX pools states. Each state includes static information (jettons in the pools), slowly changing fields (fees), reserves and TVL estimated in USD and TON.
+
+Fields:
+* pool - pool address
+* project - project name (the same as in ``dex_trades`` table)
+* version  - project version (the same as in ``dex_trades`` table)
+* discovered_at - timestamp of the pool discovery, i.e. first swap in the pool
+* jetton_left, jetton_right - addresses of the jettons in the pool (fixed for each pool address, could not be changed)
+* reserves_left, reserves_right - raw amount of the jettons in the pool
+* total_supply - total supply of the pool LP-jetton. In case of TONCO - number of active NFT positions.
+* is_liquid - flag if the pool is liquid. Pool is considered liquid if it has at TON, LSD or stable coin. Full list of supported assets see in [swap_volume.py](../parser/parsers/message/swap_volume.py). 
+* tvl_usd, tvl_ton - TVL of the pool in USD and TON. null for pools with is_liquid=false.
+* last_updated - timestamp of the pool update (swap or pool LP-jetton mint/burn)
+* lp_fee, protocol_fee, referral_fee - fees for the pool. Total fee is equal to lp_fee + protocol_fee + referral_fee (only if referral address is present during a swap). 
+
+Note that for ston.fi v2 referral_fee is always null, it is specified in each swap but it is not
+parsed just right now.
 
 # Integration with Athena
 

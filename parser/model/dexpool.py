@@ -53,6 +53,9 @@ class DexPool:
     tvl_ton: decimal.Decimal = None
     last_updated: int = None
     is_liquid: bool = True # True if the pool contains TON, LSD or stable coin
+    lp_fee: decimal.Decimal = None
+    protocol_fee: decimal.Decimal = None
+    referral_fee: decimal.Decimal = None
 
     def is_inited(self):
         return self.jetton_left is not None and self.jetton_right is not None

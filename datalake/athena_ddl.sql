@@ -351,8 +351,41 @@ LOCATION
 TBLPROPERTIES (
 )
 
+CREATE EXTERNAL TABLE `dex_pools`(
+  `pool` string COMMENT 'from deserializer', 
+  `project` string COMMENT 'from deserializer', 
+  `version` int COMMENT 'from deserializer', 
+  `discovered_at` int COMMENT 'from deserializer', 
+  `jetton_left` string COMMENT 'from deserializer', 
+  `jetton_right` string COMMENT 'from deserializer', 
+  `reserves_left` decimal(38,0) COMMENT 'from deserializer', 
+  `reserves_right` decimal(38,0) COMMENT 'from deserializer', 
+  `total_supply` decimal(38,0) COMMENT 'from deserializer', 
+  `tvl_usd` decimal(20,6) COMMENT 'from deserializer', 
+  `tvl_ton` decimal(20,9) COMMENT 'from deserializer', 
+  `last_updated` int COMMENT 'from deserializer', 
+  `is_liquid` boolean COMMENT 'from deserializer', 
+  `lp_fee` decimal(12,10) COMMENT 'from deserializer', 
+  `protocol_fee` decimal(12,10) COMMENT 'from deserializer', 
+  `referral_fee` decimal(12,10) COMMENT 'from deserializer')
+PARTITIONED BY ( 
+  `block_date` string)
+ROW FORMAT SERDE 
+  'org.apache.hadoop.hive.serde2.avro.AvroSerDe' 
+WITH SERDEPROPERTIES ( 
+  'avro.schema.literal'='{\"type\":\"record\",\"name\":\"dex_pool\",\"namespace\":\"ton\",\"fields\":[{\"name\":\"pool\",\"type\":\"string\"},{\"name\":\"project\",\"type\":\"string\"},{\"name\":\"version\",\"type\":[\"int\",\"null\"]},{\"name\":\"discovered_at\",\"type\":[\"int\",\"null\"]},{\"name\":\"jetton_left\",\"type\":[\"string\",\"null\"]},{\"name\":\"jetton_right\",\"type\":[\"string\",\"null\"]},{\"name\":\"reserves_left\",\"type\":[{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":38,\"scale\":0},\"null\"]},{\"name\":\"reserves_right\",\"type\":[{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":38,\"scale\":0},\"null\"]},{\"name\":\"total_supply\",\"type\":[{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":38,\"scale\":0},\"null\"]},{\"name\":\"tvl_usd\",\"type\":[{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":20,\"scale\":6},\"null\"]},{\"name\":\"tvl_ton\",\"type\":[{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":20,\"scale\":9},\"null\"]},{\"name\":\"last_updated\",\"type\":[\"int\",\"null\"]},{\"name\":\"is_liquid\",\"type\":[\"boolean\",\"null\"]},{\"name\":\"lp_fee\",\"type\":[{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":12,\"scale\":10},\"null\"]},{\"name\":\"protocol_fee\",\"type\":[{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":12,\"scale\":10},\"null\"]},{\"name\":\"referral_fee\",\"type\":[{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":12,\"scale\":10},\"null\"]}]}') 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat'
+LOCATION
+  's3://ton-blockchain-public-datalake/v1/dex_pools'
+TBLPROPERTIES (
+)
+
 -- views
 create or replace view "jetton_metadata_latest"
 as
 select * from "jetton_metadata_snapshots"
 where snapshot_date = (SELECT max(snapshot_date) FROM "jetton_metadata_snapshots")
+

@@ -27,8 +27,9 @@ def serialize_addr(addr: Union[Address, ExternalAddress, None]) -> str:
     return None
     
 class DB():
-    def __init__(self, use_message_content: bool):
+    def __init__(self, use_message_content: bool, dex_pool_history: bool=False):
         self.use_message_content = use_message_content
+        self.dex_pool_history = dex_pool_history
         self.pool = pool.SimpleConnectionPool(1, 3)
         if not self.pool:
             raise Exception("Unable to init connection")
@@ -483,17 +484,19 @@ class DB():
             cursor.execute(f"""
                 update prices.dex_pool
                            set reserves_left = %s, reserves_right = %s, total_supply = %s,
-                           tvl_usd = %s, tvl_ton = %s, last_updated = %s, is_liquid = %s
+                           tvl_usd = %s, tvl_ton = %s, last_updated = %s, is_liquid = %s,
+                           lp_fee = %s, protocol_fee = %s, referral_fee = %s
                            where pool = %s and (last_updated < %s or last_updated is null)
                             """, (pool.reserves_left, pool.reserves_right, pool.total_supply,
-                                  pool.tvl_usd, pool.tvl_ton, pool.last_updated, pool.is_liquid, pool.pool, pool.last_updated))
+                                  pool.tvl_usd, pool.tvl_ton, pool.last_updated, pool.is_liquid, pool.lp_fee, pool.protocol_fee, pool.referral_fee, pool.pool, pool.last_updated))
             
-            cursor.execute(f"""
-                insert into prices.dex_pool_history (pool, timestamp, reserves_left, reserves_right, total_supply, tvl_usd, tvl_ton)
-                        values (%s, %s, %s, %s, %s, %s, %s)
-                        on conflict do nothing
-                            """, (pool.pool, pool.last_updated, pool.reserves_left, pool.reserves_right, 
-                                  pool.total_supply, pool.tvl_usd, pool.tvl_ton))
+            if self.dex_pool_history:
+                cursor.execute(f"""
+                    insert into prices.dex_pool_history (pool, timestamp, reserves_left, reserves_right, total_supply, tvl_usd, tvl_ton)
+                            values (%s, %s, %s, %s, %s, %s, %s)
+                            on conflict do nothing
+                                """, (pool.pool, pool.last_updated, pool.reserves_left, pool.reserves_right, 
+                                    pool.total_supply, pool.tvl_usd, pool.tvl_ton))
             self.updated += 1
 
     """
