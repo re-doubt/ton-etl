@@ -41,6 +41,7 @@ List of topics supported:
 * indexer.streaming_jetton_metadata
 * indexer.streaming_messages (with raw bodies)
 * indexer.streaming_transactions
+* indexer.streaming_dex_pools
 
 Public Kafka topics are available for free, but to provide better observability and performance we would like to ask you to
 contact us for connection credentials linked to your organisation using [the following form](https://docs.google.com/forms/d/e/1FAIpQLSc4OhA1pe6OzyaG_gb8plAG8XlJpOkcAw7vo8fSeDeBBGFmCA/viewform?usp=sf_link).
