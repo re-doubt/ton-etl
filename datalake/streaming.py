@@ -7,7 +7,6 @@ import os
 import json
 import traceback
 from typing import Dict
-from datalake.converters.dex_pools import DexPoolsConverter
 from topics import TOPIC_BLOCKS
 from loguru import logger
 from kafka import KafkaConsumer, KafkaProducer
@@ -18,6 +17,8 @@ from converters.transactions import TransactionsConverter
 from converters.account_states import AccountStatesConverter
 from converters.jetton_metadata import JettonMetadataConverter
 from converters.dex_trades import DexTradesConverter
+from converters.dex_pools import DexPoolsConverter
+
 
 
 CONVERTERS = {
@@ -28,7 +29,7 @@ CONVERTERS = {
     "account_states": AccountStatesConverter(),
     "jetton_metadata": JettonMetadataConverter(),
     "dex_trades": DexTradesConverter(),
-    "dex_pool_trades": DexPoolsConverter()
+    "dex_pools": DexPoolsConverter()
 }
 
 FIELDS_TO_REMOVE = ['__op', '__table', '__source_ts_ms', '__lsn']
