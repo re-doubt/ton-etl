@@ -262,6 +262,40 @@ Fields:
 Note that for ston.fi v2 referral_fee is always null, it is specified in each swap but it is not
 parsed just right now.
 
+# Data corrections
+
+This section describes the list of data corrections that were applied to the data. 
+Data corrections are required in case of incorrect data was stored in the data lake and should be removed or fixed.
+In such cases keys of the rows to be excluded are stored in the **excluded_rows** that is stored in **s3://ton-blockchain-public-datalake/v1/excluded_rows** in CSV format with two fields:
+* table - name of the table
+* key - key of the row in the table
+
+Data corrections are applied to the data lake by partitions, i.e. full partition is regenerated so there are two options
+to the consumers of the data lake:
+1. Re-import the partitions
+2. Apply data corrections manually
+
+
+**1. DeDust trades data correction**
+
+Date: 2024-12-11
+
+Table: dex_trades
+
+Key: tx_hash
+
+Partitions: 20241201, 20241203, 20241204
+
+Number of rows: 12
+
+Full list: s3://ton-blockchain-public-datalake/v1/excluded_rows/dedust_20241211.csv
+
+Description: DeDust swap parses used ext-out messages to detect swaps and before the fix
+it was possible to create a smart contract that would send ext-out messages with arbitrary payload
+resulting in incorrect trades data parsing. Some users utilised this bug and created three smart contracts
+and sent 12 ext-outs. The fix was applied in [#65](https://github.com/re-doubt/ton-etl/pull/65) to mitigate the issue.
+
+
 # Integration with Athena
 
 As far the data is stored in S3 in Avro format Athena can directly read it. To start working with the data you need to create table with the DDL
