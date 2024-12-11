@@ -1,4 +1,4 @@
-# TON-ETL indexing in decoding pipeline
+# TON-ETL indexing and decoding pipeline
 
 The repository contains the code for the indexing and decoding pipeline for the TON blockchain.
 It is based on [ton-indexer-worker](https://github.com/toncenter/ton-index-worker) by [Toncenter](https://toncenter.com/).
