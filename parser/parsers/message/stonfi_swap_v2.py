@@ -48,7 +48,9 @@ ROUTERS = set(map(Parser.uf2raw, [
     # memecoin router?
     'EQAJG5pyZPWEiQiMVJdf7bDRgRLzg6QR57qKeRsOrMO-ncZN',
     # stable coin router for AquaUSDT
-    'EQDkncuJ267Py3EmL2XAN7YsSNQMUu8u-GHsW9jVljcH8fr5'
+    'EQDkncuJ267Py3EmL2XAN7YsSNQMUu8u-GHsW9jVljcH8fr5',
+    # 2024-12-16
+    'EQCiz74FCV2lYlvFPEYhL3Jql8WwIO7QvbvYT-LQH0SmtCgI'
     ]))
 
 class StonfiSwapV2(Parser):
