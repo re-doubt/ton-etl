@@ -283,6 +283,50 @@ ALTER TYPE public.dex_name ADD VALUE 'megaton' AFTER 'ston.fi_v2';
 -- required for megaton parser
 CREATE INDEX jetton_transfers_trace_id_idx ON public.jetton_transfers (trace_id);
 
+
+-- Delea
+
+CREATE TABLE parsed.delea_deposit (
+    tx_hash bpchar(44) NULL primary key,
+    msg_hash bpchar(44) NULL,
+    trace_id bpchar(44) NULL,
+    utime int4 NULL,
+    successful boolean NULL,
+    query_id numeric NULL,
+    amount numeric NULL,
+    owner_address varchar NULL,
+    created timestamp NULL,
+    updated timestamp NULL
+);
+
+CREATE TABLE parsed.delea_withdraw (
+    tx_hash bpchar(44) NULL primary key,
+    msg_hash bpchar(44) NULL,
+    trace_id bpchar(44) NULL,
+    utime int4 NULL,
+    successful boolean NULL,
+    query_id numeric NULL,
+    amount numeric NULL,
+    owner_address varchar NULL,
+    recipient_address varchar NULL,
+    created timestamp NULL,
+    updated timestamp NULL
+);
+
+CREATE TABLE parsed.delea_liquidation (
+    tx_hash bpchar(44) NULL primary key,
+    msg_hash bpchar(44) NULL,
+    trace_id bpchar(44) NULL,
+    utime int4 NULL,
+    successful boolean NULL,
+    query_id numeric NULL,
+    amount numeric NULL,
+    owner_address varchar NULL,
+    liquidator_address varchar NULL,
+    created timestamp NULL,
+    updated timestamp NULL
+);
+
 -- TonFun
 CREATE TABLE parsed.tonfun_bcl_trade (
     tx_hash bpchar(44) NULL primary key,
