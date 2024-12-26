@@ -15,14 +15,16 @@ from parsers.accounts.emulator import EmulatorException, EmulatorParser
 
 """
 Parses staking pools nominators and validators stakes
+We will try to invoke multiple methods to get list of nominators.
+If none of them works the code_hash will be blacklisted to avoid further attempts.
 """
 class StakingPoolsParser(EmulatorParser):
     def __init__(self, emulator_path):
         super().__init__(emulator_path)
+        self.blacklist = set()
 
     def predicate(self, obj) -> bool:
-        # TODO
-        return super().predicate(obj)
+        return super().predicate(obj) and obj['code_hash'] not in self.blacklist
 
     def iterate_lisp_list(self, tuple: VmTuple):
         while tuple is not None:
@@ -34,6 +36,7 @@ class StakingPoolsParser(EmulatorParser):
         OUTPUT_LISP_LIST = 'list_list'
         OUTPUT_DICT = 'dict'
         method_names = [('list_nominators', OUTPUT_LISP_LIST), ('get_members', OUTPUT_LISP_LIST), ('get_members_raw', OUTPUT_DICT)]
+        handled = False
         for method, output_type in method_names:
             try:
                 res = self._execute_method(emulator, method, [], db, obj)
@@ -57,6 +60,9 @@ class StakingPoolsParser(EmulatorParser):
                         balance = value.load_coins()
                         pending = value.load_coins()
                         db.insert_staking_position(address, obj['account'], obj['timestamp'], obj['last_trans_lt'], balance, pending)
+                handled = True
                 break # no need for more attempts
             except EmulatorException as e:
                 pass
+        if not handled:
+            self.blacklist.add(obj['code_hash'])
