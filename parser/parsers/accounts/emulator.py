@@ -97,7 +97,7 @@ class EmulatorParser(Parser):
         await client.connect()
         lib = await client.get_libraries([lib_hash])
         await client.close()
-        return lib[lib_hash.lower()]
+        return lib.get(lib_hash.lower(), None)
 
     def _prepare_emulator(self, obj):
         assert self.libs is not None, "libs are not inited"
@@ -122,6 +122,9 @@ class EmulatorParser(Parser):
 
             logger.warning(f"Got missing library {missing_library}: {result}")
             lib = asyncio.run(self.get_lib(missing_library))
+            if not lib:
+                logger.error(f"Failed to get library {missing_library}")
+                raise EmulatorException(f"Library {missing_library} not found")
             db.insert_mc_library(base64.b64encode(lib.to_boc()).decode())
             self.prepare(db)
             emulator = self._prepare_emulator(obj)
