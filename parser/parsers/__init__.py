@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from parsers.accounts.staking_pools import StakingPoolsParser
 from parsers.message.tonco import TONCOSwap
 from parsers.jetton_transfer.megaton import MegatonDexSwap
 from parsers.message.tonfun import TonFunTrade
@@ -63,6 +64,7 @@ _parsers = [
     CorePricesStormTrade(EMULATOR_PATH, Parser.uf2raw('EQAz6ehNfL7_8NI7OVh1Qg46HsuC4kFpK-icfqK9J3Frd6CJ'),
                          Parser.uf2raw('EQCup4xxCulCcNwmOocM9HtDYPU8xe0449tQLp6a-5BLEegW')),
     TVLPoolStateParser(EMULATOR_PATH),
+    StakingPoolsParser(EMULATOR_PATH),
 
     NFTsRecover(EMULATOR_PATH),
     JettonWalletsRecover(EMULATOR_PATH),

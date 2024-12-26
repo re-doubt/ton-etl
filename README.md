@@ -209,6 +209,11 @@ with [EvaaWithdrawAndLiquidationParser](./parser/parsers/message/evaa.py).
 Contains decoded EVAA liquidation events. Produced from messages table stream
 with [EvaaWithdrawAndLiquidationParser](./parser/parsers/message/evaa.py). 
 
+### staking_pools_nominators
+
+Contains latest values for nominators pools. Produced from accounts table stream
+with [StakingPoolsNominatorsParser](./parser/parsers/accounts/staking_pools.py). 
+
 ## prices
 
 Tables related to DeFi - DEX trades, TVL, LSD prices, etc..

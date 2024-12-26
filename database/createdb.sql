@@ -334,3 +334,17 @@ CREATE TABLE prices.dex_pool_link (
     jetton varchar null,
     pool varchar null references prices.dex_pool(pool)
 );
+
+-- Staking pools
+
+CREATE TABLE parsed.staking_pools_nominators (
+    pool varchar NULL,
+    address varchar NULL,
+    utime int4 NULL,
+    lt int8 NULL,
+    balance numeric NULL,
+    pending numeric NULL,
+    CONSTRAINT staking_pools_nominators_pkey PRIMARY KEY (pool, address)
+);
+
+CREATE INDEX staking_pools_nominators_idx ON parsed.staking_pools_nominators (address);

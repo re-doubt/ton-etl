@@ -269,6 +269,23 @@ class DB():
                             """, (boc, ))
             self.updated += 1
 
+
+    def insert_staking_position(self, address: Address, pool: str, utime: int, lt: int, balance: float, pending: float):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(f"""
+                insert into parsed.staking_pools_nominators(address, pool, utime, lt, balance, pending)
+                           values(%s, %s, %s, %s, %s, %s)
+                on conflict(address, pool) do update
+                           set balance = EXCLUDED.balance,
+                           pending = EXCLUDED.pending,
+                           utime = EXCLUDED.utime,
+                           lt = EXCLUDED.lt
+                           where staking_pools_nominators.balance != EXCLUDED.balance or staking_pools_nominators.pending != EXCLUDED.pending
+                            """, (address.to_str(is_user_friendly=False).upper(), pool, utime, lt, balance, pending))
+            self.updated += 1
+
+
     def insert_core_price(self, asset, price, obj):
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
