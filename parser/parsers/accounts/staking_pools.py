@@ -4,11 +4,7 @@ from typing import Dict
 from model.parser import Parser, TOPIC_ACCOUNT_STATES
 from loguru import logger
 from db import DB
-from pytoniq_core import Cell, Address, begin_cell, VmTuple, HashMap
-from model.dexpool import DexPool
-from model.dexswap import DEX_DEDUST, DEX_MEGATON, DEX_STON, DEX_STON_V2, DEX_TONCO
-from model.dedust import read_dedust_asset
-from parsers.message.swap_volume import estimate_tvl
+from pytoniq_core import Address, VmTuple, HashMap, Slice
 from pytvm.tvm_emulator.tvm_emulator import TvmEmulator
 from parsers.accounts.emulator import EmulatorException, EmulatorParser
 
@@ -49,6 +45,8 @@ class StakingPoolsParser(EmulatorParser):
                         address, balance, pending = item.pop(0), item.pop(0), item.pop(0)
                         if type(address) == int:
                             address = Address((0, address.to_bytes(length=32, byteorder='big')))
+                        elif type(address) == Slice:
+                            address = address.load_address()
                         logger.info(f"Item: {address}, {type(address)}, {balance}, {type(balance)}, {pending}, {type(pending)}")
                         db.insert_staking_position(address, obj['account'], obj['timestamp'], obj['last_trans_lt'], balance, pending)
                 elif output_type == OUTPUT_DICT:
