@@ -185,7 +185,7 @@ class JettonMastersMetadataParser(Parser):
                                     })
                         if tonapi_response.status_code != 200:
                             raise Exception(f"response status_code = {tonapi_response.status_code}")
-                        metadata.tonapi_image_url = tonapi_response.get("preview", None)
+                        metadata.tonapi_image_url = tonapi_response.json().get("preview", None)
                     except Exception as e:
                         logger.error(f"Error getting tonapi image url for {address}: {e}")
                 if symbol:
