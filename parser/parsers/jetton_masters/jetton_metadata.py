@@ -182,7 +182,9 @@ class JettonMastersMetadataParser(Parser):
                         tonapi_response = requests.get(f"https://tonapi.io/v2/jettons/{address}", timeout=self.timeout, headers={
                                     "User-Agent": DATALAKE_USER_AGENT,
                                     "Authorization": 'Bearer %s' % os.getenv("TONAPI_API_KEY")
-                                    }).json()
+                                    })
+                        if tonapi_response.status_code != 200:
+                            raise Exception(f"response status_code = {tonapi_response.status_code}")
                         metadata.tonapi_image_url = tonapi_response.get("preview", None)
                     except Exception as e:
                         logger.error(f"Error getting tonapi image url for {address}: {e}")
