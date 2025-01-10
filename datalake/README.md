@@ -263,6 +263,20 @@ Fields:
 Note that for ston.fi v2 referral_fee is always null, it is specified in each swap but it is not
 parsed just right now.
 
+## Balances history
+
+[AVRO schema](./schemas/balances_history.avsc)
+
+Partition field: __timestamp__
+URL: **s3://ton-blockchain-public-datalake/v1/balances_history/**
+
+Contains balances history for native TON balances and Jetton balances. Fields:
+* address - address of the asset owner
+* asset - asset type, ``TON`` for native TON or jetton address for Jetton balance
+* amount - balance amount
+* timestamp - timestamp of the balance update
+* lt - logical time of the balance update
+
 # Data corrections
 
 This section describes the list of data corrections that were applied to the data. 

@@ -13,6 +13,7 @@ import boto3
 import avro.schema
 from avro.datafile import DataFileWriter
 from avro.io import DatumWriter
+from converters.balances_history import BalancesHistoryConverter
 from converters.messages import MessageConverter, MessageWithDataConverter
 from converters.jetton_events import JettonEventsConverter
 from converters.blocks import BlocksConverter
@@ -36,7 +37,8 @@ CONVERTERS = {
     "account_states": AccountStatesConverter(),
     "jetton_metadata": JettonMetadataConverter(),
     "dex_trades": DexTradesConverter(),
-    "dex_pools": DexPoolsConverter()
+    "dex_pools": DexPoolsConverter(),
+    "balances_history": BalancesHistoryConverter()
 }
 
 FIELDS_TO_REMOVE = ['__op', '__table', '__source_ts_ms', '__lsn']
