@@ -183,7 +183,7 @@ class JettonMastersMetadataParser(Parser):
                                     "User-Agent": DATALAKE_USER_AGENT,
                                     "Authorization": 'Bearer %s' % os.getenv("TONAPI_API_KEY")
                                     }).json()
-                        metadata.tonapi_image_url = tonapi_response.get("metadata", {}).get("image", None)
+                        metadata.tonapi_image_url = tonapi_response.get("preview", None)
                     except Exception as e:
                         logger.error(f"Error getting tonapi image url for {address}: {e}")
                 if symbol:
