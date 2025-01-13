@@ -23,6 +23,7 @@ services:
       - KAFKA_GROUP_ID=jetton_metadata
       - SUPPORTED_PARSERS=JettonMastersMetadataParser
       - KAFKA_TOPICS=ton.public.jetton_masters
+      - COMMIT_BATCH_SIZE=1
     env_file:
       - parser.env
     logging:
