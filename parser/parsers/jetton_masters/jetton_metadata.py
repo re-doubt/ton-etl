@@ -40,22 +40,28 @@ class JettonMastersMetadataParser(Parser):
         parsed_url = urlparse(url)
         retry = 0
         while retry < self.max_attempts:
-            if parsed_url.scheme == 'ipfs':
-                requests.get(self.ipfs_gateway + parsed_url.netloc + parsed_url.path, timeout=self.timeout, 
-                             headers={"User-Agent": DATALAKE_USER_AGENT}).text
-            elif parsed_url.scheme is None or len(parsed_url.scheme) == 0:
-                logger.error(f"No schema for URL: {url}")
-                return None
-            else:
-                if parsed_url.netloc == 'localhost':
-                    logger.warning(f"Skipping {url}")
+            try:
+                if parsed_url.scheme == 'ipfs':
+                    response = requests.get(self.ipfs_gateway + parsed_url.netloc + parsed_url.path, timeout=self.timeout, 
+                                            headers={"User-Agent": DATALAKE_USER_AGENT})
+                    if response.status_code != 200:
+                        raise Exception(f"Response status_code = {response.status_code}")
+                    return response.text
+                elif parsed_url.scheme is None or len(parsed_url.scheme) == 0:
+                    logger.error(f"No schema for URL: {url}")
                     return None
-                try:
-                    return requests.get(url, timeout=self.timeout, headers={"User-Agent": DATALAKE_USER_AGENT}).text
-                except Exception as e:
-                    logger.error(f"Unable to fetch data from {url}", e)
-                    time.sleep(1)
-                retry += 1
+                else:
+                    if parsed_url.netloc == 'localhost':
+                        logger.warning(f"Skipping {url}")
+                        return None
+                    response = requests.get(url, timeout=self.timeout, headers={"User-Agent": DATALAKE_USER_AGENT})
+                    if response.status_code != 200:
+                        raise Exception(f"Response status_code = {response.status_code}")
+                    return response.text
+            except Exception as e:
+                logger.error(f"Unable to fetch data from {url}: {e}")
+                time.sleep(1)
+            retry += 1
         return None
 
     def handle_internal(self, obj: dict, db: DB):
@@ -161,9 +167,11 @@ class JettonMastersMetadataParser(Parser):
                             tonapi_response = requests.get(f"https://tonapi.io/v2/jettons/{address}", timeout=self.timeout, headers={
                                 "User-Agent": DATALAKE_USER_AGENT,
                                 "Authorization": 'Bearer %s' % os.getenv("TONAPI_API_KEY")
-                                }).json()
-                            logger.info(f"TonAPI response for {address}: {tonapi_response}")
-                            tonapi_metadata = tonapi_response.get("metadata", None)
+                                })
+                            if tonapi_response.status_code != 200:
+                                raise Exception(f"Response status_code = {tonapi_response.status_code}")
+                            logger.info(f"TonAPI response for {address}: {tonapi_response.json()}")
+                            tonapi_metadata = tonapi_response.json().get("metadata", None)
                             symbol = update_metadata(0, tonapi_metadata, "symbol", symbol, METADATA_TONAPI)
                             name = update_metadata(1, tonapi_metadata, "name", name, METADATA_TONAPI)
                             description = update_metadata(2, tonapi_metadata, "description", description, METADATA_TONAPI)
@@ -182,8 +190,11 @@ class JettonMastersMetadataParser(Parser):
                         tonapi_response = requests.get(f"https://tonapi.io/v2/jettons/{address}", timeout=self.timeout, headers={
                                     "User-Agent": DATALAKE_USER_AGENT,
                                     "Authorization": 'Bearer %s' % os.getenv("TONAPI_API_KEY")
-                                    }).json()
-                        metadata.tonapi_image_url = tonapi_response.get("preview", None)
+                                    })
+                        if tonapi_response.status_code != 200:
+                            raise Exception(f"Response status_code = {tonapi_response.status_code}")
+                        metadata.tonapi_image_url = tonapi_response.json().get("preview", None)
+                        logger.info(f"TonAPI image url for {address}: {metadata.tonapi_image_url}")
                     except Exception as e:
                         logger.error(f"Error getting tonapi image url for {address}: {e}")
                 if symbol:
