@@ -202,7 +202,6 @@ class JettonMastersMetadataParser(Parser):
                         logger.info(f"TonAPI image url for {address}: {metadata.tonapi_image_url}")
                     except Exception as e:
                         logger.error(f"Error getting tonapi image url for {address}: {e}")
-                        metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_ERROR
                 if symbol:
                     metadata.symbol = symbol
                 if name:
