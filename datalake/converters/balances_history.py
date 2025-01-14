@@ -25,13 +25,14 @@ class BalancesHistoryConverter(Converter):
         return [TOPIC_ACCOUNT_STATES, TOPIC_JETTON_WALLETS]
     
     def convert(self, obj, table_name=None):
-        if obj['__table'] == "jetton_wallets":
+        if table_name == "jetton_wallets":
             return {
                 "address": obj['owner'],
                 "asset": obj['jetton'],
                 "amount": self.decode_numeric(obj['balance']),
+                "mintless_claimed": obj['mintless_is_claimed'],
                 "timestamp": obj['last_tx_now'],
-                "lt": obj['last_tx_lt']
+                "lt": obj['last_transaction_lt']
             }
         else: # account_states
             return {

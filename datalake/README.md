@@ -274,6 +274,7 @@ Contains balances history for native TON balances and Jetton balances. Fields:
 * address - address of the asset owner
 * asset - asset type, ``TON`` for native TON or jetton address for Jetton balance
 * amount - balance amount
+* mintless_claimed - boolean flag if the mintless jetton was claimed (only for mintless jetton wallets)
 * timestamp - timestamp of the balance update
 * lt - logical time of the balance update
 

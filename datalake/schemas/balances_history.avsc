@@ -24,6 +24,10 @@
       ]
     },
     {
+      "name": "mintless_claimed",
+      "type": ["boolean", "null"]
+    },
+    {
       "name": "timestamp",
       "type": [
         "int",
