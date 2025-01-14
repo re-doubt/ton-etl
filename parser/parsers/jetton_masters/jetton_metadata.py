@@ -113,7 +113,12 @@ class JettonMastersMetadataParser(Parser):
                 code_hash=obj.get("code_hash", None)
             )
             updated = True
-        if updated and (metadata_updated or not metadata.update_time_metadata or metadata.update_time_metadata < time.time() - OFFCHAIN_UPDATE_TIME_INTERVAL):
+        if (
+            updated 
+            and (metadata_updated or not metadata.update_time_metadata or metadata.update_time_metadata < time.time() - OFFCHAIN_UPDATE_TIME_INTERVAL)
+            or metadata.metadata_status == OFFCHAIN_UPDATE_STATUS_ERROR
+            or not metadata.tonapi_image_url
+        ):
             jetton_content = obj.get('jetton_content', None)
             if not jetton_content:
                 logger.warning(f"Jetton content is not set for {address}")
