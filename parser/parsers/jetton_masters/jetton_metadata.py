@@ -115,7 +115,9 @@ class JettonMastersMetadataParser(Parser):
             updated = True
         if (
             updated 
-            and (metadata_updated or not metadata.update_time_metadata or metadata.update_time_metadata < time.time() - OFFCHAIN_UPDATE_TIME_INTERVAL)
+            or metadata_updated 
+            or not metadata.update_time_metadata 
+            or metadata.update_time_metadata < time.time() - OFFCHAIN_UPDATE_TIME_INTERVAL
             or metadata.metadata_status == OFFCHAIN_UPDATE_STATUS_ERROR
             or not metadata.tonapi_image_url
         ):
@@ -222,9 +224,9 @@ class JettonMastersMetadataParser(Parser):
                     except Exception as e:
                         logger.error(f"Error parsing decimals for {address}: {e}")
                 metadata.sources = ",".join(sources)
-                
-                
+
             metadata.update_time_metadata = time.time()
+            updated = True
         if updated:
             metadata.update_time_onchain=obj.get("last_tx_now", None)
             logger.info(f"Upserting jetton metadata for {address}")
