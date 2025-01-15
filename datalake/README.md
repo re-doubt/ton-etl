@@ -263,6 +263,42 @@ Fields:
 Note that for ston.fi v2 referral_fee is always null, it is specified in each swap but it is not
 parsed just right now.
 
+## Balances history
+
+[AVRO schema](./schemas/balances_history.avsc)
+
+Partition field: __timestamp__
+URL: **s3://ton-blockchain-public-datalake/v1/balances_history/**
+
+Contains balances history for native TON balances and Jetton balances. Fields:
+* address - address of the asset owner
+* asset - asset type, ``TON`` for native TON or jetton address for Jetton balance
+* amount - balance amount
+* mintless_claimed - boolean flag if the mintless jetton was claimed (only for mintless jetton wallets)
+* timestamp - timestamp of the balance update
+* lt - logical time of the balance update
+
+### Balances history snapshots
+
+For convenience daily snapshots of the balances history are created. It allows to get the latest balance for each address and asset without
+full scan of the ``balances_history`` table. Partitioned by ``block_date`` field (i.e. date of the latest block in the snapshot). 
+
+URL: **s3://ton-blockchain-public-datalake/v1/balances_snapshot/**
+
+Contains the same fields as ``balances_history`` table. Note that in future old snapshots will be removed.
+To get the latest snapshot one can use the following query (to get top-100 TON holders):
+
+```sql
+with latest_balances as (
+select * from "balances_snapshot"
+where block_date = (SELECT max(block_date) FROM "balances_snapshot$partitions")
+)
+select * from latest_balances
+where asset = 'TON' order by amount desc
+limit 100
+```
+
+
 # Data corrections
 
 This section describes the list of data corrections that were applied to the data. 

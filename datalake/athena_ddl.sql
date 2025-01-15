@@ -399,6 +399,69 @@ TBLPROPERTIES (
   'classification'='csv', 
   'transient_lastDdlTime'='1733881198')
 
+CREATE EXTERNAL TABLE `balances_history`(
+  `address` string COMMENT 'from deserializer', 
+  `asset` string COMMENT 'from deserializer', 
+  `amount` decimal(38,0) COMMENT 'from deserializer', 
+  `mintless_claimed` boolean COMMENT 'from deserializer', 
+  `timestamp` int COMMENT 'from deserializer', 
+  `lt` bigint COMMENT 'from deserializer')
+PARTITIONED BY ( 
+  `block_date` string)
+ROW FORMAT SERDE 
+  'org.apache.hadoop.hive.serde2.avro.AvroSerDe' 
+WITH SERDEPROPERTIES ( 
+  'avro.schema.literal'='{\"type\":\"record\",\"name\":\"balances_history\",\"namespace\":\"ton\",\"fields\":[{\"name\":\"address\",\"type\":\"string\"},{\"name\":\"asset\",\"type\":\"string\"},{\"name\":\"amount\",\"type\":[{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":38,\"scale\":0},\"null\"]},{\"name\":\"mintless_claimed\",\"type\":[\"boolean\",\"null\"]},{\"name\":\"timestamp\",\"type\":[\"int\",\"null\"]},{\"name\":\"lt\",\"type\":[\"long\",\"null\"]}]}') 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat'
+LOCATION
+  's3://ton-blockchain-public-datalake/v1/balances_history'
+TBLPROPERTIES (
+)
+
+CREATE EXTERNAL TABLE `balances_snapshot`(
+  `address` string COMMENT 'from deserializer', 
+  `asset` string COMMENT 'from deserializer', 
+  `amount` decimal(38,0) COMMENT 'from deserializer', 
+  `mintless_claimed` boolean COMMENT 'from deserializer', 
+  `timestamp` int COMMENT 'from deserializer', 
+  `lt` bigint COMMENT 'from deserializer')
+PARTITIONED BY ( 
+  `block_date` string)
+ROW FORMAT SERDE 
+  'org.apache.hadoop.hive.serde2.avro.AvroSerDe' 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat'
+LOCATION
+  's3://ton-blockchain-public-datalake/v1/balances_snapshot'
+TBLPROPERTIES (
+  'auto.purge'='false', 
+  'has_encrypted_data'='false', 
+  'numFiles'='-1', 
+  'presto_query_id'='20250115_125839_00069_9mpf6', 
+  'presto_version'='0.215-21820-g882377f', 
+  'totalSize'='-1', 
+  'transactional'='false', 
+  'write.compression'='SNAPPY')
+
+-- daily query to generate balances_snapshot
+insert into datalake.balances_snapshot(address, asset, amount, mintless_claimed, timestamp, lt, block_date)
+with ranks as (
+ select address, asset, amount, mintless_claimed, timestamp, lt,
+ row_number() over (partition by address, asset order by lt desc) as rank
+ from "datalake"."balances_history"
+)
+select address, asset, amount, mintless_claimed, timestamp, lt,
+(SELECT max(block_date) FROM "datalake"."balances_history$partitions") as block_date
+from ranks where rank = 1
+and (SELECT max(block_date) FROM "datalake"."balances_history$partitions") != 
+(SELECT max(block_date) FROM "datalake"."balances_snapshot$partitions") 
+
+
 -- views
 create or replace view "jetton_metadata_latest"
 as

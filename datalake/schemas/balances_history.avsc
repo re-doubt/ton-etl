@@ -1,0 +1,45 @@
+{
+  "namespace": "ton",
+  "type": "record",
+  "name": "balances_history",
+  "fields": [
+    {
+      "name": "address",
+      "type": "string"
+    },
+    {
+      "name": "asset",
+      "type": "string"
+    },
+    {
+      "name": "amount",
+      "type": [
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 38,
+          "scale": 0
+        },
+        "null"
+      ]
+    },
+    {
+      "name": "mintless_claimed",
+      "type": ["boolean", "null"]
+    },
+    {
+      "name": "timestamp",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "lt",
+      "type": [
+        "long",
+        "null"
+      ]
+    }
+  ]
+}
