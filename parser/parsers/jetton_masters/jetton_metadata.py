@@ -69,8 +69,9 @@ class JettonMastersMetadataParser(Parser):
         metadata = db.get_jetton_metadata(address)
         prev_ts_onchain = metadata.update_time_onchain if metadata else 0
         prev_ts_offchain = metadata.update_time_metadata if metadata else 0
-        updated = False
-        metadata_updated = False
+        created = False
+        onchain_updated = False
+        offchain_updated = False
         def normalize_json(s):
             if s and type(s) == str:
                 return json.dumps(json.loads(s))
@@ -81,24 +82,23 @@ class JettonMastersMetadataParser(Parser):
         if metadata:
             logger.info(f"Jetton metadata for {address} already exists")
             if metadata.mintable != obj.get("mintable", None):
-                updated = True
+                onchain_updated = True
                 logger.info(f"Mintable flag has been changed for {address}: {metadata.mintable} -> {obj.get('mintable', None)}")
                 metadata.mintable = obj.get("mintable", None)
             if metadata.admin_address != obj.get("admin_address", None):
-                updated = True
+                onchain_updated = True
                 logger.info(f"Admin address has been changed for {address}: {metadata.admin_address} -> {obj.get('admin_address', None)}")
                 metadata.admin_address = obj.get("admin_address", None)
             if normalize_json(metadata.jetton_content_onchain) != normalize_json(obj.get("jetton_content", None)):
-                updated = True
-                metadata_updated = True
+                onchain_updated = True
                 logger.info(f"Jetton content has been changed for {address}: {metadata.jetton_content_onchain} -> {obj.get('jetton_content', None)}")
                 metadata.jetton_content_onchain = obj.get("jetton_content", None)
             if metadata.jetton_wallet_code_hash != obj.get("jetton_wallet_code_hash", None):
-                updated = True
+                onchain_updated = True
                 logger.info(f"Jetton wallet code hash has been changed for {address}: {metadata.jetton_wallet_code_hash} -> {obj.get('jetton_wallet_code_hash', None)}")
                 metadata.jetton_wallet_code_hash = obj.get("jetton_wallet_code_hash", None)
             if metadata.code_hash != obj.get("code_hash", None):
-                updated = True
+                onchain_updated = True
                 logger.info(f"Code hash has been changed for {address}: {metadata.code_hash} -> {obj.get('code_hash', None)}")
                 metadata.code_hash = obj.get("code_hash", None)
         else:
@@ -112,10 +112,11 @@ class JettonMastersMetadataParser(Parser):
                 jetton_wallet_code_hash=obj.get("jetton_wallet_code_hash", None),
                 code_hash=obj.get("code_hash", None)
             )
-            updated = True
+            created = True
+
         if (
-            updated 
-            or metadata_updated 
+            onchain_updated
+            or created
             or not metadata.update_time_metadata 
             or metadata.update_time_metadata < time.time() - OFFCHAIN_UPDATE_TIME_INTERVAL
             or metadata.metadata_status == OFFCHAIN_UPDATE_STATUS_ERROR
@@ -145,7 +146,6 @@ class JettonMastersMetadataParser(Parser):
                 decimals = append_onchain_metadata('decimals')
                 
                 uri = jetton_content.get('uri', None)
-                tonapi_response = None
 
                 def update_metadata(index, obj, key, prev, source=METADATA_OFFCHAIN):
                     if sources[index] == "" and obj.get(key, None):
@@ -226,8 +226,11 @@ class JettonMastersMetadataParser(Parser):
                 metadata.sources = ",".join(sources)
 
             metadata.update_time_metadata = time.time()
-            updated = True
-        if updated:
+            offchain_updated = True
+
+        if onchain_updated:
             metadata.update_time_onchain=obj.get("last_tx_now", None)
+
+        if onchain_updated or offchain_updated:
             logger.info(f"Upserting jetton metadata for {address}")
             db.upsert_jetton_metadata(metadata, prev_ts_onchain, prev_ts_offchain)
