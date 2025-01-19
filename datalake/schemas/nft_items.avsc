@@ -13,15 +13,7 @@
     },
     {
       "name": "index",
-      "type": [
-        {
-          "type": "bytes",
-          "logicalType": "decimal",
-          "precision": 79,
-          "scale": 0
-        },
-        "null"
-      ]
+      "type": ["string", "null"]
     },
     {
       "name": "collection_address",
