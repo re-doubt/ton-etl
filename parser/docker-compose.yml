@@ -24,7 +24,7 @@ services:
       - SUPPORTED_PARSERS=JettonMastersMetadataParser
       - KAFKA_TOPICS=ton.public.jetton_masters
       - COMMIT_BATCH_SIZE=1
-      - MIN_MATURITY_SECONDS=10
+      - MIN_MATURITY_SECONDS=30
     env_file:
       - parser.env
     logging:
