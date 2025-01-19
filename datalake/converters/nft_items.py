@@ -23,7 +23,7 @@ class NFTItemsConverter(Converter):
         return {
             "address": obj['address'],
             "is_init": obj['init'],
-            "index": self.decode_numeric(obj['index']),
+            "index": str(self.decode_numeric(obj['index'])),
             "collection_address": obj['collection_address'],
             "owner_address": obj['owner_address'],
             "content_onchain": obj['content'],
