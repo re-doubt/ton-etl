@@ -223,6 +223,24 @@ services:
       options:
         max-size: 10M
 
+  exporter_nft_sales:
+    build: ./
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      - KAFKA_GROUP_ID=exporter_nft_sales
+      - KAFKA_TOPICS=ton.public.getgems_nft_sales,ton.public.getgems_nft_auctions
+      - CONVERTER=nft_sales
+      - PARTITION_MODE=adding_date
+    env_file:
+      - exporter.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
   streaming:
     build:
       context: ./

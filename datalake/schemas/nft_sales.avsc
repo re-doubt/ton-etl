@@ -1,0 +1,101 @@
+{
+  "namespace": "ton",
+  "type": "record",
+  "name": "nft_sales",
+  "fields": [
+    {
+      "name": "address",
+      "type": "string"
+    },
+    {
+      "name": "type",
+      "type": "string"
+    },
+    {
+      "name": "nft_address",
+      "type": ["string", "null"]
+    },
+    {
+      "name": "nft_owner_address",
+      "type": ["string", "null"]
+    },
+    {
+      "name": "created_at",
+      "type": ["int", "null"]
+    },
+    {
+      "name": "is_complete",
+      "type": ["boolean", "null"]
+    },
+    {
+      "name": "is_canceled",
+      "type": ["boolean", "null"]
+    },
+    {
+      "name": "end_time",
+      "type": ["int", "null"]
+    },
+    {
+      "name": "marketplace_address",
+      "type": ["string", "null"]
+    },
+    {
+      "name": "marketplace_fee_address",
+      "type": ["string", "null"]
+    },
+    {
+      "name": "marketplace_fee",
+      "type": [{"type": "bytes","logicalType": "decimal","precision": 38,"scale": 0}, "null"]
+    },
+    {
+      "name": "price",
+      "type": [{"type": "bytes","logicalType": "decimal","precision": 38,"scale": 0}, "null"]
+    },
+    {
+      "name": "asset",
+      "type": ["string", "null"]
+    },
+    {
+      "name": "royalty_address",
+      "type": ["string", "null"]
+    },
+    {
+      "name": "royalty_amount",
+      "type": [{"type": "bytes","logicalType": "decimal","precision": 38,"scale": 0}, "null"]
+    },
+    {
+      "name": "max_bid",
+      "type": [{"type": "bytes","logicalType": "decimal","precision": 38,"scale": 0}, "null"]
+    },
+    {
+      "name": "min_bid",
+      "type": [{"type": "bytes","logicalType": "decimal","precision": 38,"scale": 0}, "null"]
+    },
+    {
+      "name": "min_step",
+      "type": [{"type": "bytes","logicalType": "decimal","precision": 38,"scale": 0}, "null"]
+    },
+    {
+      "name": "last_bid_at",
+      "type": ["int", "null"]
+    },
+    {
+      "name": "last_member",
+      "type": ["string", "null"]
+    },
+    {
+      "name": "timestamp",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "lt",
+      "type": [
+        "long",
+        "null"
+      ]
+    }
+  ]
+}
