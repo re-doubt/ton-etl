@@ -8,6 +8,7 @@ TOPIC_JETTON_BURN = "ton.public.jetton_burns"
 TOPIC_JETTON_MINT = "ton.parsed.jetton_mint"
 TOPIC_JETTON_METADATA = "ton.parsed.jetton_metadata"
 TOPIC_NFT_ITEMS = "ton.public.nft_items"
+TOPIC_NFT_TRANSFERS = "ton.public.nft_transfers"
 
 TOPIC_DEX_SWAPS = "ton.parsed.dex_swap_parsed"
 TOPIC_GASPUMP_EVENTS = "ton.parsed.gaspump_trade"
