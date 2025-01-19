@@ -205,6 +205,24 @@ services:
       options:
         max-size: 10M
 
+  exporter_nft_transfers:
+    build: ./
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      - KAFKA_GROUP_ID=exporter_nft_transfers
+      - KAFKA_TOPICS=ton.public.nft_transfers
+      - CONVERTER=nft_transfers
+      - PARTITION_MODE=adding_date
+    env_file:
+      - exporter.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
   streaming:
     build:
       context: ./
