@@ -468,3 +468,68 @@ as
 select * from "jetton_metadata_snapshots"
 where snapshot_date = (SELECT max(snapshot_date) FROM "jetton_metadata_snapshots")
 
+-- jetton_price daily, backport from Dune - https://dune.com/queries/4438952
+  
+CREATE OR REPLACE VIEW jetton_price_daily
+AS
+WITH
+DT AS (
+    SELECT 
+        CASE
+            WHEN token_sold_address = UPPER('0:b113a994b5024a16719f69139328eb759596c38a25f59028b146fecdc3621dfe') 
+                THEN token_bought_address
+            WHEN token_bought_address != UPPER('0:b113a994b5024a16719f69139328eb759596c38a25f59028b146fecdc3621dfe')
+                 AND token_sold_address IN (
+                     '0:0000000000000000000000000000000000000000000000000000000000000000',
+                     UPPER('0:8cdc1d7640ad5ee326527fc1ad0514f468b30dc84b0173f0e155f451b4e11f7c')
+                 )
+                THEN token_bought_address
+            ELSE token_sold_address
+        END AS token_address,
+        CASE
+            WHEN token_sold_address = UPPER('0:b113a994b5024a16719f69139328eb759596c38a25f59028b146fecdc3621dfe') 
+                THEN amount_bought_raw
+            WHEN token_bought_address != UPPER('0:b113a994b5024a16719f69139328eb759596c38a25f59028b146fecdc3621dfe')
+                 AND token_sold_address IN ( 
+                     '0:0000000000000000000000000000000000000000000000000000000000000000',
+                     UPPER('0:8cdc1d7640ad5ee326527fc1ad0514f468b30dc84b0173f0e155f451b4e11f7c')
+                 )
+                THEN amount_bought_raw
+            ELSE amount_sold_raw
+        END AS amount_raw,
+        volume_usd,
+        volume_ton,
+        from_unixtime(event_time) as block_time
+    FROM datalake.dex_trades
+    WHERE amount_bought_raw > 100 AND amount_sold_raw > 100
+)
+
+-- add missing USDT trades to store all prices in one table
+, USDT_TRADES AS (
+    SELECT 
+        UPPER('0:b113a994b5024a16719f69139328eb759596c38a25f59028b146fecdc3621dfe') AS token_address,
+        CAST(amount_raw AS DOUBLE) / volume_ton * volume_usd * POWER(10, 6-9) AS amount_raw, -- ton
+        volume_usd, 
+        volume_ton,
+        block_time
+    FROM DT
+    WHERE token_address = '0:0000000000000000000000000000000000000000000000000000000000000000'
+)
+
+, ALL_TRADES AS (
+    SELECT *
+    FROM DT
+    UNION ALL
+    SELECT * 
+    FROM USDT_TRADES
+)
+
+SELECT
+    token_address,
+    DATE_TRUNC('day', block_time) AS ts,
+    SUM(volume_ton) / SUM(CAST(amount_raw AS DOUBLE)) AS price_ton,
+    SUM(volume_usd) / SUM(CAST(amount_raw AS DOUBLE)) AS price_usd,
+    COUNT(*) AS trades_count
+FROM ALL_TRADES
+GROUP BY 1, 2
+ORDER BY 1, 2 DESC;
