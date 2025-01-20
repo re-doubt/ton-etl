@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from parsers.accounts.nfts_parser import NFTItemsParser
 from parsers.accounts.staking_pools import StakingPoolsParser
 from parsers.message.tonco import TONCOSwap
 from parsers.jetton_transfer.megaton import MegatonDexSwap
@@ -68,6 +69,7 @@ _parsers = [
 
     NFTsRecover(EMULATOR_PATH),
     JettonWalletsRecover(EMULATOR_PATH),
+    NFTItemsParser(EMULATOR_PATH),
     
     CommentsDecoder(),
 
