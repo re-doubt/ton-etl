@@ -263,7 +263,7 @@ class DB():
                             """, (address.to_str(is_user_friendly=False).upper(), index,
                                   serialize_addr(collection_address),
                                   serialize_addr(owner_address), last_trans_lt,
-                                   last_tx_now, init, content))
+                                   last_tx_now, init, json.dumps(content)))
             self.updated += 1
 
 
