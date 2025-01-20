@@ -115,6 +115,9 @@ class NFTItemsParser(EmulatorParser):
                 return
             init, index, collection_address, \
                 owner_address, individual_content = res[0:5]
+            if type(init) != int:
+                logger.warning(f"Failed to parse NFT data, init is not int: {init}")
+                return
         except Exception as e:
             # 32 - Action list is invalid, specific to wallet v3, https://docs.ton.org/v3/documentation/tvm/tvm-exit-codes
             if isinstance(e, EmulatorException) and e.result and e.result['vm_exit_code'] in [11, 32]:
@@ -155,6 +158,9 @@ class NFTItemsParser(EmulatorParser):
             content = individual_content
 
         if type(content) != dict:
+            if type(content) != Cell:
+                logger.warning(f"Failed to parse NFT content, not a cell: {content}")
+                return
             content = self.parse_metadata(content)
     
         logger.info(f"New NFT discovered: {nft_address}: {index} {collection_address} {owner_address} {obj['last_trans_lt']} {content}")
