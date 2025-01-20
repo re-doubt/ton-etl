@@ -23,3 +23,14 @@ def test_onchain_metadata_chunked():
         'description': 'Random Meridian character generated while mining $MRDN token',
         'image': 'data:image/svg+xml;utf8,<svg viewBox="0 0 160 160" width="160" height="160" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><path fill="rgb(213,228,229)" d="M0 0 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 10 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 20 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 30 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 40 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 50 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 60 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 70 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 80 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 90 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 100 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 110 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 120 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 130 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 140 h160v10h-160z"/><path fill="rgb(213,228,229)" d="M0 150 h160v10h-160z"/>'
     }
+
+def test_onchain_parsing_2_nexton():
+    metadata = parser.parse_metadata(Cell.one_from_boc("te6ccgECGAEAAroAAQMAwAECASACBwICdgMFAUG+yC62Y7V6ABkvSmrEZyiN8t/t252hvuKPZSHIvr0h8ewEAKQAaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL05leC1UT04vTmV4dG9uX0NvbnRyYWN0cy9tYWluL05ld0l0ZW1fSW1hZ2UuanBnAUG+zwG6gBPzWPT8rekOkTsJ4AEnY8z1/b/xQJuPCKn83tQGAA0AUKfns8vIAgEgCBACASAJDgIBYgoMAUG+qjU3/w285+7DXWntw6GJ7m8X2C81OlU/mqlssL486JgLADQATmV4dG9uIFN0YWtpbmcgRGVyaXZhdGl2ZQFBvrUbcfhE1uUSgUsgFHQ5VrNfJXOWdYJDKty9Hb+HJA8YDQBCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATxoAAUG/eVCEa2G1BMRsCjX9lwPedMCr8ORSOR4lUUdHFUf5yKkPAEIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGeLbj4CASARFgIBIBIUAUG/JBG96N60Op87nM1WYT6VCiYL4s3yPe87JH3rHGnzRBITAIoASG9sZHMgaW5mb3JtYXRpb24gYWJvdXQgdGhlIHVzZXIncyBzdGFrZSBpbiB0aGUgTmV4dG9uIHBsYXRmb3JtIHBvb2wBQb8WThuCuQ14pL74OvNuVS3XtX7OSIJEnfLGfeY/F1QcYhUADABOeFRPTgFBv2EhliSawy9lYGDhoGZRBOT2M/UjLkke7hfp4QvIzVvLFwDEAFsnaHR0cHM6Ly90d2l0dGVyLmNvbS9OZXh0b25Ob2RlJywgJ2h0dHBzOi8vd3d3Lm5leHRvbi5zb2x1dGlvbnMvJywgJ2h0dHBzOi8vdC5tZS9uZXh0b25nbG9iYWwnIF0="))
+    assert metadata == {
+        "name": "Nexton Staking Derivative",
+        "image": "https://raw.githubusercontent.com/Nex-TON/Nexton_Contracts/main/NewItem_Image.jpg",
+        "description": "Holds information about the user's stake in the Nexton platform pool"
+        }
+
+
+    
