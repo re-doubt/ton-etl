@@ -40,10 +40,8 @@ Any non zero exit codes from the emulator are considered non critical
 and are ignored.
 """
 class EmulatorException(NonCriticalParserError):
-    def __init__(self, message):
-        super().__init__(message)
 
-    def __init__(self, message, result):
+    def __init__(self, message, result = None):
         super().__init__(message)
         self.result = result
     
