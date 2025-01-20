@@ -111,7 +111,7 @@ class NFTItemsParser(EmulatorParser):
         try:
             res = self._execute_method(emulator, 'get_nft_data', [], db, obj)
             if len(res) < 5:
-                logger.warning(f"Failed to parse NFT data, too short response {res}")
+                logger.warning(f"Failed to parse NFT data, too short response {res} for {nft_address}")
                 return
             init, index, collection_address, \
                 owner_address, individual_content = res[0:5]
