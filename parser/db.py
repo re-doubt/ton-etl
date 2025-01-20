@@ -658,7 +658,7 @@ class DB():
                            metadata_status = EXCLUDED.metadata_status,
                            name = EXCLUDED.name,
                            description = EXCLUDED.description,
-                           attibutes = EXCLUDED.attibutes,
+                           attributes = EXCLUDED.attributes,
                            image = EXCLUDED.image,
                            image_data = EXCLUDED.image_data,
                            sources = EXCLUDED.sources,
