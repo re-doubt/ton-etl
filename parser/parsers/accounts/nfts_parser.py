@@ -116,7 +116,8 @@ class NFTItemsParser(EmulatorParser):
             init, index, collection_address, \
                 owner_address, individual_content = res[0:5]
         except Exception as e:
-            if isinstance(e, EmulatorException) and e.result['vm_exit_code'] == 11:
+            # 32 - Action list is invalid, specific to wallet v3, https://docs.ton.org/v3/documentation/tvm/tvm-exit-codes
+            if isinstance(e, EmulatorException) and e.result['vm_exit_code'] in [11, 32]:
                 self.code_hash_blacklist.add(obj['code_hash'])
                 logger.warning(f"Not an NFT: {e.result}, blacklisting code_hash")
                 return
