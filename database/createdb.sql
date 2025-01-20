@@ -348,3 +348,17 @@ CREATE TABLE parsed.staking_pools_nominators (
 );
 
 CREATE INDEX staking_pools_nominators_idx ON parsed.staking_pools_nominators (address);
+
+-- NFT items
+
+CREATE TABLE parsed.nft_items (
+	address public."tonaddr" NOT NULL,
+	init bool NULL,
+	"index" numeric NULL,
+	collection_address public."tonaddr" NULL,
+	owner_address public."tonaddr" NULL,
+	"content" jsonb NULL,
+	last_transaction_lt int8 NULL,
+	last_tx_now int4 NULL,
+	CONSTRAINT nft_items_parsed_pkey PRIMARY KEY (address)
+);

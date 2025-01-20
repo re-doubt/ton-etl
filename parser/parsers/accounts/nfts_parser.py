@@ -147,12 +147,6 @@ class NFTItemsParser(EmulatorParser):
 
         if type(content) != dict:
             content = self.parse_metadata(content)
-
-        logger.info(f"Parsed NFT {nft_address}: {content}")
     
-        logger.info(f"New NFT discovered: {nft_address}: {index} {collection_address} {owner_address} {obj['last_trans_lt']}")
-        # db.insert_nft_item_v2(nft_address, index, collection_address, owner_address, obj['last_trans_lt'], obj['last_tx_now'], init, individual_content)
-
-        # Ignore contnet at this method, because it requires one more get method invocation
-        # db.insert_nft_item(nft_address, index, collection_address, owner_address, obj['last_trans_lt'],
-        #                    obj['code_hash'], obj['data_hash'])
+        logger.info(f"New NFT discovered: {nft_address}: {index} {collection_address} {owner_address} {obj['last_trans_lt']} {content}")
+        db.insert_nft_item_v2(nft_address, index, collection_address, owner_address, obj['last_trans_lt'], obj['last_tx_now'], init, individual_content)
