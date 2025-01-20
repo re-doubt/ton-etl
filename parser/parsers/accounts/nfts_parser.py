@@ -25,8 +25,6 @@ class NFTItemsParser(EmulatorParser):
 
     def prepare(self, db: DB):
         super().prepare(db)
-        # self.uniq_codes = db.get_uniq_nft_item_codes()
-        # logger.info(f"Found {len(self.uniq_codes)} unique NFT item codes")
 
     def predicate(self, obj) -> bool:
         if super().predicate(obj):
@@ -119,7 +117,6 @@ class NFTItemsParser(EmulatorParser):
         
         try:
             collection_address = collection_address.load_address()
-            # TODO support for collectionless addresses
         except Exception as e:
             logger.warning(f"Failed to load collection address: {e}")
             collection_address = None
