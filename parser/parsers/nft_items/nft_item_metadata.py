@@ -103,7 +103,7 @@ class NFTItemMetadataParser(Parser):
             or not metadata.tonapi_image_url
         ):
             content = obj.get('content', None)
-            if not content:
+            if not content or type(json.loads(content)) is not dict:
                 logger.warning(f"NFT item content is not set for {address}")
                 metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_NO
             else:
