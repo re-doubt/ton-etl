@@ -8,7 +8,6 @@ class NFTItemMetadata:
 
     address: str
     update_time_onchain: int
-    update_time_metadata: int = None
     content: str
     metadata_status: int = 0
     name: str = None
@@ -18,3 +17,4 @@ class NFTItemMetadata:
     image_data: str = None
     sources: str = None
     tonapi_image_url: str = None
+    update_time_metadata: int = None
