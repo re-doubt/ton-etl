@@ -38,7 +38,7 @@ class NFTItemsParser(EmulatorParser):
                 kind = value_cs.load_uint(8)
                 if kind == 0: # snake format
                     try:
-                        return value_cs.load_snake_string()
+                        return value_cs.load_snake_string().replace('\x00', '')
                     except Exception as e:
                         logger.warning(f"Failed to load snake string: {e}")
                         return None
@@ -49,7 +49,7 @@ class NFTItemsParser(EmulatorParser):
                     while idx in chunks:
                         out += chunks[idx]
                         idx += 1
-                    return out
+                    return out.replace('\x00', '')
                 else:
                     raise Exception(f"Unknown metadata value kind: {kind}")
             else:
@@ -153,4 +153,4 @@ class NFTItemsParser(EmulatorParser):
             content = self.parse_metadata(content)
     
         logger.info(f"New NFT discovered: {nft_address}: {index} {collection_address} {owner_address} {obj['last_trans_lt']} {content}")
-        db.insert_nft_item_v2(nft_address, index, collection_address, owner_address, obj['last_trans_lt'], obj['timestamp'], init != 0, content)
+        # db.insert_nft_item_v2(nft_address, index, collection_address, owner_address, obj['last_trans_lt'], obj['timestamp'], init != 0, content)
