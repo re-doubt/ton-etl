@@ -644,7 +644,7 @@ class DB():
             if content and type(content) == dict:
                 content = json.dumps(content)
             attributes = metadata.attributes
-            if attributes and type(attributes) == dict:
+            if attributes and type(attributes) in (dict, list):
                 attributes = json.dumps(attributes)
             cursor.execute("""
             insert into parsed.nft_item_metadata(address, update_time_onchain, update_time_metadata, 
