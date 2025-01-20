@@ -107,10 +107,14 @@ class NFTItemsParser(EmulatorParser):
     def _do_parse(self, obj, db: DB, emulator: TvmEmulator):
         nft_address = Address(obj['account'])
 
-        logger.info(f"Parsing NFT {nft_address}")
+        # logger.info(f"Parsing NFT {nft_address}")
         try:
+            res = self._execute_method(emulator, 'get_nft_data', [], db, obj)
+            if len(res) < 5:
+                logger.warning(f"Failed to parse NFT data, too short response {res}")
+                return
             init, index, collection_address, \
-                owner_address, individual_content = self._execute_method(emulator, 'get_nft_data', [], db, obj)
+                owner_address, individual_content = res[0:5]
         except Exception as e:
             if isinstance(e, EmulatorException) and e.result['vm_exit_code'] == 11:
                 self.code_hash_blacklist.add(obj['code_hash'])
@@ -153,4 +157,4 @@ class NFTItemsParser(EmulatorParser):
             content = self.parse_metadata(content)
     
         logger.info(f"New NFT discovered: {nft_address}: {index} {collection_address} {owner_address} {obj['last_trans_lt']} {content}")
-        # db.insert_nft_item_v2(nft_address, index, collection_address, owner_address, obj['last_trans_lt'], obj['timestamp'], init != 0, content)
+        db.insert_nft_item_v2(nft_address, index, collection_address, owner_address, obj['last_trans_lt'], obj['timestamp'], init != 0, content)
