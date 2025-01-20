@@ -244,6 +244,29 @@ class DB():
             self.updated += 1
 
 
+    def insert_nft_item_v2(self, address, index, collection_address, owner_address, last_trans_lt, last_tx_now, init, content):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(f"""
+                insert into parsed.nft_items(address, "index", collection_address, owner_address, 
+                           last_transaction_lt, last_tx_now, init, content)
+                           values (%s, %s, %s, %s, %s, %s, %s, %s)
+                on conflict(address) do update set
+                           init = EXCLUDED.init,
+                           index = EXCLUDED.index,
+                           collection_address = EXCLUDED.collection_address,
+                           owner_address = EXCLUDED.owner_address,
+                           content = EXCLUDED.content,
+                           last_transaction_lt = EXCLUDED.last_transaction_lt,
+                           last_tx_now = EXCLUDED.last_tx_now
+                           WHERE nft_items.last_transaction_lt < EXCLUDED.last_transaction_lt
+                            """, (address.to_str(is_user_friendly=False).upper(), index,
+                                  serialize_addr(collection_address),
+                                  serialize_addr(owner_address), last_trans_lt,
+                                   last_tx_now, init, content))
+            self.updated += 1
+
+
     def insert_jetton_wallet(self, address, balance, owner, jetton, last_trans_lt, code_hash, data_hash):
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:

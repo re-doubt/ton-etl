@@ -40,7 +40,12 @@ Any non zero exit codes from the emulator are considered non critical
 and are ignored.
 """
 class EmulatorException(NonCriticalParserError):
-    pass
+    def __init__(self, message):
+        super().__init__(message)
+
+    def __init__(self, message, result):
+        super().__init__(message)
+        self.result = result
     
 """
 Utility base class for all pytvm backed parsers. Handles 
@@ -55,9 +60,10 @@ CREATE TABLE parsed.mc_libraries (
 """
 class EmulatorParser(Parser):
     def __init__(self, emulator_path):
-        self.engine = EmulatorEngineC(emulator_path)
-        self.engine.emulator_set_verbosity_level(0)
-        logger.info(f"Emulator initialized {emulator_path}!")
+        if emulator_path is not None:
+            self.engine = EmulatorEngineC(emulator_path)
+            self.engine.emulator_set_verbosity_level(0)
+            logger.info(f"Emulator initialized {emulator_path}!")
         self.libs = None
 
     def topics(self):
@@ -116,7 +122,7 @@ class EmulatorParser(Parser):
     def _execute_method(self, emulator, method, stack, db: DB, obj):
         result = emulator.run_get_method(method=method, stack=stack)
         if not result['success']:
-            raise EmulatorException(f"Method {method} execution failed: {result}")
+            raise EmulatorException(f"Method {method} execution failed: {result}", result)
         if result['vm_exit_code'] == 9 and 'missing_library' in result and result['missing_library'] is not None:
             missing_library = result['missing_library']
 
@@ -132,7 +138,8 @@ class EmulatorParser(Parser):
             return self._execute_method(emulator, method, stack, db, obj)
             
         if result['vm_exit_code'] != 0:
-            raise EmulatorException(f"Method {method} execution failed with wrong exit code {result['vm_exit_code']}: {result}")
+            raise EmulatorException(f"Method {method} execution failed with wrong exit code {result['vm_exit_code']}: {result}", result)
+        # logger.info(f"Method {method} execution result: {result}")
         return result['stack']
 
     # Actual implementation
