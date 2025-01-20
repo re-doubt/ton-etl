@@ -12,7 +12,7 @@ def test_onchain_metadata_direct():
     metadata = parser.parse_metadata(Cell.one_from_boc("te6ccgECEAEAAp8AAQMAwAECASACBAFDv/CC62Y7V6ABkvSmrEZyiN8t/t252hvuKPZSHIvr0h8ewAMAVgBodHRwczovL3RvbmNvLmlvL3N0YXRpYy90b25jby1sb2dvLW5mdC5wbmcCASAFBwFCv4KjU3/w285+7DXWntw6GJ7m8X2C81OlU/mqlssL486JBgA2AFBvb2wgd1RUb24tVVNE4oKuIFBvc2l0aW9uAgEgCA4BQ79SCN70b1odT53OZqswn0qFEwXxZvke952SPvWONPmiCAEJAU4AIzM4IExQIFBvc2l0aW9uOiBbIC04ODcyMjAgLT4gODg3MjIwIF0KAQALAfYKVGhpcyBORlQgcmVwcmVzZW50cyBhIGxpcXVpZGl0eSBwb3NpdGlvbiBpbiBhIFRPTkNPIHdUVG9uLVVTROKCriBwb29sLiBUaGUgb3duZXIgb2YgdGhpcyBORlQgY2FuIG1vZGlmeSBvciBjbGFpbSB0aGUgcmV3YXIMAf5kcy4KUG9vbCBBZGRyZXNzOiBFUUQyNXZTdEV3Yy1oMVFUMXFsc1lQUXdxVTVJaU9ob3g1SUkwQ194c0ROcE1WbzcKd1RUb24gTWFzdGVyIEFkZHJlc3M6IEVRQ1VuRXhtZGd3QUtBRGktajJLUEtUaHlRcVRjN1U2NTBjZ00wDQCmZzc4VXpaWG45SgpVU0Tigq4gTWFzdGVyIEFkZHJlc3M6IEVRQ3hFNm1VdFFKS0ZuR2ZhUk9US090MWxaYkRpaVgxa0NpeFJ2N053MklkX3NEcwoBQb9jabZt8hHKr8RkIu1tpovrTgGp91LycCwKZP+4ORW37w8AVgBbeyJ0cmFpdF90eXBlIjogIkRFWCIsICJ2YWx1ZSI6ICJUT05DTyIgfV0="))
     assert metadata == {
         'name': 'Pool wTTon-USD₮ Position',
-        'description': '\x00#38 LP Position: [ -887220 -> 887220 ]\nThis NFT represents a liquidity position in a TONCO wTTon-USD₮ pool. The owner of this NFT can modify or claim the rewards.\nPool Address: EQD25vStEwc-h1QT1qlsYPQwqU5IiOhox5II0C_xsDNpMVo7\nwTTon Master Address: EQCUnExmdgwAKADi-j2KPKThyQqTc7U650cgM0g78UzZXn9J\nUSD₮ Master Address: EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs\n',
+        'description': '#38 LP Position: [ -887220 -> 887220 ]\nThis NFT represents a liquidity position in a TONCO wTTon-USD₮ pool. The owner of this NFT can modify or claim the rewards.\nPool Address: EQD25vStEwc-h1QT1qlsYPQwqU5IiOhox5II0C_xsDNpMVo7\nwTTon Master Address: EQCUnExmdgwAKADi-j2KPKThyQqTc7U650cgM0g78UzZXn9J\nUSD₮ Master Address: EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs\n',
         'attributes': '[{"trait_type": "DEX", "value": "TONCO" }]', 'image': 'https://tonco.io/static/tonco-logo-nft.png'
     }
 
@@ -31,6 +31,7 @@ def test_onchain_parsing_2_nexton():
         "image": "https://raw.githubusercontent.com/Nex-TON/Nexton_Contracts/main/NewItem_Image.jpg",
         "description": "Holds information about the user's stake in the Nexton platform pool"
         }
+
 
 
     
