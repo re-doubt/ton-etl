@@ -37,7 +37,11 @@ class NFTItemsParser(EmulatorParser):
             if value_cs.remaining_bits >= 8:
                 kind = value_cs.load_uint(8)
                 if kind == 0: # snake format
-                    return value_cs.load_snake_string()
+                    try:
+                        return value_cs.load_snake_string()
+                    except Exception as e:
+                        logger.warning(f"Failed to load snake string: {e}")
+                        return None
                 elif kind == 1: # chunked
                     chunks = value_cs.load_dict(key_length=32, value_deserializer=lambda x: x.load_snake_string())
                     out = ""
