@@ -585,7 +585,6 @@ class DB():
                 update_time_onchain=row['update_time_onchain'],
                 update_time_metadata=row['update_time_metadata'],
                 content=row['content'],
-                code_hash=row['code_hash'],
                 metadata_status=row['metadata_status'],
                 name=row['name'],
                 description=row['description'],
