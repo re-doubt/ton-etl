@@ -33,7 +33,7 @@ class NFTItemsParser(EmulatorParser):
     
     def parse_metadata(self, content_cell: Cell):
         def value_deserializer(value_cs):
-            logger.info(f"value_cs: {value_cs.remaining_bits} {value_cs.refs}")
+            # logger.info(f"value_cs: {value_cs.remaining_bits} {value_cs.refs}")
             if value_cs.remaining_bits >= 8:
                 kind = value_cs.load_uint(8)
                 if kind == 0: # snake format
@@ -55,7 +55,7 @@ class NFTItemsParser(EmulatorParser):
             
 
         content = content_cell.begin_parse()
-        logger.info(f"{base64.b64encode(content_cell.to_boc()).decode()}")
+        # logger.info(f"{base64.b64encode(content_cell.to_boc()).decode()}")
         try:
             marker = content.load_uint(8)
         except Exception as e:
@@ -113,7 +113,7 @@ class NFTItemsParser(EmulatorParser):
                 logger.warning(f"Not an NFT: {e.result}, blacklisting code_hash")
                 return
             raise e
-        logger.info(f"Parsed NFT {nft_address}: {individual_content}")
+        # logger.info(f"Parsed NFT {nft_address}: {individual_content}")
         
         try:
             collection_address = collection_address.load_address()
