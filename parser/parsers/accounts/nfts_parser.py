@@ -149,4 +149,4 @@ class NFTItemsParser(EmulatorParser):
             content = self.parse_metadata(content)
     
         logger.info(f"New NFT discovered: {nft_address}: {index} {collection_address} {owner_address} {obj['last_trans_lt']} {content}")
-        db.insert_nft_item_v2(nft_address, index, collection_address, owner_address, obj['last_trans_lt'], obj['last_tx_now'], init, individual_content)
+        db.insert_nft_item_v2(nft_address, index, collection_address, owner_address, obj['last_trans_lt'], obj['timestamp'], init != 0, content)
