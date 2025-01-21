@@ -166,8 +166,14 @@ class NFTItemMetadataParser(Parser):
                             attributes = update_metadata(2, tonapi_metadata, "attributes", attributes, METADATA_TONAPI)
                             image = update_metadata(3, tonapi_metadata, "image", image, METADATA_TONAPI)
                             metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_OK
-                        except Exception as e2:
-                            logger.error(f"Error getting metadata from TonAPI for {address}: {e2}")
+                            previews = tonapi_response.json().get("previews", [])
+                            for preview in previews:
+                                if preview.get("resolution") == "500x500":
+                                    metadata.tonapi_image_url = preview.get("url")
+                                    break
+                            logger.info(f"TonAPI image url for {address}: {metadata.tonapi_image_url}")
+                        except Exception as e:
+                            logger.error(f"Error getting metadata from TonAPI for {address}: {e}")
                             metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_ERROR
                 else:
                     logger.warning(f"URI is not set for {address}")
