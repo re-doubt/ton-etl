@@ -4,12 +4,19 @@ import traceback
 from model.parser import Parser, TOPIC_ACCOUNT_STATES
 from loguru import logger
 from db import DB
-from pytoniq_core import Cell, Address, begin_cell, HashMap, Builder
+from pytoniq_core import Cell, Address, begin_cell, HashMap, Builder, ExternalAddress
 from pytvm.tvm_emulator.tvm_emulator import TvmEmulator
 from parsers.accounts.emulator import EmulatorException, EmulatorParser
 
 TON_DNS = Address('0:B774D95EB20543F186C06B371AB88AD704F7E256130CAF96189368A7D0CB6CCF')
+TELEMINT_COLLECTIONS = [
+    Address('EQAOQdwdw8kGftJCSFgOErM1mBjYPe4DBPq8-AhF6vr9si5N'), # Anonymous Telegram Numbers 
+    Address('EQCA14o1-VWhS2efqoh_9M1b_A9DtKTuoqfmkn83AbJzwnPi') # Telegram Usernames 
+    ]
 KEY_DOMAIN = 'domain'
+KEY_MAX_BID_ADDRESS = 'max_bid_address'
+KEY_MAX_BID_AMOUNT = 'max_bid_amount'
+KEY_AUCTION_END_TIME = 'auction_end_time'
 KEY_URI = 'uri'
 KEYS = [(int(hashlib.sha256(k.encode()).hexdigest(), 16), k) for k in [KEY_URI, "name", "description", "image", "image_url", "image_data", "symbol", "content_url", "attributes"]]
 
@@ -89,6 +96,10 @@ class NFTItemsParser(EmulatorParser):
         return content
     
     def get_collection_emulator(self, db: DB, collection_address):
+        logger.info(f"Getting emulator for {collection_address}")
+        if type(collection_address) == ExternalAddress:
+            logger.warning(f"External address {collection_address}")
+            return None
         if collection_address in self.collections_emulators:
             return self.collections_emulators[collection_address]
         res = db.get_latest_account_state(collection_address)
@@ -108,6 +119,8 @@ class NFTItemsParser(EmulatorParser):
         nft_address = Address(obj['account'])
 
         # logger.info(f"Parsing NFT {nft_address}")
+
+        additional_content = {}
         try:
             res = self._execute_method(emulator, 'get_nft_data', [], db, obj)
             if len(res) < 5:
@@ -151,9 +164,36 @@ class NFTItemsParser(EmulatorParser):
                 return
             if collection_address == TON_DNS:
                 domain, = self._execute_method(emulator, 'get_domain', [], db, obj)
-                content = {KEY_DOMAIN: domain.load_snake_string()}
+                max_bid_address, max_bid_amount, auction_end_time = self._execute_method(emulator, 'get_auction_info', [], db, obj)
+                content = {
+                    KEY_DOMAIN: domain.load_snake_string(),
+                    KEY_MAX_BID_ADDRESS: max_bid_address.load_address().to_str(0).upper() if max_bid_address is not None else None,
+                    KEY_MAX_BID_AMOUNT: max_bid_amount,
+                    KEY_AUCTION_END_TIME: auction_end_time
+                    }
             else:
-                content, = self._execute_method(collection_emulator, 'get_nft_content', [index, individual_content], db, obj)
+                content = individual_content
+            if collection_address in TELEMINT_COLLECTIONS:
+                try:
+                    bidder_address, bid, bid_ts, min_bid, end_time = self._execute_method(emulator, 'get_telemint_auction_state', [], db, obj)
+                    additional_content['bidder_address'] = bidder_address.load_address().to_str(0).upper()
+                    additional_content['bid'] = bid
+                    additional_content['bid_ts'] = bid_ts
+                    additional_content['min_bid'] = min_bid
+                    additional_content['end_time'] = end_time
+                except Exception as e:
+                    pass # not in auction state
+
+                try:
+                    beneficiar, initial_min_bid, max_bid, min_bid_step, min_extend_time, duration = self._execute_method(emulator, 'get_telemint_auction_config', [], db, obj)
+                    additional_content['beneficiar'] = beneficiar.load_address().to_str(0).upper()
+                    additional_content['initial_min_bid'] = initial_min_bid
+                    additional_content['max_bid'] = max_bid
+                    additional_content['min_bid_step'] = min_bid_step
+                    additional_content['min_extend_time'] = min_extend_time
+                    additional_content['duration'] = duration
+                except Exception as e:
+                    pass # not in auction state
         else:
             content = individual_content
 
@@ -162,6 +202,9 @@ class NFTItemsParser(EmulatorParser):
                 logger.warning(f"Failed to parse NFT content, not a cell: {content}")
                 return
             content = self.parse_metadata(content)
-    
+        if content is not None:
+            for k, v in additional_content.items():
+                content[k] = v
+
         logger.info(f"New NFT discovered: {nft_address}: {index} {collection_address} {owner_address} {obj['last_trans_lt']} {content}")
-        db.insert_nft_item_v2(nft_address, index, collection_address, owner_address, obj['last_trans_lt'], obj['timestamp'], init != 0, content)
+        # db.insert_nft_item_v2(nft_address, index, collection_address, owner_address, obj['last_trans_lt'], obj['timestamp'], init != 0, content)
