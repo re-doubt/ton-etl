@@ -20,6 +20,7 @@ from parsers.message.evaa import EvaaSupplyParser, EvaaWithdrawAndLiquidationPar
 from parsers.message.jetton_mint import JettonMintParser, HipoTokensMinted
 from parsers.nft_transfer.nft_history import NftHistoryParser
 from parsers.jetton_wallets.jetton_wallet_balances import JettonWalletBalancesParser
+from parsers.nft_items.nft_item_metadata import NFTItemMetadataParser
 from model.parser import Parser
 from loguru import logger
 import os
@@ -28,6 +29,7 @@ EMULATOR_PATH = os.environ.get("EMULATOR_LIBRARY")
 MIN_SWAP_VOLUME_FOR_PRICE = int(os.environ.get("MIN_SWAP_VOLUME_FOR_PRICE", "1"))
 METADATA_FETCH_TIMEOUT = int(os.environ.get("METADATA_FETCH_TIMEOUT", "10"))
 METADATA_FETCH_MAX_ATTEMPTS = int(os.environ.get("METADATA_FETCH_MAX_ATTEMPTS", "3"))
+TONAPI_ONLY_MODE = os.environ.get("TONAPI_ONLY_MODE", "0").lower() in ('true', '1')
 
 _parsers = [
     NftHistoryParser(),
@@ -74,7 +76,9 @@ _parsers = [
     CommentsDecoder(),
 
     JettonWalletBalancesParser(),
-    JettonMastersMetadataParser(METADATA_FETCH_TIMEOUT, METADATA_FETCH_MAX_ATTEMPTS)
+    JettonMastersMetadataParser(METADATA_FETCH_TIMEOUT, METADATA_FETCH_MAX_ATTEMPTS),
+
+    NFTItemMetadataParser(METADATA_FETCH_TIMEOUT, METADATA_FETCH_MAX_ATTEMPTS, TONAPI_ONLY_MODE)
 ]
 
 """

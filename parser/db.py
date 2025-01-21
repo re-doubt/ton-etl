@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from model.dexswap import DexSwapParsed
 from model.dexpool import DexPool
 from model.jetton_metadata import JettonMetadata
+from model.nft_item_metadata import NFTItemMetadata
 
 @dataclass
 class FakeRecord:
@@ -570,6 +571,31 @@ class DB():
             )
         
     """
+    Returns jetton metadata
+    """
+    def get_nft_item_metadata(self, address: str) -> NFTItemMetadata:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("select * from parsed.nft_item_metadata where address = %s", (address,))
+            row = cursor.fetchone()
+            if not row:
+                return None
+            return NFTItemMetadata(
+                address=row['address'],
+                update_time_onchain=row['update_time_onchain'],
+                update_time_metadata=row['update_time_metadata'],
+                content=row['content'],
+                metadata_status=row['metadata_status'],
+                name=row['name'],
+                description=row['description'],
+                attributes=row['attributes'],
+                image=row['image'],
+                image_data=row['image_data'],
+                sources=row['sources'],
+                tonapi_image_url=row['tonapi_image_url']
+            )
+        
+    """
     Upsert jetton metadata
     """
     def upsert_jetton_metadata(self, metadata: JettonMetadata, prev_ts_onchain: int, prev_ts_offchain: int):
@@ -604,6 +630,41 @@ class DB():
             """, (metadata.address, metadata.update_time_onchain, metadata.update_time_metadata, metadata.mintable, metadata.admin_address,
                   jetton_content, metadata.jetton_wallet_code_hash, metadata.code_hash, metadata.metadata_status,
                   metadata.symbol, metadata.name, metadata.description, metadata.image, metadata.image_data, metadata.decimals, metadata.sources,
+                  metadata.tonapi_image_url, prev_ts_onchain, prev_ts_offchain))
+            self.updated += 1
+
+    """
+    Upsert NFT item metadata
+    """
+    def upsert_nft_item_metadata(self, metadata: NFTItemMetadata, prev_ts_onchain: int, prev_ts_offchain: int):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            content = metadata.content
+            if content and type(content) == dict:
+                content = json.dumps(content)
+            attributes = metadata.attributes
+            if attributes and type(attributes) in (dict, list):
+                attributes = json.dumps(attributes)
+            cursor.execute("""
+            insert into parsed.nft_item_metadata(address, update_time_onchain, update_time_metadata, 
+                           content, metadata_status, name, description, attributes,
+                           image, image_data, sources, tonapi_image_url)
+                           values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                           on conflict (address) do update
+                           set update_time_onchain = EXCLUDED.update_time_onchain,
+                           update_time_metadata = EXCLUDED.update_time_metadata,
+                           content = EXCLUDED.content,
+                           metadata_status = EXCLUDED.metadata_status,
+                           name = EXCLUDED.name,
+                           description = EXCLUDED.description,
+                           attributes = EXCLUDED.attributes,
+                           image = EXCLUDED.image,
+                           image_data = EXCLUDED.image_data,
+                           sources = EXCLUDED.sources,
+                           tonapi_image_url = EXCLUDED.tonapi_image_url
+                           -- where jetton_metadata.update_time_onchain = %s and jetton_metadata.update_time_metadata = %s
+            """, (metadata.address, metadata.update_time_onchain, metadata.update_time_metadata, content, metadata.metadata_status,
+                  metadata.name, metadata.description, attributes, metadata.image, metadata.image_data, metadata.sources,
                   metadata.tonapi_image_url, prev_ts_onchain, prev_ts_offchain))
             self.updated += 1
 

@@ -362,3 +362,20 @@ CREATE TABLE parsed.nft_items (
 	last_tx_now int4 NULL,
 	CONSTRAINT nft_items_parsed_pkey PRIMARY KEY (address)
 );
+
+-- NFT item metadata
+
+CREATE TABLE parsed.nft_item_metadata (
+	address public.tonaddr NOT NULL PRIMARY KEY,
+	update_time_onchain int4 NULL,
+	update_time_metadata int4 NULL,
+	"content" jsonb NULL,
+	metadata_status int4 NULL,
+	"name" varchar NULL,
+	description varchar NULL,
+	"attributes" jsonb NULL,
+	image varchar NULL,
+	image_data varchar NULL,
+	sources varchar NULL,
+	tonapi_image_url varchar NULL
+);
