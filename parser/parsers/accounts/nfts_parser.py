@@ -172,7 +172,11 @@ class NFTItemsParser(EmulatorParser):
                     KEY_AUCTION_END_TIME: auction_end_time
                     }
             else:
-                content = individual_content
+                try:
+                    content, = self._execute_method(collection_emulator, 'get_nft_content', [index, individual_content], db, obj)
+                except Exception as e:
+                    logger.warning(f"Failed to get nft content: {e}")
+                    content = {}
             if collection_address in TELEMINT_COLLECTIONS:
                 try:
                     bidder_address, bid, bid_ts, min_bid, end_time = self._execute_method(emulator, 'get_telemint_auction_state', [], db, obj)
@@ -207,4 +211,4 @@ class NFTItemsParser(EmulatorParser):
                 content[k] = v
 
         logger.info(f"New NFT discovered: {nft_address}: {index} {collection_address} {owner_address} {obj['last_trans_lt']} {content}")
-        # db.insert_nft_item_v2(nft_address, index, collection_address, owner_address, obj['last_trans_lt'], obj['timestamp'], init != 0, content)
+        db.insert_nft_item_v2(nft_address, index, collection_address, owner_address, obj['last_trans_lt'], obj['timestamp'], init != 0, content)
