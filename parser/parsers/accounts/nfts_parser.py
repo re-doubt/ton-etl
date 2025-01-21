@@ -96,7 +96,7 @@ class NFTItemsParser(EmulatorParser):
         return content
     
     def get_collection_emulator(self, db: DB, collection_address):
-        logger.info(f"Getting emulator for {collection_address}")
+        # logger.info(f"Getting emulator for {collection_address}")
         if type(collection_address) == ExternalAddress:
             logger.warning(f"External address {collection_address}")
             return None
