@@ -195,7 +195,7 @@ services:
       replicas: 1
     environment:
       - KAFKA_GROUP_ID=exporter_nft_items
-      - KAFKA_TOPICS=ton.public.nft_items
+      - KAFKA_TOPICS=ton.parsed.nft_items
       - CONVERTER=nft_items
       - PARTITION_MODE=adding_date
     env_file:
