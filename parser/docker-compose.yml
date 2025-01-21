@@ -185,6 +185,7 @@ services:
       - KAFKA_TOPICS=ton.parsed.nft_items
       - COMMIT_BATCH_SIZE=1
       - MIN_MATURITY_SECONDS=30
+      - TONAPI_ONLY_MODE=true
     env_file:
       - parser.env
     logging:

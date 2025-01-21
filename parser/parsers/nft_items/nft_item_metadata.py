@@ -26,9 +26,10 @@ The parser extracts on-chain and off-chain metadata from NFT items and stores it
 """
 class NFTItemMetadataParser(Parser):
 
-    def __init__(self, timeout: int = 10, max_attempts: int = 3):
+    def __init__(self, timeout: int = 10, max_attempts: int = 3, tonapi_only_mode: bool = False):
         self.timeout = timeout
         self.max_attempts = max_attempts
+        self.tonapi_only_mode = tonapi_only_mode
 
     def topics(self):
         return [TOPIC_NFT_ITEMS]
@@ -135,18 +136,21 @@ class NFTItemMetadataParser(Parser):
                     else:
                         return prev
                 if uri:
-                    logger.info(f"Updating offchain metadata for {address}: {uri}")
-                    try:
-                        offchain_metadata = json.loads(self.fetch_url(uri))
-                        logger.info(f"Offchain metadata for {address}: {offchain_metadata}")
-                        name = update_metadata(0, offchain_metadata, "name", name, METADATA_OFFCHAIN)
-                        description = update_metadata(1, offchain_metadata, "description", description, METADATA_OFFCHAIN)
-                        attributes = update_metadata(2, offchain_metadata, "attributes", attributes, METADATA_OFFCHAIN)
-                        image = update_metadata(3, offchain_metadata, "image", image, METADATA_OFFCHAIN)
-                        image_data = update_metadata(4, offchain_metadata, "image_data", image_data, METADATA_OFFCHAIN)
-                        metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_OK
-                    except Exception as e:
-                        logger.error(f"Error updating offchain metadata for {address}: {e}")
+                    if not self.tonapi_only_mode:
+                        logger.info(f"Updating offchain metadata for {address}: {uri}")
+                        try:
+                            offchain_metadata = json.loads(self.fetch_url(uri))
+                            logger.info(f"Offchain metadata for {address}: {offchain_metadata}")
+                            name = update_metadata(0, offchain_metadata, "name", name, METADATA_OFFCHAIN)
+                            description = update_metadata(1, offchain_metadata, "description", description, METADATA_OFFCHAIN)
+                            attributes = update_metadata(2, offchain_metadata, "attributes", attributes, METADATA_OFFCHAIN)
+                            image = update_metadata(3, offchain_metadata, "image", image, METADATA_OFFCHAIN)
+                            image_data = update_metadata(4, offchain_metadata, "image_data", image_data, METADATA_OFFCHAIN)
+                            metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_OK
+                        except Exception as e:
+                            logger.error(f"Error updating offchain metadata for {address}: {e}")
+                            metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_ERROR
+                    if self.tonapi_only_mode or metadata.metadata_status == OFFCHAIN_UPDATE_STATUS_ERROR:
                         try:
                             logger.info(f"Trying to get metadata from TonAPI for {address}")
                             tonapi_response = requests.get(f"https://tonapi.io/v2/nfts/{address}", timeout=self.timeout, headers={
