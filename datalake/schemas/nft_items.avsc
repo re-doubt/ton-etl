@@ -1,7 +1,7 @@
 {
   "namespace": "ton",
   "type": "record",
-  "name": "nft_items",
+  "name": "nft_items_history",
   "fields": [
     {
       "name": "address",
