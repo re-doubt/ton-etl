@@ -33,5 +33,11 @@ def test_onchain_parsing_2_nexton():
         }
 
 
+def test_offchain_uri_escape_zero():
+    metadata = parser.parse_metadata(Cell.one_from_boc("te6ccgEBAQEARgAAiAEAaHR0cHM6Ly9zLmdldGdlbXMuaW8vbmZ0LXN0YWdpbmcvYy82MjhmNmFiODA3NzA2MGE3YThkNTJkNjMvMS5qc29u"))
+    assert metadata == {
+        "uri": "https://s.getgems.io/nft-staging/c/628f6ab8077060a7a8d52d63/1.json"
+        }
+
 
     

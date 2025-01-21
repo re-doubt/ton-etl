@@ -85,7 +85,7 @@ class NFTItemsParser(EmulatorParser):
                         out[key] = d[hashed_key]
                 return out
             elif marker == 1: # offchain metadata
-                uri = content.load_snake_string()
+                uri = content.load_snake_string().replace('\x00', '')
                 return {KEY_URI: uri}
             else:
                 logger.warning(f"Invalid marker: {marker}")
