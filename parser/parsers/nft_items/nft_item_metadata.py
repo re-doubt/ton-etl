@@ -160,6 +160,7 @@ class NFTItemMetadataParser(Parser):
                                     "Authorization": 'Bearer %s' % os.getenv("TONAPI_API_KEY")
                                     })
                                 if tonapi_response.status_code == 429:
+                                    logger.warning(f"Tonapi response status_code = 429 (Too Many Requests) for {address}. Setting a {retry_delay}s delay")
                                     time.sleep(retry_delay)
                                     retry_delay *= 2
                                     continue
