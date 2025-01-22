@@ -152,26 +152,33 @@ class NFTItemMetadataParser(Parser):
                             metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_ERROR
                     if self.tonapi_only_mode or metadata.metadata_status == OFFCHAIN_UPDATE_STATUS_ERROR:
                         try:
-                            logger.info(f"Trying to get metadata from TonAPI for {address}")
-                            tonapi_response = requests.get(f"https://tonapi.io/v2/nfts/{address}", timeout=self.timeout, headers={
-                                "User-Agent": DATALAKE_USER_AGENT,
-                                "Authorization": 'Bearer %s' % os.getenv("TONAPI_API_KEY")
-                                })
-                            if tonapi_response.status_code != 200:
-                                raise Exception(f"Response status_code = {tonapi_response.status_code}")
-                            logger.info(f"TonAPI response for {address}: {tonapi_response.json()}")
-                            tonapi_metadata = tonapi_response.json().get("metadata", None)
-                            name = update_metadata(0, tonapi_metadata, "name", name, METADATA_TONAPI)
-                            description = update_metadata(1, tonapi_metadata, "description", description, METADATA_TONAPI)
-                            attributes = update_metadata(2, tonapi_metadata, "attributes", attributes, METADATA_TONAPI)
-                            image = update_metadata(3, tonapi_metadata, "image", image, METADATA_TONAPI)
-                            metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_OK
-                            previews = tonapi_response.json().get("previews", [])
-                            for preview in previews:
-                                if preview.get("resolution") == "500x500":
-                                    metadata.tonapi_image_url = preview.get("url")
-                                    break
-                            logger.info(f"TonAPI image url for {address}: {metadata.tonapi_image_url}")
+                            retry_delay = 0.1
+                            while True:
+                                logger.info(f"Trying to get metadata from TonAPI for {address}")
+                                tonapi_response = requests.get(f"https://tonapi.io/v2/nfts/{address}", timeout=self.timeout, headers={
+                                    "User-Agent": DATALAKE_USER_AGENT,
+                                    "Authorization": 'Bearer %s' % os.getenv("TONAPI_API_KEY")
+                                    })
+                                if tonapi_response.status_code == 429:
+                                    time.sleep(retry_delay)
+                                    retry_delay *= 2
+                                    continue
+                                if tonapi_response.status_code != 200:
+                                    raise Exception(f"Response status_code = {tonapi_response.status_code}")
+                                logger.info(f"TonAPI response for {address}: {tonapi_response.json()}")
+                                tonapi_metadata = tonapi_response.json().get("metadata", None)
+                                name = update_metadata(0, tonapi_metadata, "name", name, METADATA_TONAPI)
+                                description = update_metadata(1, tonapi_metadata, "description", description, METADATA_TONAPI)
+                                attributes = update_metadata(2, tonapi_metadata, "attributes", attributes, METADATA_TONAPI)
+                                image = update_metadata(3, tonapi_metadata, "image", image, METADATA_TONAPI)
+                                previews = tonapi_response.json().get("previews", [])
+                                for preview in previews:
+                                    if preview.get("resolution") == "500x500":
+                                        metadata.tonapi_image_url = preview.get("url")
+                                        break
+                                metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_OK
+                                logger.info(f"TonAPI image url for {address}: {metadata.tonapi_image_url}")
+                                break
                         except Exception as e:
                             logger.error(f"Error getting metadata from TonAPI for {address}: {e}")
                             metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_ERROR
