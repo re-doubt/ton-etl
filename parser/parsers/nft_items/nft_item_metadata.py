@@ -153,14 +153,22 @@ class NFTItemMetadataParser(Parser):
                     if self.tonapi_only_mode or metadata.metadata_status == OFFCHAIN_UPDATE_STATUS_ERROR:
                         try:
                             retry_delay = 0.1
+                            timeout = self.timeout
                             while True:
                                 logger.info(f"Trying to get metadata from TonAPI for {address}")
-                                tonapi_response = requests.get(f"https://tonapi.io/v2/nfts/{address}", timeout=self.timeout, headers={
-                                    "User-Agent": DATALAKE_USER_AGENT,
-                                    "Authorization": 'Bearer %s' % os.getenv("TONAPI_API_KEY")
-                                    })
+                                try:
+                                    tonapi_response = requests.get(f"https://tonapi.io/v2/nfts/{address}", timeout=timeout, headers={
+                                        "User-Agent": DATALAKE_USER_AGENT,
+                                        "Authorization": 'Bearer %s' % os.getenv("TONAPI_API_KEY")
+                                        })
+                                except Exception as e:
+                                    logger.warning(f"Error getting metadata from TonAPI for {address}: {e}. Retrying after {retry_delay}s!")
+                                    time.sleep(retry_delay)
+                                    retry_delay *= 2
+                                    timeout = int(timeout * 1.5)
+                                    continue
                                 if tonapi_response.status_code == 429:
-                                    logger.warning(f"Tonapi response status_code = 429 (Too Many Requests) for {address}. Setting a {retry_delay}s delay")
+                                    logger.warning(f"TonAPI response status_code = 429 (Too Many Requests) for {address}. Retrying after {retry_delay}s!")
                                     time.sleep(retry_delay)
                                     retry_delay *= 2
                                     continue
