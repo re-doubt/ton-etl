@@ -21,8 +21,7 @@ KEY_URI = 'uri'
 KEYS = [(int(hashlib.sha256(k.encode()).hexdigest(), 16), k) for k in [KEY_URI, "name", "description", "image", "image_url", "image_data", "symbol", "content_url", "attributes"]]
 
 """
-TODO: nft_items from ton-index-worker has some missing cases for metadata and also
-there is a bug in datalake version that generates wrong timestamps
+Reimplementation of public.nft_items table from ton-index-worker.
 """
 class NFTItemsParser(EmulatorParser):
     def __init__(self, emulator_path):
