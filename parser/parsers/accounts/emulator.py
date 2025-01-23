@@ -112,6 +112,7 @@ class EmulatorParser(Parser):
                         rand_seed_hex="0443c4e42c6ae4c9e62b584098bc73a699c654130260ae0c4a8a24605921c0be", 
                         config=CONFIGCELL.get())
         emulator.set_libraries(self.libs)
+        emulator.set_gas_limit(10000000)
 
         return emulator
     
