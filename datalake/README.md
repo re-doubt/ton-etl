@@ -317,6 +317,55 @@ Fields:
 * timestamp - timestamp of the NFT state update
 * lt - logical time of the NFT state update
 
+## NFT transfers
+
+[AVRO schema](./schemas/nft_transfers.avsc)
+
+Partition field: __tx_now__
+URL: **s3://ton-blockchain-public-datalake/v1/nft_transfers/**
+
+Contains history of NFT transfers. Includes the following fields:
+* tx_hash - transaction hash
+* tx_lt - transaction logical time
+* tx_now - transaction block timestamp
+* tx_aborted - transaction aborted flag (aborted=true means that transfer was not successful)
+* query_id - query id
+* nft_item_address - NFT item address
+* nft_item_index - NFT item index
+* nft_collection_address - NFT collection address (may be null)
+* old_owner - old owner address
+* new_owner - new owner address
+* response_destination, custom_payload, forward_amount, forward_payload - see [TEP-62](https://github.com/ton-blockchain/TEPs/blob/master/text/0062-nft-standard.md)
+* comment - text comment from forward_payload
+* trace_id - trace id from the transaction
+
+
+## NFT sales contracts history
+
+[AVRO schema](./schemas/nft_sales.avsc)
+
+Partition field: __timestamp__
+URL: **s3://ton-blockchain-public-datalake/v1/nft_sales/**
+
+Contains history of NFT sales contracts. Includes the following fields:
+* address - NFT sales contract address
+* type - sale/auction. sale means fixed price sale, auction means auction with bids.
+* nft_address - NFT item address
+* nft_owner_address - NFT owner address
+* created_at - timestamp of the NFT sales contract creation
+* is_complete - true if the sale is complete
+* is_canceled - true if the sale is canceled (only for auction)
+* end_time - time of expiration of the sale
+* marketplace_address - address of the marketplace
+* marketplace_fee_address - address of the marketplace fee
+* marketplace_fee - amount of the marketplace fee
+* price - price of the NFT (current bid for auction)
+* asset - asset type, ``TON`` for native TON
+* royalty_address - address of the royalty
+* royalty_amount - amount of the royalty
+* max_bid, min_bid, min_step - max bid, min bid and min bit step for auction
+* last_bit_at, last_member - information about the last bid
+* timestamp, lt - state timestamp and logical time
 
 # Data corrections
 
