@@ -109,6 +109,11 @@ class NFTItemMetadataParser(Parser):
                 metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_NO
             else:
                 content = json.loads(content)
+                if "attributes" in content and type(content["attributes"]) is str:
+                    try:
+                        content["attributes"] = json.loads(content["attributes"].replace("'", '"'))
+                    except Exception:
+                        content["attributes"] = None
                 # track sources of metadata
                 sources = []
                 def append_onchain_metadata(key):
