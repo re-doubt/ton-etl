@@ -22,7 +22,12 @@
     {
       "name": "query_id",
       "type": [
-        "double",
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 20,
+          "scale": 0
+        },
         "null"
       ]
     },
@@ -36,7 +41,7 @@
     {
       "name": "nft_item_index",
       "type": [
-        "double",
+        "string",
         "null"
       ]
     },
@@ -78,7 +83,12 @@
     {
       "name": "forward_amount",
       "type": [
-        "double",
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 38,
+          "scale": 0
+        },
         "null"
       ]
     },

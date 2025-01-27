@@ -18,12 +18,13 @@ from converters.messages import MessageConverter, MessageWithDataConverter
 from converters.jetton_events import JettonEventsConverter
 from converters.blocks import BlocksConverter
 from converters.dex_trades import DexTradesConverter
-from converters.tradoor_position_change import TradoorPositionChangeConverter
 from converters.transactions import TransactionsConverter
 from converters.account_states import AccountStatesConverter
 from converters.jetton_metadata import JettonMetadataConverter
 from converters.dex_pools import DexPoolsConverter
-
+from converters.nft_items import NFTItemsConverter
+from converters.nft_transfers import NFTTransfersConverter
+from converters.nft_sales import NFTSalesConverter
 
 AVRO_TMP_BUFFER = "tmp_buffer.avro"
 FLUSH_INTERVAL = 100
@@ -38,7 +39,10 @@ CONVERTERS = {
     "jetton_metadata": JettonMetadataConverter(),
     "dex_trades": DexTradesConverter(),
     "dex_pools": DexPoolsConverter(),
-    "balances_history": BalancesHistoryConverter()
+    "balances_history": BalancesHistoryConverter(),
+    "nft_items": NFTItemsConverter(),
+    "nft_transfers": NFTTransfersConverter(),
+    "nft_sales": NFTSalesConverter()
 }
 
 FIELDS_TO_REMOVE = ['__op', '__table', '__source_ts_ms', '__lsn']
