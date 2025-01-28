@@ -21,6 +21,7 @@ from parsers.message.jetton_mint import JettonMintParser, HipoTokensMinted
 from parsers.nft_transfer.nft_history import NftHistoryParser
 from parsers.jetton_wallets.jetton_wallet_balances import JettonWalletBalancesParser
 from parsers.nft_items.nft_item_metadata import NFTItemMetadataParser
+from parsers.nft_collections.nft_collection_metadata import NFTCollectionMetadataParser
 from model.parser import Parser
 from loguru import logger
 import os
@@ -78,7 +79,8 @@ _parsers = [
     JettonWalletBalancesParser(),
     JettonMastersMetadataParser(METADATA_FETCH_TIMEOUT, METADATA_FETCH_MAX_ATTEMPTS),
 
-    NFTItemMetadataParser(METADATA_FETCH_TIMEOUT, METADATA_FETCH_MAX_ATTEMPTS, TONAPI_ONLY_MODE)
+    NFTItemMetadataParser(METADATA_FETCH_TIMEOUT, METADATA_FETCH_MAX_ATTEMPTS, TONAPI_ONLY_MODE),
+    NFTCollectionMetadataParser(METADATA_FETCH_TIMEOUT, METADATA_FETCH_MAX_ATTEMPTS, TONAPI_ONLY_MODE)
 ]
 
 """
