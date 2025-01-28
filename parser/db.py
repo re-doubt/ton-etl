@@ -703,7 +703,7 @@ class DB():
             if content and type(content) == dict:
                 content = json.dumps(content)
             cursor.execute("""
-            insert into parsed.nft_item_metadata(address, update_time_onchain, update_time_metadata, 
+            insert into parsed.nft_collection_metadata(address, update_time_onchain, update_time_metadata, 
                            content, metadata_status, name, description,
                            image, image_data, sources, tonapi_image_url)
                            values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
