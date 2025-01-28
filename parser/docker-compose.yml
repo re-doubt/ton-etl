@@ -176,6 +176,23 @@ services:
       options:
         max-size: 10M
 
+  parser_nft_collection_metadata:
+    build: ./
+    restart: always
+    environment:
+      - KAFKA_GROUP_ID=nft_collection_metadata
+      - SUPPORTED_PARSERS=NFTCollectionMetadataParser
+      - KAFKA_TOPICS=ton.public.nft_collections
+      - COMMIT_BATCH_SIZE=1
+      - MIN_MATURITY_SECONDS=30
+      - TONAPI_ONLY_MODE=false
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
   parser_nft_item_metadata:
     build: ./
     restart: always
