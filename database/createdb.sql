@@ -386,6 +386,7 @@ CREATE TABLE parsed.nft_collection_metadata (
 	address public.tonaddr NOT NULL PRIMARY KEY,
 	update_time_onchain int4 NULL,
 	update_time_metadata int4 NULL,
+  	owner_address public."tonaddr" NULL,
 	"content" jsonb NULL,
 	metadata_status int4 NULL,
 	"name" varchar NULL,

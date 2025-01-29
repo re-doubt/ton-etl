@@ -610,6 +610,7 @@ class DB():
                 address=row['address'],
                 update_time_onchain=row['update_time_onchain'],
                 update_time_metadata=row['update_time_metadata'],
+                owner_address=row['owner_address'],
                 content=row['content'],
                 metadata_status=row['metadata_status'],
                 name=row['name'],
@@ -696,7 +697,7 @@ class DB():
     """
     Upsert NFT collection metadata
     """
-    def upsert_nft_collection_metadata(self, metadata: NFTItemMetadata, prev_ts_onchain: int, prev_ts_offchain: int):
+    def upsert_nft_collection_metadata(self, metadata: NFTCollectionMetadata, prev_ts_onchain: int, prev_ts_offchain: int):
         assert self.conn is not None
         with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
             content = metadata.content
@@ -704,13 +705,14 @@ class DB():
                 content = json.dumps(content)
             cursor.execute("""
             insert into parsed.nft_collection_metadata(address, update_time_onchain, update_time_metadata, 
-                           content, metadata_status, name, description,
+                           owner_address, content, metadata_status, name, description,
                            image, image_data, sources, tonapi_image_url)
-                           values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                           values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                            on conflict (address) do update
                            set update_time_onchain = EXCLUDED.update_time_onchain,
                            update_time_metadata = EXCLUDED.update_time_metadata,
                            content = EXCLUDED.content,
+                           owner_address = EXCLUDED.owner_address,
                            metadata_status = EXCLUDED.metadata_status,
                            name = EXCLUDED.name,
                            description = EXCLUDED.description,
@@ -719,8 +721,8 @@ class DB():
                            sources = EXCLUDED.sources,
                            tonapi_image_url = EXCLUDED.tonapi_image_url
                            -- where jetton_metadata.update_time_onchain = %s and jetton_metadata.update_time_metadata = %s
-            """, (metadata.address, metadata.update_time_onchain, metadata.update_time_metadata, content, metadata.metadata_status,
-                  metadata.name, metadata.description, metadata.image, metadata.image_data, metadata.sources,
+            """, (metadata.address, metadata.update_time_onchain, metadata.update_time_metadata, metadata.owner_address, content, 
+                  metadata.metadata_status, metadata.name, metadata.description, metadata.image, metadata.image_data, metadata.sources,
                   metadata.tonapi_image_url, prev_ts_onchain, prev_ts_offchain))
             self.updated += 1
 
