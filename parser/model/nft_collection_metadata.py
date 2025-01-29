@@ -8,6 +8,7 @@ class NFTCollectionMetadata:
 
     address: str
     update_time_onchain: int
+    owner_address: str
     content: str
     metadata_status: int = 0
     name: str = None

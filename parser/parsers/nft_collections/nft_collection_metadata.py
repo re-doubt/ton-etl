@@ -82,6 +82,10 @@ class NFTCollectionMetadataParser(Parser):
 
         if metadata:
             logger.info(f"NFT collection metadata for {address} already exists")
+            if metadata.owner_address != obj.get("owner_address", None):
+                onchain_updated = True
+                logger.info(f"Owner address has been changed for {address}: {metadata.owner_address} -> {obj.get('owner_address', None)}")
+                metadata.owner_address = obj.get("owner_address", None)
             if normalize_json(metadata.content) != normalize_json(obj.get("collection_content", None)):
                 onchain_updated = True
                 logger.info(f"NFT collection content has been changed for {address}: {metadata.content} -> {obj.get('collection_content', None)}")
@@ -91,6 +95,7 @@ class NFTCollectionMetadataParser(Parser):
             metadata = NFTCollectionMetadata(
                 address=address,
                 update_time_onchain=obj.get("last_tx_now", None),
+                owner_address=obj.get("owner_address", None),
                 content=obj.get("collection_content", None),
             )
             created = True
