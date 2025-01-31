@@ -121,61 +121,56 @@ Estimates pool TVL using current core prices
 Updates swap pool inplace
 """
 def estimate_tvl(pool: DexPool, db: DB):
-    tvl_usd, tvl_ton = None, None
+    def normalize_addr(a):
+        if type(a) is Address:
+            return a.to_str(is_user_friendly=False).upper()
+        else:
+            return a
+
+    def estimate_jetton_tvl(jetton, reserves, last_updated, ton_price):
+        tvl_usd, tvl_ton, is_liquid = None, None, True
+        jetton = normalize_addr(jetton)
+
+        if jetton in STABLES or (jetton in ORBIT_STABLES and last_updated < ORBIT_HACK_TIMESTAMP):
+            tvl_usd = reserves / 1e6
+            tvl_ton = tvl_usd / ton_price
+
+        elif jetton in TONS:
+            tvl_ton = reserves / 1e9
+            tvl_usd = tvl_ton * ton_price
+
+        elif jetton in LSDS:
+            lsd_price = db.get_core_price(jetton, last_updated)
+            if not lsd_price:
+                logger.warning(f"No price for {jetton} for {last_updated}")
+                return
+            tvl_ton = reserves / 1e9 * lsd_price
+            tvl_usd = tvl_ton * ton_price
+
+        else:
+            if NON_LIQUID_POOLS_TVL:
+                price = db.get_agg_price(jetton, last_updated)
+                if not price :
+                    logger.warning(f"No price for {jetton} for {last_updated}")
+                    return
+                tvl_ton = reserves * price / 1e9
+                tvl_usd = tvl_ton * ton_price
+            is_liquid = False
+        
+        return tvl_usd, tvl_ton, is_liquid
+    
     ton_price = db.get_core_price(USDT, pool.last_updated)
     if ton_price is None:
         logger.warning(f"No TON price found for {pool.last_updated}")
         return
     ton_price = ton_price * 1e3 # normalize on decimals difference
-    def normalize_addr(a):
-        if type(a) == Address:
-            return a.to_str(is_user_friendly=False).upper()
-        else:
-            return a
-    jetton_left = normalize_addr(pool.jetton_left)
-    jetton_right = normalize_addr(pool.jetton_right)
-    if jetton_left in STABLES or (jetton_left in ORBIT_STABLES and pool.last_updated < ORBIT_HACK_TIMESTAMP):
-        tvl_usd = pool.reserves_left / 1e6 * 2
-        tvl_ton = tvl_usd / ton_price
-    elif jetton_right in STABLES or (jetton_right in ORBIT_STABLES and pool.last_updated < ORBIT_HACK_TIMESTAMP):
-        tvl_usd = pool.reserves_right / 1e6 * 2
-        tvl_ton = tvl_usd / ton_price
 
-    elif jetton_left in TONS:
-        tvl_ton = pool.reserves_left / 1e9 * 2
-        tvl_usd = tvl_ton * ton_price
-    elif jetton_right in TONS:
-        tvl_ton = pool.reserves_right / 1e9 * 2
-        tvl_usd = tvl_ton * ton_price
+    tvl_usd_left, tvl_ton_left, is_liquid_left = estimate_jetton_tvl(pool.jetton_left, pool.reserves_left, pool.last_updated, ton_price)
+    tvl_usd_right, tvl_ton_right, is_liquid_right = estimate_jetton_tvl(pool.jetton_right, pool.reserves_right, pool.last_updated, ton_price)
 
-    elif jetton_left in LSDS:
-        lsd_price = db.get_core_price(jetton_left, pool.last_updated)
-        if not lsd_price:
-            logger.warning(f"No price for {jetton_left} for {pool.last_updated}")
-            return
-        tvl_ton = pool.reserves_left / 1e9 * lsd_price * 2
-        tvl_usd = tvl_ton * ton_price
-    elif jetton_right in LSDS:
-        lsd_price = db.get_core_price(jetton_right, pool.last_updated)
-        if not lsd_price:
-            logger.warning(f"No price for {jetton_right} for {pool.last_updated}")
-            return
-        tvl_ton = pool.reserves_right / 1e9 * lsd_price * 2
-        tvl_usd = tvl_ton * ton_price
-    else:
-        if NON_LIQUID_POOLS_TVL:
-            left_price = db.get_agg_price(jetton_left, pool.last_updated)
-            right_price = db.get_agg_price(jetton_right, pool.last_updated)
-            if not left_price :
-                logger.warning(f"No price for {jetton_left} for {pool.last_updated}")
-                return
-            if not right_price :
-                logger.warning(f"No price for {right_price} for {pool.last_updated}")
-                return
-            tvl_ton = (pool.reserves_left * left_price + pool.reserves_right * right_price) / 1e9
-            tvl_usd = tvl_ton * ton_price
-        pool.is_liquid = False
-    
-    if tvl_ton is not None:
-        pool.tvl_ton = tvl_ton
-        pool.tvl_usd = tvl_usd
+    if tvl_ton_left is not None and tvl_ton_right is not None:
+        pool.tvl_ton = tvl_ton_left + tvl_ton_right
+        pool.tvl_usd = tvl_usd_left + tvl_usd_right
+
+        if not is_liquid_left and not is_liquid_right:
+            pool.is_liquid = False
