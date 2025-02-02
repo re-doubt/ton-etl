@@ -60,8 +60,12 @@ class NFTItemMetadataParser(Parser):
                         raise Exception(f"Response status_code = {response.status_code}")
                     return response.text
             except Exception as e:
-                logger.error(f"Unable to fetch data from {url}: {e}")
-                time.sleep(1)
+                if "NameResolutionError" in str(e):
+                    logger.error(f"NameResolutionError for {url}: {e}")
+                    return None
+                else:
+                    logger.error(f"Unable to fetch data from {url}: {e}")
+                    time.sleep(1)
             retry += 1
         return None
 
