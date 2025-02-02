@@ -43,7 +43,7 @@ class NFTItemMetadataParser(Parser):
         while retry < self.max_attempts:
             try:
                 if parsed_url.scheme == 'ipfs':
-                    response = requests.get(self.ipfs_gateway + parsed_url.netloc + parsed_url.path, timeout=self.timeout, 
+                    response = requests.get(IPFS_GATEWAY + parsed_url.netloc + parsed_url.path, timeout=self.timeout, 
                                             headers={"User-Agent": DATALAKE_USER_AGENT})
                     if response.status_code != 200:
                         raise Exception(f"Response status_code = {response.status_code}")
