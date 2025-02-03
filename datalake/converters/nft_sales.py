@@ -26,7 +26,7 @@ class NFTSalesConverter(Converter):
                 "address": obj['address'],
                 "type": "sale",
                 "nft_address": obj['nft_address'],
-                "nft_owner_address": obj['nft_address'],
+                "nft_owner_address": obj['nft_owner_address'],
                 "created_at": obj['created_at'],
                 "is_complete": obj['is_complete'],
                 "is_canceled": False,
