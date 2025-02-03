@@ -12,6 +12,8 @@ from dataclasses import dataclass
 from model.dexswap import DexSwapParsed
 from model.dexpool import DexPool
 from model.jetton_metadata import JettonMetadata
+from model.nft_item_metadata import NFTItemMetadata
+from model.nft_collection_metadata import NFTCollectionMetadata
 
 @dataclass
 class FakeRecord:
@@ -241,6 +243,29 @@ class DB():
                                   serialize_addr(collection_address),
                                   serialize_addr(owner_address), last_trans_lt,
                                     code_hash, data_hash))
+            self.updated += 1
+
+
+    def insert_nft_item_v2(self, address, index, collection_address, owner_address, last_trans_lt, last_tx_now, init, content):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(f"""
+                insert into parsed.nft_items(address, "index", collection_address, owner_address, 
+                           last_transaction_lt, last_tx_now, init, content)
+                           values (%s, %s, %s, %s, %s, %s, %s, %s)
+                on conflict(address) do update set
+                           init = EXCLUDED.init,
+                           index = EXCLUDED.index,
+                           collection_address = EXCLUDED.collection_address,
+                           owner_address = EXCLUDED.owner_address,
+                           content = EXCLUDED.content,
+                           last_transaction_lt = EXCLUDED.last_transaction_lt,
+                           last_tx_now = EXCLUDED.last_tx_now
+                           WHERE nft_items.last_transaction_lt < EXCLUDED.last_transaction_lt
+                            """, (address.to_str(is_user_friendly=False).upper(), index,
+                                  serialize_addr(collection_address),
+                                  serialize_addr(owner_address), last_trans_lt,
+                                   last_tx_now, init, json.dumps(content)))
             self.updated += 1
 
 
@@ -547,6 +572,56 @@ class DB():
             )
         
     """
+    Returns NFT item metadata
+    """
+    def get_nft_item_metadata(self, address: str) -> NFTItemMetadata:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("select * from parsed.nft_item_metadata where address = %s", (address,))
+            row = cursor.fetchone()
+            if not row:
+                return None
+            return NFTItemMetadata(
+                address=row['address'],
+                update_time_onchain=row['update_time_onchain'],
+                update_time_metadata=row['update_time_metadata'],
+                content=row['content'],
+                metadata_status=row['metadata_status'],
+                name=row['name'],
+                description=row['description'],
+                attributes=row['attributes'],
+                image=row['image'],
+                image_data=row['image_data'],
+                sources=row['sources'],
+                tonapi_image_url=row['tonapi_image_url']
+            )
+        
+    """
+    Returns NFT collection metadata
+    """
+    def get_nft_collection_metadata(self, address: str) -> NFTCollectionMetadata:
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("select * from parsed.nft_collection_metadata where address = %s", (address,))
+            row = cursor.fetchone()
+            if not row:
+                return None
+            return NFTCollectionMetadata(
+                address=row['address'],
+                update_time_onchain=row['update_time_onchain'],
+                update_time_metadata=row['update_time_metadata'],
+                owner_address=row['owner_address'],
+                content=row['content'],
+                metadata_status=row['metadata_status'],
+                name=row['name'],
+                description=row['description'],
+                image=row['image'],
+                image_data=row['image_data'],
+                sources=row['sources'],
+                tonapi_image_url=row['tonapi_image_url']
+            )
+        
+    """
     Upsert jetton metadata
     """
     def upsert_jetton_metadata(self, metadata: JettonMetadata, prev_ts_onchain: int, prev_ts_offchain: int):
@@ -581,6 +656,73 @@ class DB():
             """, (metadata.address, metadata.update_time_onchain, metadata.update_time_metadata, metadata.mintable, metadata.admin_address,
                   jetton_content, metadata.jetton_wallet_code_hash, metadata.code_hash, metadata.metadata_status,
                   metadata.symbol, metadata.name, metadata.description, metadata.image, metadata.image_data, metadata.decimals, metadata.sources,
+                  metadata.tonapi_image_url, prev_ts_onchain, prev_ts_offchain))
+            self.updated += 1
+
+    """
+    Upsert NFT item metadata
+    """
+    def upsert_nft_item_metadata(self, metadata: NFTItemMetadata, prev_ts_onchain: int, prev_ts_offchain: int):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            content = metadata.content
+            if content and type(content) == dict:
+                content = json.dumps(content)
+            attributes = metadata.attributes
+            if attributes and type(attributes) in (dict, list):
+                attributes = json.dumps(attributes)
+            cursor.execute("""
+            insert into parsed.nft_item_metadata(address, update_time_onchain, update_time_metadata, 
+                           content, metadata_status, name, description, attributes,
+                           image, image_data, sources, tonapi_image_url)
+                           values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                           on conflict (address) do update
+                           set update_time_onchain = EXCLUDED.update_time_onchain,
+                           update_time_metadata = EXCLUDED.update_time_metadata,
+                           content = EXCLUDED.content,
+                           metadata_status = EXCLUDED.metadata_status,
+                           name = EXCLUDED.name,
+                           description = EXCLUDED.description,
+                           attributes = EXCLUDED.attributes,
+                           image = EXCLUDED.image,
+                           image_data = EXCLUDED.image_data,
+                           sources = EXCLUDED.sources,
+                           tonapi_image_url = EXCLUDED.tonapi_image_url
+                           -- where jetton_metadata.update_time_onchain = %s and jetton_metadata.update_time_metadata = %s
+            """, (metadata.address, metadata.update_time_onchain, metadata.update_time_metadata, content, metadata.metadata_status,
+                  metadata.name, metadata.description, attributes, metadata.image, metadata.image_data, metadata.sources,
+                  metadata.tonapi_image_url, prev_ts_onchain, prev_ts_offchain))
+            self.updated += 1
+
+    """
+    Upsert NFT collection metadata
+    """
+    def upsert_nft_collection_metadata(self, metadata: NFTCollectionMetadata, prev_ts_onchain: int, prev_ts_offchain: int):
+        assert self.conn is not None
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            content = metadata.content
+            if content and type(content) == dict:
+                content = json.dumps(content)
+            cursor.execute("""
+            insert into parsed.nft_collection_metadata(address, update_time_onchain, update_time_metadata, 
+                           owner_address, content, metadata_status, name, description,
+                           image, image_data, sources, tonapi_image_url)
+                           values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                           on conflict (address) do update
+                           set update_time_onchain = EXCLUDED.update_time_onchain,
+                           update_time_metadata = EXCLUDED.update_time_metadata,
+                           content = EXCLUDED.content,
+                           owner_address = EXCLUDED.owner_address,
+                           metadata_status = EXCLUDED.metadata_status,
+                           name = EXCLUDED.name,
+                           description = EXCLUDED.description,
+                           image = EXCLUDED.image,
+                           image_data = EXCLUDED.image_data,
+                           sources = EXCLUDED.sources,
+                           tonapi_image_url = EXCLUDED.tonapi_image_url
+                           -- where jetton_metadata.update_time_onchain = %s and jetton_metadata.update_time_metadata = %s
+            """, (metadata.address, metadata.update_time_onchain, metadata.update_time_metadata, metadata.owner_address, content, 
+                  metadata.metadata_status, metadata.name, metadata.description, metadata.image, metadata.image_data, metadata.sources,
                   metadata.tonapi_image_url, prev_ts_onchain, prev_ts_offchain))
             self.updated += 1
 

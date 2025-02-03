@@ -113,22 +113,23 @@ services:
       driver: local
       options:
         max-size: 10M
-  # parser_nfts_recover:
-  #   build: ./
-  #   restart: always
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 4
-  #   environment:
-  #     - KAFKA_GROUP_ID=recovery_nfts
-  #     - SUPPORTED_PARSERS=NFTsRecover
-  #     - KAFKA_TOPICS=ton.public.latest_account_states
-  #   env_file:
-  #     - parser.env
-  #   logging:
-  #     driver: local
-  #     options:
-  #       max-size: 10M
+
+  parser_nft_items_parser:
+    build: ./
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      - KAFKA_GROUP_ID=nft_items_parser
+      - SUPPORTED_PARSERS=NFTItemsParser
+      - KAFKA_TOPICS=ton.public.latest_account_states
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
   # parser_jetton_wallets_recover:
   #   build: ./
   #   restart: always
@@ -168,6 +169,40 @@ services:
       - SUPPORTED_PARSERS=JettonWalletBalancesParser
       - KAFKA_TOPICS=ton.public.jetton_wallets
       - COMMIT_BATCH_SIZE=20
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
+  parser_nft_collection_metadata:
+    build: ./
+    restart: always
+    environment:
+      - KAFKA_GROUP_ID=nft_collection_metadata
+      - SUPPORTED_PARSERS=NFTCollectionMetadataParser
+      - KAFKA_TOPICS=ton.public.nft_collections
+      - COMMIT_BATCH_SIZE=1
+      - MIN_MATURITY_SECONDS=30
+      - TONAPI_ONLY_MODE=false
+    env_file:
+      - parser.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
+  parser_nft_item_metadata:
+    build: ./
+    restart: always
+    environment:
+      - KAFKA_GROUP_ID=nft_item_metadata
+      - SUPPORTED_PARSERS=NFTItemMetadataParser
+      - KAFKA_TOPICS=ton.parsed.nft_items
+      - COMMIT_BATCH_SIZE=1
+      - MIN_MATURITY_SECONDS=30
+      - TONAPI_ONLY_MODE=true
     env_file:
       - parser.env
     logging:

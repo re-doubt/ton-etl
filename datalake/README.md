@@ -298,10 +298,78 @@ where asset = 'TON' order by amount desc
 limit 100
 ```
 
+## NFT items
+
+[AVRO schema](./schemas/nft_items.avsc)
+
+Partition field: __timestamp__
+URL: **s3://ton-blockchain-public-datalake/v1/nft_items/**
+
+Contains [TEP-62](https://github.com/ton-blockchain/TEPs/blob/master/text/0062-nft-standard.md) NFT full history of NFT items states. Includes on-chain metadata.
+
+Fields:
+* address - NFT address
+* is_init - true if the NFT is initialized
+* index - NFT index
+* collection_address - NFT collection address (may be null)
+* owner_address - NFT owner address
+* content_onchain - NFT metadata extracted from the on-chain data
+* timestamp - timestamp of the NFT state update
+* lt - logical time of the NFT state update
+
+## NFT transfers
+
+[AVRO schema](./schemas/nft_transfers.avsc)
+
+Partition field: __tx_now__
+URL: **s3://ton-blockchain-public-datalake/v1/nft_transfers/**
+
+Contains history of NFT transfers. Includes the following fields:
+* tx_hash - transaction hash
+* tx_lt - transaction logical time
+* tx_now - transaction block timestamp
+* tx_aborted - transaction aborted flag (aborted=true means that transfer was not successful)
+* query_id - query id
+* nft_item_address - NFT item address
+* nft_item_index - NFT item index
+* nft_collection_address - NFT collection address (may be null)
+* old_owner - old owner address
+* new_owner - new owner address
+* response_destination, custom_payload, forward_amount, forward_payload - see [TEP-62](https://github.com/ton-blockchain/TEPs/blob/master/text/0062-nft-standard.md)
+* comment - text comment from forward_payload
+* trace_id - trace id from the transaction
+
+
+## NFT sales contracts history
+
+[AVRO schema](./schemas/nft_sales.avsc)
+
+Partition field: __timestamp__
+URL: **s3://ton-blockchain-public-datalake/v1/nft_sales/**
+
+Contains history of NFT sales contracts. Includes the following fields:
+* address - NFT sales contract address
+* type - sale/auction. sale means fixed price sale, auction means auction with bids.
+* nft_address - NFT item address
+* nft_owner_address - NFT owner address
+* created_at - timestamp of the NFT sales contract creation
+* is_complete - true if the sale is complete
+* is_canceled - true if the sale is canceled (only for auction)
+* end_time - time of expiration of the sale
+* marketplace_address - address of the marketplace
+* marketplace_fee_address - address of the marketplace fee
+* marketplace_fee - amount of the marketplace fee
+* price - price of the NFT (current bid for auction)
+* asset - asset type, ``TON`` for native TON
+* royalty_address - address of the royalty
+* royalty_amount - amount of the royalty
+* max_bid, min_bid, min_step - max bid, min bid and min bit step for auction
+* last_bit_at, last_member - information about the last bid
+* timestamp, lt - state timestamp and logical time
 
 # Data corrections
 
-This section describes the list of data corrections that were applied to the data. 
+This section describes the list of data corrections that were applied to the data lake and should be removed or fixed. 
 Data corrections are required in case of incorrect data was stored in the data lake and should be removed or fixed.
 In such cases keys of the rows to be excluded are stored in the **excluded_rows** that is stored in **s3://ton-blockchain-public-datalake/v1/excluded_rows** in CSV format with two fields:
 * table - name of the table
@@ -335,6 +403,9 @@ and sent 12 ext-outs. The fix was applied in [#65](https://github.com/re-doubt/t
 # Known issues
 
 * __messages__, __account_states__ and other tables contains wrong values for [anycast addresses](https://docs.ton.org/v3/documentation/data-formats/tlb/msg-tlb#addr_std10) for messages before 02/02/2025 21:30 UTC.
+* [Meridian NFT collection](https://tonviewer.com/EQAVGhk_3rUA3ypZAZ1SkVGZIaDt7UdvwA4jsSGRKRo-MRDN?section=overview) has a lack of onchain metadata for items before 2025-01-23 (out of gas issue for get methods).
+* [DIGGER GAME PASS NFT collection](https://tonviewer.com/EQAQQD4LjKX7vOut9VZDnwDdXZVH4dCJ9s-_cqznLT9dCo1v) is not indexed due to frozen collection address.
+
 
 # Integration with Athena
 

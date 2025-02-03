@@ -1,0 +1,48 @@
+{
+  "namespace": "ton",
+  "type": "record",
+  "name": "nft_items_history",
+  "fields": [
+    {
+      "name": "address",
+      "type": "string"
+    },
+    {
+      "name": "is_init",
+      "type": ["boolean", "null"]
+    },
+    {
+      "name": "index",
+      "type": ["string", "null"]
+    },
+    {
+      "name": "collection_address",
+      "type": ["string", "null"]
+    },
+    {
+      "name": "owner_address",
+      "type": ["string", "null"]
+    },
+    {
+      "name": "content_onchain",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+        {
+      "name": "timestamp",
+      "type": [
+        "int",
+        "null"
+      ]
+    },
+    {
+      "name": "lt",
+      "type": [
+        "long",
+        "null"
+      ]
+    }
+  ]
+}

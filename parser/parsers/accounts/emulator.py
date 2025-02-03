@@ -40,7 +40,10 @@ Any non zero exit codes from the emulator are considered non critical
 and are ignored.
 """
 class EmulatorException(NonCriticalParserError):
-    pass
+
+    def __init__(self, message, result = None):
+        super().__init__(message)
+        self.result = result
     
 """
 Utility base class for all pytvm backed parsers. Handles 
@@ -55,9 +58,10 @@ CREATE TABLE parsed.mc_libraries (
 """
 class EmulatorParser(Parser):
     def __init__(self, emulator_path):
-        self.engine = EmulatorEngineC(emulator_path)
-        self.engine.emulator_set_verbosity_level(0)
-        logger.info(f"Emulator initialized {emulator_path}!")
+        if emulator_path is not None:
+            self.engine = EmulatorEngineC(emulator_path)
+            self.engine.emulator_set_verbosity_level(0)
+            logger.info(f"Emulator initialized {emulator_path}!")
         self.libs = None
 
     def topics(self):
@@ -101,22 +105,21 @@ class EmulatorParser(Parser):
 
     def _prepare_emulator(self, obj):
         assert self.libs is not None, "libs are not inited"
-        data = Cell.one_from_boc(obj.get('data_boc'))
-        code = Cell.one_from_boc(obj.get('code_boc'))
-        emulator = TvmEmulator(code, data, verbosity_level=0, engine=self.engine)
+        emulator = TvmEmulator(obj.get('code_boc').encode("utf-8"), obj.get('data_boc').encode("utf-8"), verbosity_level=0, engine=self.engine)
         emulator.set_c7(address=obj.get('account'),
                         unixtime=int(time.time()),
                         balance=10, 
                         rand_seed_hex="0443c4e42c6ae4c9e62b584098bc73a699c654130260ae0c4a8a24605921c0be", 
                         config=CONFIGCELL.get())
         emulator.set_libraries(self.libs)
+        emulator.set_gas_limit(10000000)
 
         return emulator
     
     def _execute_method(self, emulator, method, stack, db: DB, obj):
         result = emulator.run_get_method(method=method, stack=stack)
         if not result['success']:
-            raise EmulatorException(f"Method {method} execution failed: {result}")
+            raise EmulatorException(f"Method {method} execution failed: {result}", result)
         if result['vm_exit_code'] == 9 and 'missing_library' in result and result['missing_library'] is not None:
             missing_library = result['missing_library']
 
@@ -132,7 +135,8 @@ class EmulatorParser(Parser):
             return self._execute_method(emulator, method, stack, db, obj)
             
         if result['vm_exit_code'] != 0:
-            raise EmulatorException(f"Method {method} execution failed with wrong exit code {result['vm_exit_code']}: {result}")
+            raise EmulatorException(f"Method {method} execution failed with wrong exit code {result['vm_exit_code']}: {result}", result)
+        # logger.info(f"Method {method} execution result: {result}")
         return result['stack']
 
     # Actual implementation

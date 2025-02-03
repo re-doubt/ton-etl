@@ -14,6 +14,8 @@ TOPIC_NFT_TRANSFERS = "ton.public.nft_transfers"
 TOPIC_DEX_SWAPS = "ton.parsed.dex_swap_parsed"
 TOPIC_JETTON_WALLETS = "ton.public.jetton_wallets"
 TOPIC_JETTON_MASTERS = "ton.public.jetton_masters"
+TOPIC_NFT_ITEMS = "ton.parsed.nft_items"
+TOPIC_NFT_COLLECTIONS = "ton.public.nft_collections"
 
 """
 Base class for any kind of errors during parsing that are not critical

@@ -264,5 +264,6 @@ you have to recover all states for the accounts and jetton_wallets and NFT items
 To do it you should use [ton-smc-scanner](https://github.com/toncenter/ton-index-worker/tree/main/ton-smc-scanner) 
 tool from ``ton-index-worker`` to populate all accounts states first. Since this
 tool doesn't update jetton wallets and NFT items you can use special parsers to recover all jettton wallets and NFT items:
-* [NFTsRecover](./parser/parsers/accounts/nfts_recover.py) - recovers NFTs from the latest_accounts_states table
+* [NFTsRecover](./parser/parsers/accounts/nfts_recover.py) - recovers NFTs from the latest_accounts_states table without metadata support (deprecated)
+* [NFTItemsParser](./parser/parsers/accounts/nfts_parser.py) - more sophisticated NFTs parser with full metadata support
 * [JettonWalletsRecover](./parser/parsers/accounts/jetton_wallets_recover.py) - recovers jetton wallets from the latest_accounts_states table

@@ -187,6 +187,60 @@ services:
       options:
         max-size: 10M
 
+  exporter_nft_items:
+    build: ./
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      - KAFKA_GROUP_ID=exporter_nft_items
+      - KAFKA_TOPICS=ton.parsed.nft_items
+      - CONVERTER=nft_items
+      - PARTITION_MODE=adding_date
+    env_file:
+      - exporter.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
+  exporter_nft_transfers:
+    build: ./
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      - KAFKA_GROUP_ID=exporter_nft_transfers
+      - KAFKA_TOPICS=ton.public.nft_transfers
+      - CONVERTER=nft_transfers
+      - PARTITION_MODE=adding_date
+    env_file:
+      - exporter.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
+  exporter_nft_sales:
+    build: ./
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      - KAFKA_GROUP_ID=exporter_nft_sales
+      - KAFKA_TOPICS=ton.public.getgems_nft_sales,ton.public.getgems_nft_auctions
+      - CONVERTER=nft_sales
+      - PARTITION_MODE=adding_date
+    env_file:
+      - exporter.env
+    logging:
+      driver: local
+      options:
+        max-size: 10M
+
   streaming:
     build:
       context: ./

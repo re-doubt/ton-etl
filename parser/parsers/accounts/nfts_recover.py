@@ -61,7 +61,7 @@ class NFTsRecover(EmulatorParser):
                 logger.warning(f"NFT address mismatch: {original_address} != {nft_address}")
                 return
 
-        logger.info(f"New NFT discovered: {nft_address}")
+        logger.info(f"New NFT discovered: {nft_address}: {index} {collection_address} {owner_address} {obj['last_trans_lt']}")
         # Ignore contnet at this method, because it requires one more get method invocation
-        db.insert_nft_item(nft_address, index, collection_address, owner_address, obj['last_trans_lt'],
-                           obj['code_hash'], obj['data_hash'])
+        # db.insert_nft_item(nft_address, index, collection_address, owner_address, obj['last_trans_lt'],
+        #                    obj['code_hash'], obj['data_hash'])
