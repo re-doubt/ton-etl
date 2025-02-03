@@ -133,9 +133,16 @@ def estimate_tvl(pool: DexPool, db: DB):
         tvl_usd, tvl_ton, is_liquid = None, None, True
         jetton = normalize_addr(jetton)
 
-        if jetton in STABLES or (jetton in ORBIT_STABLES and last_updated < ORBIT_HACK_TIMESTAMP):
+        if jetton in STABLES:
             tvl_usd = reserves / 1e6
             tvl_ton = tvl_usd / ton_price
+
+        elif jetton in ORBIT_STABLES:
+            if last_updated < ORBIT_HACK_TIMESTAMP:
+                tvl_usd = reserves / 1e6
+                tvl_ton = tvl_usd / ton_price
+            else:
+                is_liquid = False
 
         elif jetton in TONS:
             tvl_ton = reserves / 1e9
@@ -150,12 +157,13 @@ def estimate_tvl(pool: DexPool, db: DB):
                 logger.warning(f"No price for {jetton} for {last_updated}")
 
         else:
-            price = db.get_agg_price(jetton, last_updated)
-            if price :
-                tvl_ton = reserves * price / 1e9
-                tvl_usd = tvl_ton * ton_price
-            else:
-                logger.warning(f"No price for {jetton} for {last_updated}")
+            if NON_LIQUID_POOLS_TVL:
+                price = db.get_agg_price(jetton, last_updated)
+                if price :
+                    tvl_ton = reserves * price / 1e9
+                    tvl_usd = tvl_ton * ton_price
+                else:
+                    logger.warning(f"No price for {jetton} for {last_updated}")
             is_liquid = False
 
         return tvl_usd, tvl_ton, is_liquid
@@ -169,22 +177,21 @@ def estimate_tvl(pool: DexPool, db: DB):
     tvl_usd_left, tvl_ton_left, is_liquid_left = estimate_jetton_tvl(pool.jetton_left, pool.reserves_left, pool.last_updated, ton_price)
     tvl_usd_right, tvl_ton_right, is_liquid_right = estimate_jetton_tvl(pool.jetton_right, pool.reserves_right, pool.last_updated, ton_price)
 
-    if tvl_ton_left is not None and tvl_ton_right is not None:
-        if is_liquid_left and is_liquid_right:
-            pool.tvl_ton = tvl_ton_left + tvl_ton_right
-            pool.tvl_usd = tvl_usd_left + tvl_usd_right
+    if is_liquid_left and is_liquid_right and tvl_ton_left is not None and tvl_ton_right is not None:
+        pool.tvl_ton = tvl_ton_left + tvl_ton_right
+        pool.tvl_usd = tvl_usd_left + tvl_usd_right
 
-        elif is_liquid_left and not is_liquid_right:
-            pool.tvl_ton = tvl_ton_left * 2
-            pool.tvl_usd = tvl_usd_left * 2
+    elif is_liquid_left and not is_liquid_right and tvl_ton_left is not None:
+        pool.tvl_ton = tvl_ton_left * 2
+        pool.tvl_usd = tvl_usd_left * 2
 
-        elif is_liquid_right and not is_liquid_left:
-            pool.tvl_ton = tvl_ton_right * 2
-            pool.tvl_usd = tvl_usd_right * 2
+    elif is_liquid_right and not is_liquid_left and tvl_ton_right is not None:
+        pool.tvl_ton = tvl_ton_right * 2
+        pool.tvl_usd = tvl_usd_right * 2
 
-        elif not is_liquid_left and not is_liquid_right and NON_LIQUID_POOLS_TVL:
-            pool.tvl_ton = tvl_ton_left + tvl_ton_right
-            pool.tvl_usd = tvl_usd_left + tvl_usd_right
-
-    if not is_liquid_left and not is_liquid_right:
+    elif not is_liquid_left and not is_liquid_right:
         pool.is_liquid = False
+
+        if tvl_ton_left is not None and tvl_ton_right is not None:
+            pool.tvl_ton = tvl_ton_left + tvl_ton_right
+            pool.tvl_usd = tvl_usd_left + tvl_usd_right
