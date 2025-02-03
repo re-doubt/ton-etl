@@ -403,9 +403,6 @@ and sent 12 ext-outs. The fix was applied in [#65](https://github.com/re-doubt/t
 # Known issues
 
 * __messages__, __account_states__ and other tables contains wrong values for [anycast addresses](https://docs.ton.org/v3/documentation/data-formats/tlb/msg-tlb#addr_std10) for messages before 02/02/2025 21:30 UTC.
-
-# Known issues
-
 * [Meridian NFT collection](https://tonviewer.com/EQAVGhk_3rUA3ypZAZ1SkVGZIaDt7UdvwA4jsSGRKRo-MRDN?section=overview) has a lack of onchain metadata for items before 2025-01-23 (out of gas issue for get methods).
 * [DIGGER GAME PASS NFT collection](https://tonviewer.com/EQAQQD4LjKX7vOut9VZDnwDdXZVH4dCJ9s-_cqznLT9dCo1v) is not indexed due to frozen collection address.
 
