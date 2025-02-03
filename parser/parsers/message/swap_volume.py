@@ -23,8 +23,10 @@ stTON = Parser.uf2raw('EQDNhy-nxYFgUqzfUzImBEP67JqsyMIcyk2S5_RwNNEYku0k')
 tsTON = Parser.uf2raw('EQC98_qAmNEptUtPc7W6xdHh_ZHrBUFpw5Ft_IzNU20QAJav')
 oUSDT = Parser.uf2raw('EQC_1YoM8RBixN95lz7odcF3Vrkc_N8Ne7gQi7Abtlet_Efi')
 oUSDC = Parser.uf2raw('EQC61IQRl0_la95t27xhIpjxZt32vl1QQVF2UgTNuvD18W-4')
+AquaUSD = Parser.uf2raw('EQAWDyxARSl3ol2G1RMLMwepr3v6Ter5ls3jiAlheKshgg0K')
 
-STABLES = [USDT, jUSDT, jUSDC]
+
+STABLES = [USDT, jUSDT, jUSDC, AquaUSD]
 TONS = [pTON, TON, pTONv2, WTON_Megaton, WTON_Stonfi, wTTon_TONCO]
 LSDS = [stTON, tsTON]
 ORBIT_STABLES = [oUSDT, oUSDC]
@@ -168,7 +170,19 @@ def estimate_tvl(pool: DexPool, db: DB):
     tvl_usd_right, tvl_ton_right, is_liquid_right = estimate_jetton_tvl(pool.jetton_right, pool.reserves_right, pool.last_updated, ton_price)
 
     if tvl_ton_left is not None and tvl_ton_right is not None:
-        if is_liquid_left or is_liquid_right or NON_LIQUID_POOLS_TVL:
+        if is_liquid_left and is_liquid_right:
+            pool.tvl_ton = tvl_ton_left + tvl_ton_right
+            pool.tvl_usd = tvl_usd_left + tvl_usd_right
+
+        elif is_liquid_left and not is_liquid_right:
+            pool.tvl_ton = tvl_ton_left * 2
+            pool.tvl_usd = tvl_usd_left * 2
+
+        elif is_liquid_right and not is_liquid_left:
+            pool.tvl_ton = tvl_ton_right * 2
+            pool.tvl_usd = tvl_usd_right * 2
+
+        elif not is_liquid_left and not is_liquid_right and NON_LIQUID_POOLS_TVL:
             pool.tvl_ton = tvl_ton_left + tvl_ton_right
             pool.tvl_usd = tvl_usd_left + tvl_usd_right
 

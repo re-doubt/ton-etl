@@ -13,6 +13,7 @@ oUSDT = Address("EQC_1YoM8RBixN95lz7odcF3Vrkc_N8Ne7gQi7Abtlet_Efi")
 tsTON = Address("EQC98_qAmNEptUtPc7W6xdHh_ZHrBUFpw5Ft_IzNU20QAJav")
 NOT = Address("EQAvlWFDxGF2lXm67y4yzC17wYKD9A0guwPkMs1gOsM__NOT")
 STORM = Address("EQBsosmcZrD6FHijA7qWGLw5wo_aH8UN435hi935jJ_STORM")
+AquaUSD = Address("EQAWDyxARSl3ol2G1RMLMwepr3v6Ter5ls3jiAlheKshgg0K")
 
 
 @pytest.mark.parametrize(
@@ -39,7 +40,9 @@ STORM = Address("EQBsosmcZrD6FHijA7qWGLw5wo_aH8UN435hi935jJ_STORM")
         # LSDS-STABLES pool, no price for LSD
         (tsTON, USDT, 2e15, 1e13, 1738000000, 0.005, None, 0.001, 0.005, "0", None, None, True),
         # TONS-JETTONS pool, usual case
-        (TON, NOT, 1e12, 1e15, 1738000000, 0.005, 1.05, 0.001, 0.005, "0", 1e4, 2e3, True),
+        (TON, NOT, 1e12, 1.999e15, 1738000000, 0.005, 1.05, 0.001, 0.005, "0", 1e4, 2e3, True),
+        # JETTONS-TONS pool, usual case
+        (NOT, TON, 1.999e15, 1e12, 1738000000, 0.005, 1.05, 0.001, 0.005, "0", 1e4, 2e3, True),
         # TONS-JETTONS pool, no price for jetton
         (TON, NOT, 1e12, 1e15, 1738000000, 0.005, 1.05, None, 0.005, "0", None, None, True),
         # TONS-JETTONS pool, usual case, NON_LIQUID_POOLS_TVL is set to '1'
@@ -52,6 +55,8 @@ STORM = Address("EQBsosmcZrD6FHijA7qWGLw5wo_aH8UN435hi935jJ_STORM")
         (NOT, STORM, 5e15, 1e15, 1738000000, 0.005, 1.05, 0.001, None, "1", None, None, False),
         # JETTONS-JETTONS pool, no price for both jettons, NON_LIQUID_POOLS_TVL is set to '1'
         (NOT, STORM, 5e15, 1e15, 1738000000, 0.005, 1.05, None, None, "1", None, None, False),
+        # USDT-AquaUSD stable pool, usual case
+        (USDT, AquaUSD, 2e11, 4e11, 1738000000, 0.005, 1.05, 0.001, 0.005, "0", 6e5, 1.2e5, True),
     ],
 )
 def test_estimate_tvl(
