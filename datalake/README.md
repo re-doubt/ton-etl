@@ -332,6 +332,9 @@ it was possible to create a smart contract that would send ext-out messages with
 resulting in incorrect trades data parsing. Some users utilised this bug and created three smart contracts
 and sent 12 ext-outs. The fix was applied in [#65](https://github.com/re-doubt/ton-etl/pull/65) to mitigate the issue.
 
+# Known issues
+
+* __messages__, __account_states__ and other tables contains wrong values for [anycast addresses](https://docs.ton.org/v3/documentation/data-formats/tlb/msg-tlb#addr_std10) for messages before 02/02/2025 21:30 UTC.
 
 # Integration with Athena
 
