@@ -141,27 +141,26 @@ def estimate_tvl(pool: DexPool, db: DB):
 
         elif jetton in LSDS:
             lsd_price = db.get_core_price(jetton, last_updated)
-            if not lsd_price:
+            if lsd_price:
+                tvl_ton = reserves * lsd_price / 1e9
+                tvl_usd = tvl_ton * ton_price
+            else:
                 logger.warning(f"No price for {jetton} for {last_updated}")
-                return
-            tvl_ton = reserves / 1e9 * lsd_price
-            tvl_usd = tvl_ton * ton_price
 
         else:
-            if NON_LIQUID_POOLS_TVL:
-                price = db.get_agg_price(jetton, last_updated)
-                if not price :
-                    logger.warning(f"No price for {jetton} for {last_updated}")
-                    return
+            price = db.get_agg_price(jetton, last_updated)
+            if price :
                 tvl_ton = reserves * price / 1e9
                 tvl_usd = tvl_ton * ton_price
+            else:
+                logger.warning(f"No price for {jetton} for {last_updated}")
             is_liquid = False
-        
+
         return tvl_usd, tvl_ton, is_liquid
     
     ton_price = db.get_core_price(USDT, pool.last_updated)
-    if ton_price is None:
-        logger.warning(f"No TON price found for {pool.last_updated}")
+    if not ton_price:
+        logger.warning(f"No TON price found or TON price = 0 for {pool.last_updated}")
         return
     ton_price = ton_price * 1e3 # normalize on decimals difference
 
@@ -169,8 +168,9 @@ def estimate_tvl(pool: DexPool, db: DB):
     tvl_usd_right, tvl_ton_right, is_liquid_right = estimate_jetton_tvl(pool.jetton_right, pool.reserves_right, pool.last_updated, ton_price)
 
     if tvl_ton_left is not None and tvl_ton_right is not None:
-        pool.tvl_ton = tvl_ton_left + tvl_ton_right
-        pool.tvl_usd = tvl_usd_left + tvl_usd_right
+        if is_liquid_left or is_liquid_right or NON_LIQUID_POOLS_TVL:
+            pool.tvl_ton = tvl_ton_left + tvl_ton_right
+            pool.tvl_usd = tvl_usd_left + tvl_usd_right
 
-        if not is_liquid_left and not is_liquid_right:
-            pool.is_liquid = False
+    if not is_liquid_left and not is_liquid_right:
+        pool.is_liquid = False
