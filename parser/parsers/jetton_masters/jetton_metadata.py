@@ -73,10 +73,13 @@ class JettonMastersMetadataParser(Parser):
         onchain_updated = False
         offchain_updated = False
         def normalize_json(s):
-            if s and type(s) == str:
-                return json.dumps(json.loads(s))
-            if s and type(s) == dict:
-                return json.dumps(s)
+            try:
+                if s and type(s) == str:
+                    return json.dumps(json.loads(s))
+                if s and type(s) == dict:
+                    return json.dumps(s)
+            except json.JSONDecodeError:
+                pass
             return None
 
         if metadata:
