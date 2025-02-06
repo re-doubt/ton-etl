@@ -122,12 +122,15 @@ class JettonMastersMetadataParser(Parser):
             or metadata.metadata_status == OFFCHAIN_UPDATE_STATUS_ERROR
             or not metadata.tonapi_image_url
         ):
-            jetton_content = obj.get('jetton_content', None)
-            if not jetton_content:
+            try:
+                jetton_content = json.loads(obj.get('jetton_content', None))
+            except json.JSONDecodeError:
+                jetton_content = None
+
+            if not jetton_content or type(jetton_content) is not dict:
                 logger.warning(f"Jetton content is not set for {address}")
                 metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_NO
             else:
-                jetton_content = json.loads(jetton_content)
                 # track sources of metadata
                 sources = []
                 def append_onchain_metadata(key):

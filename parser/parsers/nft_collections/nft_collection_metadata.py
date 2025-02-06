@@ -108,12 +108,15 @@ class NFTCollectionMetadataParser(Parser):
             or metadata.metadata_status == OFFCHAIN_UPDATE_STATUS_ERROR
             or not metadata.tonapi_image_url
         ):
-            content = obj.get('collection_content', None)
-            if not content or type(json.loads(content)) is not dict:
+            try:
+                content = json.loads(obj.get('collection_content', None))
+            except json.JSONDecodeError:
+                content = None
+
+            if not content or type(content) is not dict:
                 logger.warning(f"NFT collection content is not set for {address}")
                 metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_NO
             else:
-                content = json.loads(content)
                 # track sources of metadata
                 sources = []
                 def append_onchain_metadata(key):
