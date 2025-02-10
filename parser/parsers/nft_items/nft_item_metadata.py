@@ -78,10 +78,13 @@ class NFTItemMetadataParser(Parser):
         onchain_updated = False
         offchain_updated = False
         def normalize_json(s):
-            if s and type(s) == str:
-                return json.dumps(json.loads(s))
-            if s and type(s) == dict:
-                return json.dumps(s)
+            try:
+                if s and type(s) == str:
+                    return json.dumps(json.loads(s))
+                if s and type(s) == dict:
+                    return json.dumps(s)
+            except json.JSONDecodeError:
+                pass
             return None
 
         if metadata:
@@ -107,12 +110,15 @@ class NFTItemMetadataParser(Parser):
             or metadata.metadata_status == OFFCHAIN_UPDATE_STATUS_ERROR
             or not metadata.tonapi_image_url
         ):
-            content = obj.get('content', None)
-            if not content or type(json.loads(content)) is not dict:
+            try:
+                content = json.loads(obj.get('content', None))
+            except json.JSONDecodeError:
+                content = None
+
+            if not content or type(content) is not dict:
                 logger.warning(f"NFT item content is not set for {address}")
                 metadata.metadata_status = OFFCHAIN_UPDATE_STATUS_NO
             else:
-                content = json.loads(content)
                 if "attributes" in content and type(content["attributes"]) is str:
                     try:
                         content["attributes"] = json.loads(content["attributes"].replace("'", '"'))
